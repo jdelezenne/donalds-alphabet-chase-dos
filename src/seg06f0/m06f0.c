@@ -1,6 +1,8 @@
 /* Module at segment 06F0 (compiled without -O). Functions in address order. */
 #include "donald.h"
 
+long fn_06F0_0CF4();
+
 struct name_entry { char far *name; char pad[4]; char far *data; int value; char pad2[4]; };
 extern struct name_entry g_1772[];
 char far *fn_08E1_0003();
@@ -31,8 +33,33 @@ void close_slot(register int i)
     g_3B58[i] = 0x7fff;
 }
 
-/* FUNCTION: DONALD 06F0:0373 */
+/* FUNCTION: DONALD 06F0:028D */
 long read_file(register int slot, char far *buf, long len)
+{
+    register unsigned n;
+    long total;
+
+    if (g_3B58[slot] == 0x7fff)
+        fatal(g_1F06);
+    if (g_3B58[slot] & 0x8000)
+        return fn_06F0_0CF4(g_3B58[slot] & 0x7fff, buf, len);
+    total = 0;
+    while (len > 0xFA00L) {
+        n = read(g_3B58[slot], buf, 0xFA00);
+        len -= 0xFA00;
+        if (n == -1)
+            return 0L;
+        else
+            total += n;
+    }
+    n = read(g_3B58[slot], buf, len);
+    if (n == -1)
+        return 0L;
+    return n + total;
+}
+
+/* FUNCTION: DONALD 06F0:0373 */
+long write_file(register int slot, char far *buf, long len)
 {
     register unsigned n;
     long total;

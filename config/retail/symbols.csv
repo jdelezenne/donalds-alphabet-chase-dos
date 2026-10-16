@@ -34,6 +34,7 @@ play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
 stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
 key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
 get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
+blit_ega,05C5:0008,234,matched,100.0% src/seg05c5/m05c5.c
 repeat_call,05D4:0002,27,matched,100.0% src/seg05d4/repeat.c
 fill_rect,05E7:000A,93,matched,100.0% src/seg05e7/m05e7.c
 hline,05ED:0007,159,matched,100.0% src/seg05ed/m05ed.c
@@ -43,6 +44,7 @@ draw_pic,0604:0001,126,matched,100.0% src/seg0604/m0604.c
 set_palette,060B:000F,106,matched,100.0% src/seg060b/m060b.c
 xalloc,0612:0009,124,matched,100.0% src/seg0612/m0612.c
 load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
+calibrate,061F:0007,222,matched,100.0% src/seg061f/m061f.c
 music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
 redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
 harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
@@ -55,7 +57,8 @@ set_and_redraw,06EF:000B,19,matched,100.0% src/seg06ef/m06ef.c
 fatal,06F0:000E,34,matched,100.0% src/seg06f0/m06f0.c
 quit,06F0:0030,19,matched,100.0% src/seg06f0/m06f0.c
 close_slot,06F0:0245,72,matched,100.0% src/seg06f0/m06f0.c
-read_file,06F0:0373,207,matched,100.0% src/seg06f0/m06f0.c
+read_file,06F0:028D,230,matched,100.0% src/seg06f0/m06f0.c
+write_file,06F0:0373,207,matched,100.0% src/seg06f0/m06f0.c
 file_exists,06F0:0620,48,matched,100.0% src/seg06f0/m06f0.c
 delete_ok,06F0:0650,25,matched,100.0% src/seg06f0/m06f0.c
 create_file,06F0:0669,52,matched,100.0% src/seg06f0/m06f0.c
