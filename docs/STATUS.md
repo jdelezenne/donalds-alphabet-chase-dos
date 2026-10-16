@@ -150,7 +150,7 @@ Assembly modules (NASM, byte-exact; checked by verify.py):
 | calibrate | 061F:0007 | 222 | matched | 100.0% src/seg061f/m061f.c |
 | grab | 062D:0005 | 417 | matched | 100.0% src/seg062d/m062d.c |
 | grab_vga | 062D:01A6 | 326 | matched | 100.0% src/seg062d/m062d.c |
-| music_toggle | 065B:000C | 44 | matched | 100.0% src/seg065b/music.c |
+| select_drive | 065B:000C | 44 | matched | 100.0% src/seg065b/music.c |
 | set_window | 065E:0008 | 272 | matched | 100.0% src/seg065e/m065e.c |
 | redraw_rect | 066F:0008 | 37 | matched | 100.0% src/seg066f/redraw.c |
 | print_wrapped | 0671:000D | 949 | matched | 100.0% src/seg0671/m0671.c |
@@ -166,22 +166,22 @@ Assembly modules (NASM, byte-exact; checked by verify.py):
 | set_and_redraw | 06EF:000B | 19 | matched | 100.0% src/seg06ef/m06ef.c |
 | fatal | 06F0:000E | 34 | matched | 100.0% src/seg06f0/m06f0.c |
 | quit | 06F0:0030 | 19 | matched | 100.0% src/seg06f0/m06f0.c |
-| open_slot | 06F0:0043 | 514 | matched | 100.0% src/seg06f0/m06f0.c |
-| close_slot | 06F0:0245 | 72 | matched | 100.0% src/seg06f0/m06f0.c |
-| read_file | 06F0:028D | 230 | matched | 100.0% src/seg06f0/m06f0.c |
-| write_file | 06F0:0373 | 207 | matched | 100.0% src/seg06f0/m06f0.c |
-| seek_slot | 06F0:0442 | 478 | matched | 100.0% src/seg06f0/m06f0.c |
-| file_exists | 06F0:0620 | 48 | matched | 100.0% src/seg06f0/m06f0.c |
-| delete_ok | 06F0:0650 | 25 | matched | 100.0% src/seg06f0/m06f0.c |
-| create_file | 06F0:0669 | 52 | matched | 100.0% src/seg06f0/m06f0.c |
-| lookup_value | 06F0:069D | 130 | matched | 100.0% src/seg06f0/m06f0.c |
+| Open_File | 06F0:0043 | 514 | matched | 100.0% src/seg06f0/m06f0.c |
+| Close_File | 06F0:0245 | 72 | matched | 100.0% src/seg06f0/m06f0.c |
+| Read_File | 06F0:028D | 230 | matched | 100.0% src/seg06f0/m06f0.c |
+| Write_File | 06F0:0373 | 207 | matched | 100.0% src/seg06f0/m06f0.c |
+| Seek_File | 06F0:0442 | 478 | matched | 100.0% src/seg06f0/m06f0.c |
+| File_Exists | 06F0:0620 | 48 | matched | 100.0% src/seg06f0/m06f0.c |
+| Delete_File | 06F0:0650 | 25 | matched | 100.0% src/seg06f0/m06f0.c |
+| Create_File | 06F0:0669 | 52 | matched | 100.0% src/seg06f0/m06f0.c |
+| Find_Disk_Number | 06F0:069D | 130 | matched | 100.0% src/seg06f0/m06f0.c |
 | show_error | 06F0:071F | 605 | matched | 100.0% src/seg06f0/m06f0.c |
 | error_msg | 06F0:097C | 17 | matched | 100.0% src/seg06f0/m06f0.c |
-| free_all | 06F0:098D | 150 | matched | 100.0% src/seg06f0/m06f0.c |
+| free_resident | 06F0:098D | 150 | matched | 100.0% src/seg06f0/m06f0.c |
 | load_resources | 06F0:0A23 | 473 | matched | 100.0% src/seg06f0/m06f0.c |
 | is_loaded | 06F0:0BFC | 135 | matched | 100.0% src/seg06f0/m06f0.c |
-| find_name | 06F0:0C83 | 113 | matched | 100.0% src/seg06f0/m06f0.c |
-| mem_read | 06F0:0CF4 | 261 | matched | 100.0% src/seg06f0/m06f0.c |
+| Get_Resident_Index | 06F0:0C83 | 113 | matched | 100.0% src/seg06f0/m06f0.c |
+| Read_Resident | 06F0:0CF4 | 261 | matched | 100.0% src/seg06f0/m06f0.c |
 | inset_rect | 06F0:0DF9 | 34 | matched | 100.0% src/seg06f0/m06f0.c |
 | IOERROR | 06F0:0E1B | 59 | lib | CL.LIB:IOERROR |
 | exit_local | 07D5:0006 | 1 | lib | CL.LIB:EXIT |

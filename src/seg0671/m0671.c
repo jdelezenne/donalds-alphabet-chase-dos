@@ -18,7 +18,7 @@ void print_wrapped(char far *s)
     flag = wlen;
     idx = wlen = wlen;
     line[0] = 0;
-    col = g_textCol;
+    col = g_win.col;
     while ((ch = s[idx++]) != 0 && !flag) {
         if (ch & 0x80) {
             ch &= 0x7f;
@@ -26,7 +26,7 @@ void print_wrapped(char far *s)
         }
         if (ch == '\r') {
             word[wlen] = 0;
-            if (wlen + col <= win_w) {
+            if (wlen + col <= g_win.w) {
                 strcat(line, word);
                 print_word(line, 1);
             } else {
@@ -36,7 +36,7 @@ void print_wrapped(char far *s)
             col = wlen = 0;
         } else if (ch == 2) {
             word[wlen] = 0;
-            if (wlen + col <= win_w) {
+            if (wlen + col <= g_win.w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -44,12 +44,12 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            col = g_textCol;
-            g_textBg = s[idx];
+            col = g_win.col;
+            g_win.bg = s[idx];
             idx++;
         } else if (ch == 6) {
             word[wlen] = 0;
-            if (wlen + col <= win_w) {
+            if (wlen + col <= g_win.w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -57,12 +57,12 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            col = g_textCol;
-            g_textFg = s[idx];
+            col = g_win.col;
+            g_win.fg = s[idx];
             idx++;
         } else if (ch == 9) {
             word[wlen] = 0;
-            if (wlen + col <= win_w) {
+            if (wlen + col <= g_win.w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -70,17 +70,17 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            g_textCol = col = s[idx];
+            g_win.col = col = s[idx];
             idx++;
-            if (g_textCol >= win_w) {
+            if (g_win.col >= g_win.w) {
                 col = 0;
-                g_textCol = col;
+                g_win.col = col;
             }
         } else if (ch == 0x13) {
             cnt = s[idx];
             idx++;
-            if (g_textCol < cnt) {
-                while (g_textCol < cnt) {
+            if (g_win.col < cnt) {
+                while (g_win.col < cnt) {
                     word[wlen] = ' ';
                     wlen++;
                     cnt--;
@@ -91,8 +91,8 @@ void print_wrapped(char far *s)
                 wlen = 0;
             }
         } else if (ch == ' ') {
-            if (wlen + col <= win_w) {
-                if (wlen + col != win_w && wlen + col != 0) {
+            if (wlen + col <= g_win.w) {
+                if (wlen + col != g_win.w && wlen + col != 0) {
                     word[wlen] = ' ';
                     wlen++;
                 }
@@ -110,7 +110,7 @@ void print_wrapped(char far *s)
             }
             col += wlen;
             wlen = 0;
-        } else if (win_w - 1 <= wlen) {
+        } else if (g_win.w - 1 <= wlen) {
             if (line[0])
                 print_word(line, 1);
             word[wlen] = ch;
@@ -126,7 +126,7 @@ void print_wrapped(char far *s)
     }
     if (wlen || line[0]) {
         word[wlen] = 0;
-        if (wlen + col <= win_w) {
+        if (wlen + col <= g_win.w) {
             strcat(line, word);
             print_word(line, 0);
         } else {

@@ -7,36 +7,36 @@ void print_word(char far *s, int nl)
     register int i;
     register int n;
 
-    if (g_textRow >= win_h) {
+    if (g_win.row >= g_win.h) {
         n = i = strlen(s);
-        for (; i < win_w; i++)
+        for (; i < g_win.w; i++)
             s[i] = ' ';
-        s[win_w] = 0;
-        blit_ega(win_x, win_y + 1, win_x, win_y, win_w, win_h - 1, g_videoMem, g_videoMem);
-        fill_rect(win_x << 3, (win_y + win_h - 1) << 3, (win_x + win_w - 1) << 3,
-                  ((win_y + win_h) << 3) - 1, 0);
-        print_text(s, win_x, win_y + win_h - 1, g_textFg, g_textBg);
+        s[g_win.w] = 0;
+        blit_ega(g_win.x, g_win.y + 1, g_win.x, g_win.y, g_win.w, g_win.h - 1, g_videoMem, g_videoMem);
+        fill_rect(g_win.x << 3, (g_win.y + g_win.h - 1) << 3, (g_win.x + g_win.w - 1) << 3,
+                  ((g_win.y + g_win.h) << 3) - 1, 0);
+        print_text(s, g_win.x, g_win.y + g_win.h - 1, g_win.fg, g_win.bg);
         if (nl) {
-            g_textCol = 0;
-            g_textRow++;
+            g_win.col = 0;
+            g_win.row++;
         } else {
-            g_textCol += n;
-            g_textRow = win_h - 1;
-            if (g_textCol >= win_w) {
-                g_textCol = 0;
-                g_textRow++;
+            g_win.col += n;
+            g_win.row = g_win.h - 1;
+            if (g_win.col >= g_win.w) {
+                g_win.col = 0;
+                g_win.row++;
             }
         }
     } else {
-        print_text(s, g_textCol + win_x, g_textRow + win_y, g_textFg, g_textBg);
+        print_text(s, g_win.col + g_win.x, g_win.row + g_win.y, g_win.fg, g_win.bg);
         if (nl) {
-            g_textCol = 0;
-            g_textRow++;
+            g_win.col = 0;
+            g_win.row++;
         } else {
-            g_textCol += strlen(s);
-            if (g_textCol >= win_w) {
-                g_textCol = 0;
-                g_textRow++;
+            g_win.col += strlen(s);
+            if (g_win.col >= g_win.w) {
+                g_win.col = 0;
+                g_win.row++;
             }
         }
     }

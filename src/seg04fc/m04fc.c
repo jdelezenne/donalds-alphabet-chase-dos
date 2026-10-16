@@ -1,9 +1,5 @@
 #include "donald.h"
 
-void far about();
-char far *xalloc();
-void init_game(void);
-void shutdown(void);
 
 /* Module data: DGROUP 1AAA-1ADF (text windows for set_window; BIOS video mode per g_videoMode). */
 struct window g_windows[] = {{0, 0, 40, 25, 15, 0, 0, 0}, {0, 8, 30, 10, 15, 0, 0, 0}, {5, 10, 30, 4, 15, 0, 0, 0}};
@@ -20,7 +16,7 @@ main(int argc, char far **argv)
         snd_set_option(60);
     g_errWindow = 1;
     g_errShowHook = about;
-    g_errHooked = 1;
+    g_preload = 1;
     kbd_install();
     detect_video();
 #else
@@ -34,21 +30,21 @@ main(int argc, char far **argv)
     }
     g_errWindow = 1;
     g_errShowHook = about;
-    g_errHooked = 1;
+    g_preload = 1;
     kbd_install();
     if (g_videoMode == -1)
         detect_video();
 #endif
     set_bios_mode(g_biosVideoMode[g_videoMode]);
     g_videoMem = (char far *)0xB8000000L;
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         g_videoMem = (char far *)0xA0000000L;
     g_memReserve = 0x39;
-    if (g_videoMode == 1)
+    if (g_videoMode == VM_TANDY)
         g_memReserve += 0x10;
     init_game();
     game();
-    free_all();
+    free_resident();
     shutdown();
 }
 
@@ -57,7 +53,7 @@ void init_game(void)
 {
     snd_init();
     g_initDone = 1;
-    g_noDiskCheck = 0;
+    g_fixedDrive = 0;
     install_harderr();
     gfx_init();
     calibrate();

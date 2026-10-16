@@ -7,15 +7,15 @@ void set_palette(char far *pal)
     register int v;
 
     wait_vretrace(g_retraceWait);
-    if (g_videoMode == 1)
+    if (g_videoMode == VM_TANDY)
         set_palette_regs(pal);
-    else if (g_videoMode == 2) {
+    else if (g_videoMode == VM_EGA) {
         for (i = 0; i < 16; i++) {
             v = pal[i];
             if (v > 7)
                 v += 8;
             set_palette_reg(i, v);
         }
-    } else if (g_videoMode == 3)
+    } else if (g_videoMode == VM_MODE3)
         set_dac_regs(pal);
 }

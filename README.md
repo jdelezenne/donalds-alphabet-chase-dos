@@ -19,7 +19,7 @@ The assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14
 That covers 99.97% of the 38,000 code bytes; the rest is 12 bytes of zero padding.
 **`tools/relink.sh` relinks DONALD.EXE with TLINK 2.0 byte-identically (header, relocation table, code, data; sha256 c72ed190…).** Every byte comes from `src/` (all initialised data, `GFX_DATA` and `_BSS` are C or asm definitions); the original EXE is only read for the comparison (see docs/MATCHING.md, Relink and Data in source).
 **The alternate build `DONALD` (sha256 61d3bc8b…) relinks byte-identically from the same sources** with `DONALD_ALT` defined: a shorter `main()` with no command-line options, `shutdown()` without `exit()`, and the two driver modules 8 bytes further into their paragraph (`CSO()` offsets).
-See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MATCHING.md](docs/MATCHING.md), [docs/CMP.md](docs/CMP.md) (picture format) and [docs/SCRIPTS.md](docs/SCRIPTS.md) (actor script opcodes).
+See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MATCHING.md](docs/MATCHING.md), [docs/CMP.md](docs/CMP.md) (picture format) and [docs/SCRIPTS.md](docs/SCRIPTS.md) (actor script opcodes) and [docs/DATA.md](docs/DATA.md) (data structures and the evidence for them).
 
 ## Layout
 - `src/segXXXX/` one C file per original code segment (= one Turbo C translation unit, functions in address order); `src/include/` headers; `src/asm/` NASM sources of the assembly modules (`tasm.inc` holds the TASM-style encodings).

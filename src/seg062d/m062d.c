@@ -1,8 +1,6 @@
 /* Module 062D: sprite grabbing (compiled with -ml). */
 #include "donald.h"
 
-char far *xalloc();
-char far *grab_vga();
 
 /* FUNCTION: DONALD 062D:0005 */
 char far *grab(int x, register int y, int w, register int h)
@@ -12,29 +10,29 @@ char far *grab(int x, register int y, int w, register int h)
     unsigned size;
     char far *res;
 
-    if (g_videoMode != 3) {
+    if (g_videoMode != VM_MODE3) {
         size = (w * h) << 2;
-        if (g_videoMode != 2) {
-            res = xalloc((long)(size + 4));
+        if (g_videoMode != VM_EGA) {
+            res = xalloc((long)(size + SPR_HDR));
             if (res) {
-                res[1] = h - 1;
-                res[2] = w;
+                res[SPR_HM1] = h - 1;
+                res[SPR_W] = w;
                 x <<= 2;
                 y *= 160;
                 w <<= 1;
                 stride = 160;
-                pack_rect(g_backBuf + y + x, res + 4, w, h, stride - w * 2);
-                if (g_videoMode == 0)
-                    pack_rect(g_backBuf + y + x + 1, res + (size >> 1) + 4, w, h, stride - w * 2);
+                pack_rect(g_backBuf + y + x, res + SPR_HDR, w, h, stride - w * 2);
+                if (g_videoMode == VM_CGA)
+                    pack_rect(g_backBuf + y + x + 1, res + (size >> 1) + SPR_HDR, w, h, stride - w * 2);
             }
         } else {
             x <<= 2;
             y *= 160;
             n2 = pack_rect(g_backBuf + y + x, g_packBuf, w, h, 160 - w * 4);
-            res = xalloc((long)(n2 + 4));
-            res[1] = h - 1;
-            res[2] = w;
-            far_copy(g_packBuf, res + 4, (long)n2);
+            res = xalloc((long)(n2 + SPR_HDR));
+            res[SPR_HM1] = h - 1;
+            res[SPR_W] = w;
+            far_copy(g_packBuf, res + SPR_HDR, (long)n2);
         }
     } else
         res = grab_vga(x, y, w, h);
@@ -53,9 +51,9 @@ char far *grab_vga(int x, int y, int w, int h)
 
     size = 4;
     dst = g_packBuf;
-    dst[1] = h - 1;
-    dst[2] = w;
-    dst += 4;
+    dst[SPR_HM1] = h - 1;
+    dst[SPR_W] = w;
+    dst += SPR_HDR;
     p = g_backBuf;
     p += y * 320 + x;
     row = p;

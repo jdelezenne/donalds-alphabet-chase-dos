@@ -96,8 +96,8 @@ How the pieces were recovered:
   the far-pointer table of disk error messages, the `show_error`/`error_msg` hooks, then TC's literal pool) is now
   real C initialisers in `m06f0.c`. TC emitted those relocations before the code ones, exactly as in the original.
   seg0612's two string literals were already C. Since batch 4 every other data byte is in source too (next section).
-- **Bugs the fixup-masked matcher could not see**, all found by the whole-EXE compare: `write_file` called `read`
-  instead of `write`; `free_all` called `free` instead of `farfree`; `main` calls `atol`, not `atoi`.
+- **Bugs the fixup-masked matcher could not see**, all found by the whole-EXE compare: `Write_File` called `read`
+  instead of `write`; `free_resident` called `free` instead of `farfree`; `main` calls `atol`, not `atoi`.
   These calls differ only in fixup bytes, so **the relink is now the real proof for calls and data references**.
 
 ## Data in source (batch 4): no bytes from the EXE
@@ -162,7 +162,7 @@ messages and file names, and those name the message globals (`msg_*`, `msg_err_*
   and `pick_frame1/2` in `scr_pick_helper`. The script pieces around them are `scr_bubble_2/3` and `scr_pick_helper_2`.
 - CGA/Tandy colour maps (`g_palettes[]`) are `pal_<first picture that uses it>`. Tunes are `tune_NN` by `g_tunes` index.
 - `struct window` is now `{x, y, w, h, fg, bg, col, row}`: set_window swaps the last four with
-  `g_textFg/g_textBg/g_textCol/g_textRow`.
+  `g_win.fg/g_win.bg/g_win.col/g_win.row`.
 - New asm names: `copy_rect` (0000:0342) with its helpers `copy_rect_core`/`copy_rect_ega_latch`, and in seg0512
   `ctrlc_install/remove` (int 23h) and `kbbreak_install/remove` (int 9). Internal helpers: `take_nibble`,
   `smc_merge_nibble`, `smc_merge_shifted`, `expand_bits4`. `GV_MODE` (tasm.inc) names GFX_DATA:0286. The other

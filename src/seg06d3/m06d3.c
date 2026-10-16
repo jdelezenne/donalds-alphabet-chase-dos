@@ -10,8 +10,8 @@ void draw_sprite_masked(char far *dst, char far *src, register int x, register i
     clip_y1 = gfx_clip_y1 = g_windows[idx].y * 8;
     y += clip_y1;
     clip_y2 = gfx_clip_y2 = g_windows[idx].h * 8 + clip_y1;
-    if (g_videoMode != 2) {
-        if (g_videoMode == 3)
+    if (g_videoMode != VM_EGA) {
+        if (g_videoMode == VM_MODE3)
             sprite_mask_m3(dst, src, x, y);
         else
             sprite_mask_cga(dst, src, x, y);
