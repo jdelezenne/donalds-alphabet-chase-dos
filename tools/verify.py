@@ -66,9 +66,12 @@ for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
 fn = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
 ctot = sum(int(r["size"]) for r in fn if r["kind"] == "c")
 code_end = struct.unpack_from("<H", img, 1)[0] * 16       # DGROUP start = end of code
-mc = sum(int(r["size"] or 0) for r in rows if r["status"] == "matched")
+matched = {r["addr"] for r in rows if r["status"] == "matched"}
+mc = sum(int(r["size"]) for r in fn if r["kind"] == "c" and r["addr"] in matched)   # sizes from functions.csv (data-trimmed)
 lib = sum(int(r["size"]) for r in rows if r["status"] == "lib")
 nm = sum(1 for r in rows if r["status"] == "matched")
+unc = [r["addr"] for r in fn if r["kind"] == "c" and r["addr"] not in matched]
+if unc: print("unmatched C:", " ".join(unc))
 print(f"checked {len(res)}, all matched {nm}; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
       f"code {mc+lib}/{code_end} bytes = {100*(mc+lib)/code_end:.2f}% (incl. {lib} lib)")
 (ROOT / "build").mkdir(exist_ok=True)

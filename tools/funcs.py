@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Build config/retail/functions.csv: function starts = far-call targets (9A with relocation) + near calls
 preceded by PUSH CS + `push bp; mov bp,sp` prologues. size = distance to next start (or DGROUP).
-kind: lib (libmatch spans in symbols.csv), asm (segment 0000 after C0L, or self-loading DS prologue), c.
+kind: lib (libmatch spans in symbols.csv), asm (segment 0000 after C0L, segments 0512/056A, or self-loading
+DS prologue), c (size trimmed to the last RET, so trailing data is not counted). Annotated starts are included;
+sizes never cross the next segment base.
 Usage: funcs.py [--write]"""
 import csv, struct, sys
 from pathlib import Path
@@ -30,15 +32,27 @@ for p in range(end - 4):
         bases = sorted({s for s, _ in starts.values() if s * 16 <= p}); s = bases[-1] if bases else 0
         t = s * 16 + ((p - s * 16 + 4 + struct.unpack_from("<h", img, p + 2)[0]) & 0xFFFF)
         if t < end and t not in starts: starts[t] = (s, t - s * 16)
+# annotated functions (src/**/*.c `/* FUNCTION: DONALD SSSS:OOOO */`) are authoritative starts
+import re
+for src in (ROOT / "src").rglob("*.c"):
+    for m in re.finditer(r"FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})", src.read_text()):
+        sg, of = int(m.group(1), 16), int(m.group(2), 16); starts[sg * 16 + of] = (sg, of)
+ASM_SEGS = {0x0512, 0x056A}                     # hand-written asm modules (cs:-relative data, DS reloads)
+segbases = sorted({s * 16 for s, _ in starts.values()} | {end})
 lib = [r for r in csv.DictReader(open(ROOT / "config/retail/symbols.csv")) if r["status"] == "lib"]
 sp = [(int(r["addr"][:4], 16) * 16 + int(r["addr"][5:], 16), int(r["size"])) for r in lib]
 ks = sorted(starts); rows = []
 for i, p in enumerate(ks):
-    n = (ks[i + 1] if i + 1 < len(ks) else end) - p
     s, o = starts[p]
+    nb = next(b for b in segbases if b > p)       # never run past the next segment base
+    n = min(ks[i + 1] if i + 1 < len(ks) else end, nb) - p
     if any(a <= p < a + m for a, m in sp): kind = "lib"
-    elif p < 0x2DAB or img[p + 3:p + 7] == b"\x57\x56\x1e\xb8": kind = "asm"
-    else: kind = "c"
+    elif p < 0x2DAB or s in ASM_SEGS or img[p + 3:p + 7] == b"\x57\x56\x1e\xb8": kind = "asm"
+    else:
+        kind = "c"
+        # C size excludes trailing data/padding: cut after the last RET/RETF in the span
+        body = img[p:p + n]; r = max(body.rfind(b"\xcb"), body.rfind(b"\xc3"))
+        if r >= 0: n = r + 1
     rows.append(dict(addr=f"{s:04X}:{o:04X}", linear=f"{p:05X}", size=n, kind=kind))
 if "--write" in sys.argv:
     w = csv.DictWriter(open(ROOT / "config/retail/functions.csv", "w"), fieldnames=["addr", "linear", "size", "kind"]); w.writeheader(); w.writerows(rows)
