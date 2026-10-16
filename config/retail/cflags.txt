@@ -6,3 +6,4 @@ seg05e7/*: -ml
 seg0612/*: -ml
 seg061f/*: -ml
 seg05c5/*: -ml
+seg06c3/*: -ml

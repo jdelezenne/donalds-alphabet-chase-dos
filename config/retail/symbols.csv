@@ -19,6 +19,7 @@ LXLSH@,0000:302D,31,lib,CL.LIB:LLSH
 blit_dispatch,0304:000C,90,matched,100.0% src/seg0304/blit_dispatch.c
 draw_items,0304:0187,154,matched,100.0% src/seg0304/draw_items.c
 step,0304:0383,121,matched,100.0% src/seg0304/step.c
+draw_frame,0304:03FC,252,nonmatching,52.4% src/seg0304/draw_frame.c
 next_level,0304:04F9,199,matched,100.0% src/seg0304/next_level.c
 rom_check,0304:05C0,43,matched,100.0% src/seg0304/rom_check.c
 level_sum,0304:0737,63,matched,100.0% src/seg0304/level_sum.c
@@ -47,6 +48,7 @@ load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
 calibrate,061F:0007,222,matched,100.0% src/seg061f/m061f.c
 music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
 redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
+draw_sprite,06C3:000F,253,matched,100.0% src/seg06c3/m06c3.c
 harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
 install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr_handler.c
 harderr_local,06E3:0024,56,lib,CL.LIB:HARDERR
@@ -66,6 +68,7 @@ lookup_value,06F0:069D,130,matched,100.0% src/seg06f0/m06f0.c
 free_all,06F0:098D,150,matched,100.0% src/seg06f0/m06f0.c
 is_loaded,06F0:0BFC,135,matched,100.0% src/seg06f0/m06f0.c
 find_name,06F0:0C83,113,matched,100.0% src/seg06f0/m06f0.c
+mem_read,06F0:0CF4,261,matched,100.0% src/seg06f0/m06f0.c
 inset_rect,06F0:0DF9,34,matched,100.0% src/seg06f0/m06f0.c
 IOERROR,06F0:0E1B,59,lib,CL.LIB:IOERROR
 exit_local,07D5:0006,1,lib,CL.LIB:EXIT

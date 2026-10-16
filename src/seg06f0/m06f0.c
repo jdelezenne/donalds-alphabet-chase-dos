@@ -1,11 +1,12 @@
 /* Module at segment 06F0 (compiled without -O). Functions in address order. */
 #include "donald.h"
 
-long fn_06F0_0CF4();
+long mem_read(int i, char far *buf, long len);
 
-struct name_entry { char far *name; char pad[4]; char far *data; int value; char pad2[4]; };
+struct name_entry { char far *name; long size; char far *data; int value; long pos; };
 extern struct name_entry g_1772[];
 char far *fn_08E1_0003();
+char far *fn_0000_115F();
 
 /* FUNCTION: DONALD 06F0:000E */
 void fatal(char far *msg)
@@ -42,7 +43,7 @@ long read_file(register int slot, char far *buf, long len)
     if (g_3B58[slot] == 0x7fff)
         fatal(g_1F06);
     if (g_3B58[slot] & 0x8000)
-        return fn_06F0_0CF4(g_3B58[slot] & 0x7fff, buf, len);
+        return mem_read(g_3B58[slot] & 0x7fff, buf, len);
     total = 0;
     while (len > 0xFA00L) {
         n = read(g_3B58[slot], buf, 0xFA00);
@@ -165,6 +166,19 @@ int find_name(char far *name)
         if (fn_087E_0009(g_1772[i].name, name) == 0)
             return i;
     fatal(g_1F1E);
+}
+
+/* FUNCTION: DONALD 06F0:0CF4 */
+long mem_read(register int i, char far *buf, long len)
+{
+    char far *src;
+
+    if (g_1772[i].pos + len > g_1772[i].size)
+        len = g_1772[i].size - g_1772[i].pos;
+    src = fn_0000_115F(g_1772[i].data + g_1772[i].pos);
+    fn_0000_0A2E(src, buf, len);
+    g_1772[i].pos += len;
+    return len;
 }
 
 /* FUNCTION: DONALD 06F0:0DF9 */
