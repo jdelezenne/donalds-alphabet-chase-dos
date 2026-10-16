@@ -1,2 +1,12 @@
 -ml -O -Z
 # line 1 = default TCC flags (UNVERIFIED guess, see docs/MATCHING.md). Per-file override: FOO.C: -ml ...
+seg06f0/*: -ml
+seg05ed/*: -ml
+seg05e7/*: -ml
+seg0612/*: -ml
+seg061f/*: -ml
+seg05c5/*: -ml
+seg06c3/*: -ml
+seg06d3/*: -ml
+seg05d5/*: -ml
+seg062d/*: -ml

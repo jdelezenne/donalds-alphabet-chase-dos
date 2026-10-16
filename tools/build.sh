@@ -6,14 +6,17 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; OUT="$ROOT/build/obj"; DOS="$ROOT/build/dos"
 mkdir -p "$OUT"; rm -rf "$DOS"; mkdir -p "$DOS"
 FLAGS=$(head -1 "$ROOT/config/retail/cflags.txt")
-FILES=("$@"); [ ${#FILES[@]} -gt 0 ] || FILES=("$ROOT"/src/*.c)
+FILES=("$@"); [ ${#FILES[@]} -gt 0 ] || mapfile -t FILES < <(find "$ROOT/src" -name '*.c' | sort)
 for h in "$ROOT"/src/include/*.h; do [ -f "$h" ] && sed "s/\r*$/\r/" "$h" > "$DOS/$(basename "$h" | tr a-z A-Z)"; done
 cmds=(); names=(); i=0
 for f in "${FILES[@]}"; do
   [ -f "$f" ] || continue
   base=$(basename "$f" .c); short=$(printf 'C%03d' $i); i=$((i+1))
   sed "s/\r*$/\r/" "$f" > "$DOS/$short.C"; names+=("$short:$base")
-  over=$(grep -i "^$base.c:" "$ROOT/config/retail/cflags.txt" | cut -d: -f2- || true)
+  rel=${f#"$ROOT/src/"}; over=""
+  # override lines: "<glob relative to src/>: flags" (last match wins), e.g. "seg06f0/*: -ml -Z"
+  while IFS= read -r line; do g=${line%%:*}; [[ "$line" == *:* && "$line" != \#* ]] || continue
+    [[ "$rel" == $g ]] && over=${line#*:}; done < <(tail -n +2 "$ROOT/config/retail/cflags.txt")
   cmds+=("TCC -c -IC:\\INCLUDE ${over:-$FLAGS} $short.C")
 done
 "$ROOT/tools/dosrun.sh" "$DOS" "${cmds[@]}" | grep -vE "^(Turbo C|$|.*Available memory)" || true

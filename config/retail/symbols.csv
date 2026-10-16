@@ -1,8 +1,10 @@
 name,addr,size,status,notes
+c0l_local,0000:0000,269,lib,C0L
 exit,0000:010D,101,lib,C0L
 restorezero,0000:0172,61,lib,C0L
 abort,0000:01AF,24,lib,C0L
 DGROUP@,0000:01C7,2,lib,C0L
+setargv_local,0000:2DAB,8,lib,CL.LIB:SETARGV
 setargv,0000:2DB3,254,lib,CL.LIB:SETARGV
 setenvp,0000:2EB1,68,lib,CL.LIB:SETENVP
 PADD@,0000:2EF5,45,lib,CL.LIB:PADD
@@ -14,21 +16,84 @@ LUDIV@,0000:2F8E,5,lib,CL.LIB:LDIV
 LMOD@,0000:2F93,5,lib,CL.LIB:LDIV
 LUMOD@,0000:2F98,149,lib,CL.LIB:LDIV
 LXLSH@,0000:302D,31,lib,CL.LIB:LLSH
-blit_dispatch,0304:000C,90,matched,TCC -ml -O -Z
-draw_items,0304:0187,154,matched,TCC -ml -O -Z
-rom_check,0304:05C0,43,matched,TCC -ml -O -Z
+blit_dispatch,0304:000C,90,matched,100.0% src/seg0304/m0304.c
+check_collisions,0304:0066,289,matched,100.0% src/seg0304/m0304.c
+draw_items,0304:0187,154,matched,100.0% src/seg0304/m0304.c
+draw_item,0304:0221,354,matched,100.0% src/seg0304/m0304.c
+step,0304:0383,121,matched,100.0% src/seg0304/m0304.c
+draw_frame,0304:03FC,252,nonmatching,52.4% src/seg0304/m0304.c
+next_level,0304:04F9,199,matched,100.0% src/seg0304/m0304.c
+rom_check,0304:05C0,43,matched,100.0% src/seg0304/m0304.c
+detect_video,0304:05EB,332,matched,100.0% src/seg0304/m0304.c
+level_sum,0304:0737,63,matched,100.0% src/seg0304/m0304.c
+aim,0304:0776,152,matched,100.0% src/seg0304/m0304.c
+reset_actors,0304:080E,163,matched,100.0% src/seg0304/m0304.c
+setup_level,0304:08B1,139,matched,100.0% src/seg0304/m0304.c
+show_picture,0304:093C,274,matched,100.0% src/seg0304/m0304.c
+load_level_gfx,0304:0A4E,447,matched,100.0% src/seg0304/m0304.c
+handle_key,0304:1061,329,matched,100.0% src/seg0304/m0304.c
+roll,0304:1A71,73,matched,100.0% src/seg0304/m0304.c
+init_slots,0304:1ABA,125,matched,100.0% src/seg0304/m0304.c
+wait_key,0304:1B37,61,matched,100.0% src/seg0304/m0304.c
+main,04FC:0009,214,matched,100.0% src/seg04fc/main.c
+init_game,04FC:00DF,99,matched,100.0% src/seg04fc/m04fc.c
+shutdown,04FC:0142,31,matched,100.0% src/seg04fc/m04fc.c
+play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
+stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
+key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
+get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
+blit_ega,05C5:0008,234,matched,100.0% src/seg05c5/m05c5.c
+repeat_call,05D4:0002,27,matched,100.0% src/seg05d4/repeat.c
+print_text,05D5:000D,285,matched,100.0% src/seg05d5/m05d5.c
+fill_rect,05E7:000A,93,matched,100.0% src/seg05e7/m05e7.c
+hline,05ED:0007,159,matched,100.0% src/seg05ed/m05ed.c
+draw_line,05ED:00A6,177,matched,100.0% src/seg05ed/m05ed.c
+plot,05ED:0157,26,matched,100.0% src/seg05ed/m05ed.c
+draw_pic,0604:0001,126,matched,100.0% src/seg0604/m0604.c
+set_palette,060B:000F,106,matched,100.0% src/seg060b/m060b.c
+xalloc,0612:0009,124,matched,100.0% src/seg0612/m0612.c
+load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
+calibrate,061F:0007,222,matched,100.0% src/seg061f/m061f.c
+grab,062D:0005,417,matched,100.0% src/seg062d/m062d.c
+grab_vga,062D:01A6,326,matched,100.0% src/seg062d/m062d.c
+music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
+set_window,065E:0008,272,matched,100.0% src/seg065e/m065e.c
+redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
+draw_sprite,06C3:000F,253,matched,100.0% src/seg06c3/m06c3.c
+draw_sprite_masked,06D3:000C,253,matched,100.0% src/seg06d3/m06d3.c
+harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
+install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr_handler.c
+harderr_local,06E3:0024,56,lib,CL.LIB:HARDERR
 harderr,06E3:005C,32,lib,CL.LIB:HARDERR
 hardresume,06E3:007C,27,lib,CL.LIB:HARDERR
 hardretn,06E3:0097,52,lib,CL.LIB:HARDERR
+set_and_redraw,06EF:000B,19,matched,100.0% src/seg06ef/m06ef.c
+fatal,06F0:000E,34,matched,100.0% src/seg06f0/m06f0.c
+quit,06F0:0030,19,matched,100.0% src/seg06f0/m06f0.c
+close_slot,06F0:0245,72,matched,100.0% src/seg06f0/m06f0.c
+read_file,06F0:028D,230,matched,100.0% src/seg06f0/m06f0.c
+write_file,06F0:0373,207,matched,100.0% src/seg06f0/m06f0.c
+file_exists,06F0:0620,48,matched,100.0% src/seg06f0/m06f0.c
+delete_ok,06F0:0650,25,matched,100.0% src/seg06f0/m06f0.c
+create_file,06F0:0669,52,matched,100.0% src/seg06f0/m06f0.c
+lookup_value,06F0:069D,130,matched,100.0% src/seg06f0/m06f0.c
+free_all,06F0:098D,150,matched,100.0% src/seg06f0/m06f0.c
+is_loaded,06F0:0BFC,135,matched,100.0% src/seg06f0/m06f0.c
+find_name,06F0:0C83,113,matched,100.0% src/seg06f0/m06f0.c
+mem_read,06F0:0CF4,261,matched,100.0% src/seg06f0/m06f0.c
+inset_rect,06F0:0DF9,34,matched,100.0% src/seg06f0/m06f0.c
 IOERROR,06F0:0E1B,59,lib,CL.LIB:IOERROR
+exit_local,07D5:0006,1,lib,CL.LIB:EXIT
 exit,07D5:0007,51,lib,CL.LIB:EXIT
 atexit,07D5:003A,47,lib,CL.LIB:ATEXIT
 malloc,07DB:0009,21,lib,CL.LIB:FMALLOC
 pull_free_block,07DB:001E,492,lib,CL.LIB:FMALLOC
 farmalloc,07DB:020A,271,lib,CL.LIB:FMALLOC
+fbrk_local,080C:0009,144,lib,CL.LIB:FBRK
 brk,080C:0099,71,lib,CL.LIB:FBRK
 sbrk,080C:00E0,123,lib,CL.LIB:FBRK
 setblock,0821:000B,32,lib,CL.LIB:SETBLOCK
+open_local,0823:000B,51,lib,CL.LIB:OPEN
 open,0823:003E,365,lib,CL.LIB:OPEN
 open,083D:000B,77,lib,CL.LIB:OPENA
 ioctl,0842:0008,45,lib,CL.LIB:IOCTL
