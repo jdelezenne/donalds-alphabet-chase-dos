@@ -18,14 +18,14 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
     set_text_colours(fg, bg);
     p = s;
     off = y * 320;
-    if (g_videoMode == 3)
+    if (g_videoMode == VM_MODE3)
         off = y * 0xa00;
     x0 = col;
     while (*p) {
         if (*p == '\r') {
             col = x0;
             off += 320;
-            if (g_videoMode == 3)
+            if (g_videoMode == VM_MODE3)
                 off += 0x8c0;
             p++;
         } else {
@@ -35,15 +35,15 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
                 col = x0;
                 g_textWraps++;
                 off += 320;
-                if (g_videoMode == 3)
+                if (g_videoMode == VM_MODE3)
                     off += 0x8c0;
             }
             cur = col++;
-            if (g_videoMode == 0)
+            if (g_videoMode == VM_CGA)
                 draw_char_tandy(ch << 1, off, cur << 1);
-            else if (g_videoMode == 1)
+            else if (g_videoMode == VM_TANDY)
                 draw_char_cga(ch << 2, off, cur << 2);
-            else if (g_videoMode == 2)
+            else if (g_videoMode == VM_EGA)
                 draw_char_ega(ch, off, cur);
             else
                 draw_char_buf(ch, off, cur << 3);

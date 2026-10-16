@@ -9,7 +9,7 @@ void draw_pic(char far *p, char far *dst)
         cmp_unpack_planar(p, dst);
     else
         cmp_unpack_cga(p, dst);
-    if (g_videoMode == 0) {
+    if (g_videoMode == VM_CGA) {
         n = 80;
         if (g_cgaSmallWin)
             n = 4;

@@ -1,14 +1,6 @@
 /* Module at segment 0304 (one translation unit; functions in address order). */
 #include "donald.h"
 
-unsigned char rand8();
-char far *grab();
-void far reset_actors(void);
-void far init_slots(void);
-void far load_level_gfx(void);
-int far handle_key(void);
-int far run_script(int i);
-int far ending(void);
 
 /* Module data: DGROUP 0094-0209 (detect_video's messages, palette maps, disk prompt). */
 char msg_cga[] = "\n\r\nA CGA ";
@@ -62,7 +54,7 @@ int g_jumping;
 
 void blit_dispatch(char far *src, register int x, register int y, int w, int h)
 {
-    if (g_videoMode != 2)
+    if (g_videoMode != VM_EGA)
         blit_generic(x, y, w, h >> 3, src);
     else
         blit_ega(x, y, x, y, w, h >> 3, (char far *)0xA8000000L, (char far *)0xA0000000L);
@@ -166,7 +158,7 @@ void draw_item(int mode, register int x, register int y, int w, int h)
         dst = (char far *)0xA0000000L;
         break;
     }
-    if (g_videoMode != 2) {
+    if (g_videoMode != VM_EGA) {
         switch (mode) {
         case 0:
             src = g_videoMem;
@@ -226,7 +218,7 @@ void draw_frame(int mode, register int i, register int x, int y)
     char far *p;
 
     p = g_backBuf;
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         p = (char far *)0xA8000000L;
     g_windows[1].x = 0;
     g_windows[1].w = 40;
@@ -267,7 +259,7 @@ void next_level(void)
         i = 0;
         if (key_ready())
             i = handle_key();
-        if (i == 0 || i == 27) {
+        if (i == 0 || i == KEY_ESC) {
             load_level_gfx();
             reset_actors();
         }
@@ -300,15 +292,15 @@ void detect_video(void)
     }
     i = 0;
     if (rom_check()) {
-        g_videoMode = 1;
+        g_videoMode = VM_TANDY;
         while (msg_tandy[i])
             dos_putc(msg_tandy[i++]);
     } else if (ega_present()) {
-        g_videoMode = 2;
+        g_videoMode = VM_EGA;
         while (msg_ega[i])
             dos_putc(msg_ega[i++]);
     } else {
-        g_videoMode = 0;
+        g_videoMode = VM_CGA;
         while (msg_cga[i])
             dos_putc(msg_cga[i++]);
     }
@@ -326,13 +318,13 @@ void detect_video(void)
     if (i) {
         switch (i) {
         case '1':
-            g_videoMode = 0;
+            g_videoMode = VM_CGA;
             break;
         case '2':
-            g_videoMode = 2;
+            g_videoMode = VM_EGA;
             break;
         case '3':
-            g_videoMode = 1;
+            g_videoMode = VM_TANDY;
             break;
         }
     }
@@ -431,25 +423,25 @@ void show_picture(register int n)
     load_file(g_cmpFiles[n].name, g_workBuf);
     if (pic_needs_ega[n]) {
         c = 0;
-        if (g_videoMode == 0) {
+        if (g_videoMode == VM_CGA) {
             set_palette16(g_palettes[n]);
-            c = g_videoMode = 1;
+            c = g_videoMode = VM_TANDY;
             set_video_type(g_videoMode);
         }
         draw_pic(g_workBuf, g_backBuf);
         if (c) {
-            g_videoMode = 0;
+            g_videoMode = VM_CGA;
             set_video_type(0);
             clear_buffer(g_backBuf, 0);
         }
     } else {
-        if (g_videoMode == 0)
+        if (g_videoMode == VM_CGA)
             set_palette16(g_palettes[n]);
         draw_pic(g_workBuf, g_backBuf);
-        if (g_videoMode == 2)
+        if (g_videoMode == VM_EGA)
             present_buffer(g_backBuf, 0xA800);
     }
-    if (g_videoMode == 0)
+    if (g_videoMode == VM_CGA)
         cga_select_palette(1);
 }
 
@@ -526,10 +518,10 @@ void game(void)
         g_sprites[i + 3] = grab(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
     key = 1;
     if (!key)
-        key = 27;
-    if (key != 27)
+        key = KEY_ESC;
+    if (key != KEY_ESC)
         key = 0;
-    while (key != 27) {
+    while (key != KEY_ESC) {
         for (i = 0; i < 26; i++)
             g_letterScore[i] = g_letterDone[i] = 0;
         i = 0; g_gameWon = 0; g_idleTicks = 0; g_letterPicked = 0; g_keysEnabled = g_group = g_jumping = 0;
@@ -572,12 +564,12 @@ void game(void)
             } while ((dt = now - last) <= 4);
             last = timer_ticks();
             if (!snd_get_option()) {
-                key = 27;
+                key = KEY_ESC;
                 break;
             }
             if (key_ready()) {
                 key = handle_key();
-                if (key == 27)
+                if (key == KEY_ESC)
                     break;
             }
             if (g_gameWon) {
@@ -607,10 +599,10 @@ int handle_key(void)
         kbd_flush();
         if (key >= 'a' && key <= 'z')
             key = key - 32;
-        if ((key < 'A' || key > 'Z') && key != 27 && key != '1')
+        if ((key < 'A' || key > 'Z') && key != KEY_ESC && key != KEY_SOUND)
             key = 0;
     }
-    if (key && key != 27 && !g_letterPicked && key != '1') {
+    if (key && key != KEY_ESC && !g_letterPicked && key != KEY_SOUND) {
         r = level_sum();
         if (r)
             goto done;
@@ -638,7 +630,7 @@ int handle_key(void)
         bubble_frame = (key - g_groupFirst[g_group]) * 4 + 1;
         goto done;
     }
-    if (key != '1')
+    if (key != KEY_SOUND)
         goto done;
     snd_play(g_tunes[4]);
     g_soundOn ^= 1;
@@ -660,7 +652,7 @@ int run_script(register int i)
 
     if (slot_timer[i]) {
         slot_timer[i]--;
-        if (g_videoMode == 1 && slot_timer[i])
+        if (g_videoMode == VM_TANDY && slot_timer[i])
             slot_timer[i]--;
         return -1;
     }
@@ -672,7 +664,7 @@ int run_script(register int i)
         r = *slot_pc[i]++;
         if (r < 0)
         switch (r) {
-        case -1:
+        case OP_WALK:
             if (slot_x[i] >> 3 == *slot_pc[i]) {
                 slot_pc[i] += 3;
                 break;
@@ -692,18 +684,18 @@ int run_script(register int i)
             slot_pc[i]--;
             r = slot_frame[i];
             break;
-        case -2:
+        case OP_END:
             r = cont = -1;
             slot_pc[i] = g_scriptTable[SCR_IDLE];
             break;
-        case -3:
+        case OP_POS:
             slot_x[i] = *slot_pc[i]++ << 3;
             slot_y[i] = *slot_pc[i]++ << 3;
             break;
-        case -4:
+        case OP_DELAY:
             slot_delay[i] = slot_timer[i] = *slot_pc[i]++;
             break;
-        case -5:
+        case OP_NEXT:
             if ((t = level_sum()) != 0) {
                 slot_pc[i] = g_scriptTable[SCR_LEVEL_DONE];
                 break;
@@ -731,7 +723,7 @@ int run_script(register int i)
                 slot_pc[j - g_groupFirst[g_group]] = g_scriptTable[j];
                 break;
             }
-        case -6:
+        case OP_WAIT_DONALD_X:
             if (slot_x[7] >> 3 == *slot_pc[i])
                 slot_pc[i]++;
             else {
@@ -740,64 +732,64 @@ int run_script(register int i)
                 r = cont = -1;
             }
             break;
-        case -7:
+        case OP_JMP_IF_LEFT:
             j = *slot_pc[i]++;
             if (*slot_pc[i]++ < slot_x[j] >> 3)
                 goto back2;
             else
                 slot_pc[i]++;
             break;
-        case -8:
+        case OP_JMP_UNTIL_AT:
             j = *slot_pc[i]++;
             if (*slot_pc[i]++ != slot_x[j] >> 3)
                 goto back2;
             else
                 goto inc;
             break;
-        case -9:
+        case OP_TALLER:
             slot_h[i]++;
             break;
-        case -10:
+        case OP_SHORTER:
             slot_h[i]--;
             break;
-        case -11:
+        case OP_RANDOM:
             j = *slot_pc[i]++;
             j = roll(1, j, -1);
             slot_pc[i] += j;
             slot_pc[i] = g_scriptTable[*slot_pc[i]];
             break;
-        case -12:
+        case OP_FACE_LEFT:
             slot_flag[i] = 1;
             break;
-        case -13:
+        case OP_SKIP_50:
             if (rand8() & 1)
                 slot_pc[i] += *slot_pc[i];
             else
                 slot_pc[i]++;
             break;
-        case -14:
+        case OP_LOOP_75:
             if (rand8() & 3)
                 slot_pc[i]++;
             else
         back2:
                 slot_pc[i] -= *slot_pc[i];
             break;
-        case -15:
+        case OP_NEXT_LEVEL:
             next_level();
             break;
-        case -16:
+        case OP_WAIT_DONALD_Y:
             if (slot_y[7] >> 3 != *slot_pc[i])
                 goto back3;
             else
                 goto inc;
             break;
-        case -17:
+        case OP_WAIT_DONALD_DX:
             if ((slot_x[i] >> 3) + *slot_pc[i] != slot_x[7] >> 3)
                 goto back3;
             else
                 slot_pc[i]++;
             break;
-        case -18:
+        case OP_IF_FOUND:
             if (g_letterDone[g_groupFirst[g_group] + i] == 0)
                 slot_pc[i]++;
             else {
@@ -805,10 +797,10 @@ int run_script(register int i)
                 g_letterScore[g_groupFirst[g_group] + i] = 1;
             }
             break;
-        case -19:
+        case OP_BUBBLE_X:
             slot_pc[7][3] = *slot_pc[i]++ + (slot_x[i] >> 3);
             break;
-        case -20:
+        case OP_JUMP_CATCH:
             if (!g_jumping) {
                 slot_timer[i] = slot_delay[i] = 4;
                 g_jumping++;
@@ -831,108 +823,108 @@ int run_script(register int i)
                 slot_pc[i]--;
             r = slot_frame[i];
             break;
-        case -22:
+        case OP_INIT_SLOTS:
             init_slots();
             break;
-        case -23:
+        case OP_GROUP_INTRO:
             slot_pc[0] = g_scriptTable[group_intro_script[g_group]];
             break;
-        case -24:
+        case OP_IF_GROUP:
             if (*slot_pc[i]++ == g_group)
                 slot_pc[i] += *slot_pc[i];
             else
                 slot_pc[i]++;
             break;
-        case -21:
+        case OP_SKIP:
             slot_pc[i] += *slot_pc[i];
             break;
-        case -25:
+        case OP_START:
             j = *slot_pc[i]++;
             slot_pc[j] = g_scriptTable[*slot_pc[i]++];
             slot_timer[j] = 0;
             break;
-        case -26:
+        case OP_MOVE_E:
             slot_x[i] += 8;
             break;
-        case -28:
+        case OP_MOVE_W:
             slot_x[i] -= 8;
             break;
-        case -30:
+        case OP_MOVE_SE:
             slot_x[i] += 8;
             slot_y[i] += 8;
             break;
-        case -31:
+        case OP_MOVE_NE:
             slot_x[i] += 8;
             slot_y[i] -= 8;
             break;
-        case -32:
+        case OP_MOVE_SW:
             slot_x[i] -= 8;
-        case -27:
+        case OP_MOVE_S:
             slot_y[i] += 8;
             break;
-        case -33:
+        case OP_MOVE_NW:
             slot_x[i] -= 8;
-        case -29:
+        case OP_MOVE_N:
             slot_y[i] -= 8;
             break;
-        case -34:
+        case OP_SHOW_E:
             slot_x[i] += 8;
             r = slot_frame[i];
             break;
-        case -36:
+        case OP_SHOW_W:
             slot_x[i] -= 8;
             r = slot_frame[i];
             break;
-        case -38:
+        case OP_SHOW_SE:
             slot_x[i] += 8;
             slot_y[i] += 8;
             r = slot_frame[i];
             break;
-        case -39:
+        case OP_SHOW_NE:
             slot_x[i] += 8;
             slot_y[i] -= 8;
             r = slot_frame[i];
             break;
-        case -40:
+        case OP_SHOW_SW:
             slot_x[i] -= 8;
-        case -35:
+        case OP_SHOW_S:
             slot_y[i] += 8;
             r = slot_frame[i];
             break;
-        case -41:
+        case OP_SHOW_NW:
             slot_x[i] -= 8;
-        case -37:
+        case OP_SHOW_N:
             slot_y[i] -= 8;
             r = slot_frame[i];
             break;
-        case -42:
+        case OP_RESET_BUBBLE:
             g_curLetter = -1;
             bubble_arg1 = bubble_arg2 = 0;
             slot_pc[5] = g_scriptTable[SCR_BUBBLE];
             bubble_frame = 0x25;
             break;
-        case -43:
+        case OP_IF_PICKED:
             if (!g_letterPicked)
         inc:
                 slot_pc[i]++;
             else
                 setup_level(g_curLetter);
             break;
-        case -44:
+        case OP_BESIDE_DONALD:
             slot_x[i] = slot_x[7] + 16;
             slot_y[i] = 0x60;
             break;
-        case -45:
+        case OP_CLEAR_LETTER:
             g_curLetter = -1;
             break;
-        case -46:
+        case OP_SOUND:
             j = *slot_pc[i]++;
             play_sound(j);
             break;
-        case -47:
+        case OP_KEYS_ON:
             g_keysEnabled = 1;
             break;
-        case -48:
+        case OP_KEYS_OFF:
             g_keysEnabled = 0;
             break;
         }
@@ -984,7 +976,7 @@ int wait_key(int any)
         repeat_call(1);
         if (key_ready()) {
             key = get_key();
-            if (any || key == 27)
+            if (any || key == KEY_ESC)
                 break;
         }
     }
@@ -1001,50 +993,50 @@ int ending(void)
     load_file(g_cmpFiles[19].name, g_workBuf + 0x1b8a);
     load_file(g_cmpFiles[20].name, g_workBuf + 0x3714);
     load_file(g_cmpFiles[21].name, g_workBuf + 0x5910);
-    if (g_videoMode == 0)
+    if (g_videoMode == VM_CGA)
         set_palette16(g_palettes[18]);
     draw_pic(g_workBuf, g_backBuf);
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     play_sound(24);
     draw_pic(g_workBuf + 0x1b8a, g_backBuf);
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     k = wait_key(0);
-    if (k == 27)
+    if (k == KEY_ESC)
         return k;
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     draw_pic(g_workBuf + 0x3714, g_backBuf);
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     k = wait_key(0);
-    if (k == 27)
+    if (k == KEY_ESC)
         return k;
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     draw_pic(g_workBuf + 0x5910, g_backBuf);
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     k = wait_key(0);
-    if (k == 27)
+    if (k == KEY_ESC)
         return k;
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     k = wait_key(0);
-    if (k == 27)
+    if (k == KEY_ESC)
         return k;
     play_sound(17);
     load_file(g_cmpFiles[22].name, g_workBuf);
-    if (g_videoMode == 0)
+    if (g_videoMode == VM_CGA)
         set_palette16(g_palettes[22]);
     set_palette(pal_ending);
     if (g_videoMode)
         ega_select_palette(1);
     draw_pic(g_workBuf, g_backBuf);
-    if (g_videoMode == 2)
+    if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     k = wait_key(1);
-    if (k != 27)
+    if (k != KEY_ESC)
         k = wait_key(1);
     return k;
 }
@@ -1054,10 +1046,10 @@ void about(void)
 {
     clear_screen();
     set_and_redraw(2);
-    draw_line((win_x - 1) << 3, (win_y - 1) << 3, ((win_x + win_w + 1) << 3) - 1, (win_y - 1) << 3, 15);
-    draw_line((win_x - 1) << 3, ((win_y + win_h + 1) << 3) - 1, ((win_x + win_w + 1) << 3) - 1, ((win_y + win_h + 1) << 3) - 1, 15);
-    draw_line((win_x - 1) << 3, (win_y - 1) << 3, (win_x - 1) << 3, ((win_y + win_h + 1) << 3) - 1, 15);
-    draw_line(((win_x + win_w + 1) << 3) - 1, (win_y - 1) << 3, ((win_x + win_w + 1) << 3) - 1, ((win_y + win_h + 1) << 3) - 1, 15);
+    draw_line((g_win.x - 1) << 3, (g_win.y - 1) << 3, ((g_win.x + g_win.w + 1) << 3) - 1, (g_win.y - 1) << 3, 15);
+    draw_line((g_win.x - 1) << 3, ((g_win.y + g_win.h + 1) << 3) - 1, ((g_win.x + g_win.w + 1) << 3) - 1, ((g_win.y + g_win.h + 1) << 3) - 1, 15);
+    draw_line((g_win.x - 1) << 3, (g_win.y - 1) << 3, (g_win.x - 1) << 3, ((g_win.y + g_win.h + 1) << 3) - 1, 15);
+    draw_line(((g_win.x + g_win.w + 1) << 3) - 1, (g_win.y - 1) << 3, ((g_win.x + g_win.w + 1) << 3) - 1, ((g_win.y + g_win.h + 1) << 3) - 1, 15);
     print_wrapped(msg_insert_disk);
     get_key();
     clear_screen();

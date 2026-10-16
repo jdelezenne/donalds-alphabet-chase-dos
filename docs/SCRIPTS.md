@@ -1,5 +1,7 @@
 # Actor scripts
 
+Opcode names (`OP_WALK` = -1 ... `OP_KEYS_OFF` = -48) are defined in `src/include/donald.h` in table order.
+
 Up to 8 actors ("slots") are animated by byte-code scripts (`src/data/scripts.c`, DGROUP 020A-125F).
 `g_scriptTable[127]` (DGROUP 1262-145D) holds one far pointer per script: entries 0-25 are the letter scripts
 (`scr_letter_A`..`scr_letter_Z`) and the code uses fixed entries through `SCR_*` indices in `donald.h`: `SCR_IDLE` (52),

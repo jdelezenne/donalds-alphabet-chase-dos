@@ -16,7 +16,7 @@ void hline(register int y, register int x, int x2, int c)
         vline(x++, y, y, c);
     if (x < x2) {
         n = x2 - x;
-        if (g_videoMode != 3)
+        if (g_videoMode != VM_MODE3)
             n >>= hline_shift[g_videoMode];
         if (n)
             hspan(x, y, n, c);

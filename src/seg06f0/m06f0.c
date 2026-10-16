@@ -1,24 +1,15 @@
 /* Module at segment 06F0 (compiled without -O). Functions in address order. */
 #include "donald.h"
 
-long mem_read(int i, char far *buf, long len);
 
-char far *strupr();
-char far *normalize_ptr();
-char far *farmalloc();
-void far inset_rect(int n);
-void show_error(void);
-void error_msg(void);
 
 /* Initialised data of this module: DGROUP 1ECE-2193 (pointer table, then TC's literal pool at 1F40).
    Ownership of 1ECE-1EF1 is inferred (it lies after seg0612's literals and before this module's table). */
 int g_cgaSmallWin = 0;
 int unused_1ED0[3] = {0, 0, 0};
 int g_curWindow = 0;                         /* current window */
-int win_x = 0, win_y = 0;             /* error box x, y (text cells) */
-int win_w = 40, win_h = 25;           /* error box w, h */
-int g_textFg = 15, g_textBg = 0;            /* text fg, bg */
-int g_textCol = 0, g_textRow = 0, g_windowSet = 0;
+struct window g_win = {0, 0, 40, 25, 15, 0, 0, 0};  /* the active window: set_window loads it from g_windows[] */
+int g_windowSet = 0;
 int arrow_scancodes[4] = {-72, -80, -75, -77};
 char far *msg_err_create = "Could not create the file on disk...";
 char far *msg_err_mode = "Illegal MODE in Open_File...";
@@ -46,9 +37,9 @@ int g_errWindow = 0;
 int g_videoMode;
 char far *g_errMsg;
 int g_diskNum;
-int g_diskSwapOn;
+int g_multiDisk;
 int g_fileHandles[10];
-int g_errHooked;
+int g_preload;
 
 /* FUNCTION: DONALD 06F0:000E */
 void fatal(char far *msg)
@@ -67,7 +58,7 @@ void quit(int code)
 }
 
 /* FUNCTION: DONALD 06F0:0043 */
-int open_slot(char far *name, int mode)
+int Open_File(char far *name, int mode)
 {
     int oflag;
     int slot;
@@ -75,30 +66,30 @@ int open_slot(char far *name, int mode)
     register int tries;
 
     switch (mode) {
-    case 1:
-        if (!is_loaded(name) && !file_exists(name)) {
-            g_diskNum = lookup_value(name);
-            if (g_diskSwapOn)
-                music_toggle(g_diskNum);
+    case READ:
+        if (!is_loaded(name) && !File_Exists(name)) {
+            g_diskNum = Find_Disk_Number(name);
+            if (g_multiDisk)
+                select_drive(g_diskNum);
         }
         oflag = 0x8001;
         break;
-    case 2:
+    case WRITE:
         oflag = 0x8002;
-        delete_ok(name);
-    case 3:
+        Delete_File(name);
+    case READWRITE:
         tries = g_diskRetries;
-        if (!file_exists(name)) {
-            while (!create_file(name) && tries--) {
+        if (!File_Exists(name)) {
+            while (!Create_File(name) && tries--) {
                 g_errMsg = msg_err_create;
                 (*g_errShowHook)();
             }
-            if (!file_exists(name)) {
+            if (!File_Exists(name)) {
                 (*g_errMsgHook)();
                 quit(1);
             }
         }
-        if (mode == 3)
+        if (mode == READWRITE)
             oflag = 0x8004;
         break;
     default:
@@ -115,7 +106,7 @@ int open_slot(char far *name, int mode)
             fd = open(name, oflag);
             if (fd == -1) {
                 tries--;
-                g_diskNum = lookup_value(name);
+                g_diskNum = Find_Disk_Number(name);
                 g_errMsg = msg_insert_disk_n;
                 (*g_errShowHook)();
             }
@@ -125,17 +116,17 @@ int open_slot(char far *name, int mode)
             quit(1);
         }
     } else {
-        fd = find_name(name);
+        fd = Get_Resident_Index(name);
         g_cmpFiles[fd].pos = 0;
-        fd = fd | 0x8000;
+        fd = fd | FH_RESIDENT;
     }
-    slot = 10;
-    for (tries = 0; tries < 10; tries++)
-        if (g_fileHandles[tries] == 0x7fff) {
+    slot = NUM_FILES;
+    for (tries = 0; tries < NUM_FILES; tries++)
+        if (g_fileHandles[tries] == FH_FREE) {
             slot = tries;
             break;
         }
-    if (slot == 10) {
+    if (slot == NUM_FILES) {
         g_errMsg = msg_err_too_many;
         (*g_errShowHook)();
         (*g_errMsgHook)();
@@ -145,25 +136,25 @@ int open_slot(char far *name, int mode)
 }
 
 /* FUNCTION: DONALD 06F0:0245 */
-void close_slot(register int i)
+void Close_File(register int i)
 {
-    if (g_fileHandles[i] == 0x7fff)
+    if (g_fileHandles[i] == FH_FREE)
         fatal(msg_err_close);
-    if (!(g_fileHandles[i] & 0x8000))
+    if (!(g_fileHandles[i] & FH_RESIDENT))
         close(g_fileHandles[i]);
-    g_fileHandles[i] = 0x7fff;
+    g_fileHandles[i] = FH_FREE;
 }
 
 /* FUNCTION: DONALD 06F0:028D */
-long read_file(register int slot, char far *buf, long len)
+long Read_File(register int slot, char far *buf, long len)
 {
     register unsigned n;
     long total;
 
-    if (g_fileHandles[slot] == 0x7fff)
+    if (g_fileHandles[slot] == FH_FREE)
         fatal(msg_err_read);
-    if (g_fileHandles[slot] & 0x8000)
-        return mem_read(g_fileHandles[slot] & 0x7fff, buf, len);
+    if (g_fileHandles[slot] & FH_RESIDENT)
+        return Read_Resident(g_fileHandles[slot] & 0x7fff, buf, len);
     total = 0;
     while (len > 0xFA00L) {
         n = read(g_fileHandles[slot], buf, 0xFA00);
@@ -180,14 +171,14 @@ long read_file(register int slot, char far *buf, long len)
 }
 
 /* FUNCTION: DONALD 06F0:0373 */
-long write_file(register int slot, char far *buf, long len)
+long Write_File(register int slot, char far *buf, long len)
 {
     register unsigned n;
     long total;
 
-    if (g_fileHandles[slot] == 0x7fff)
+    if (g_fileHandles[slot] == FH_FREE)
         fatal(msg_err_write);
-    if (g_fileHandles[slot] & 0x8000)
+    if (g_fileHandles[slot] & FH_RESIDENT)
         fatal(msg_err_write_res);
     total = 0;
     while (len > 0xFA00L) {
@@ -204,14 +195,14 @@ long write_file(register int slot, char far *buf, long len)
 }
 
 /* FUNCTION: DONALD 06F0:0442 */
-long seek_slot(register int slot, long off, int whence)
+long Seek_File(register int slot, long off, int whence)
 {
     long pos;
     register int i;
 
-    if (g_fileHandles[slot] == 0x7fff)
+    if (g_fileHandles[slot] == FH_FREE)
         fatal(msg_err_seek);
-    if (g_fileHandles[slot] & 0x8000) {
+    if (g_fileHandles[slot] & FH_RESIDENT) {
         i = g_fileHandles[slot] & 0x7fff;
         pos = g_cmpFiles[i].pos;
         switch (whence) {
@@ -251,7 +242,7 @@ long seek_slot(register int slot, long off, int whence)
 }
 
 /* FUNCTION: DONALD 06F0:0620 */
-int file_exists(char far *name)
+int File_Exists(char far *name)
 {
     register int fd;
 
@@ -263,13 +254,13 @@ int file_exists(char far *name)
 }
 
 /* FUNCTION: DONALD 06F0:0650 */
-int delete_ok(char far *name)
+int Delete_File(char far *name)
 {
     return !unlink(name);
 }
 
 /* FUNCTION: DONALD 06F0:0669 */
-int create_file(char far *name)
+int Create_File(char far *name)
 {
     register int fd;
 
@@ -281,14 +272,14 @@ int create_file(char far *name)
 }
 
 /* FUNCTION: DONALD 06F0:069D */
-int lookup_value(char far *name)
+int Find_Disk_Number(char far *name)
 {
     register int i = 0;
 
     name = strupr(name);
     for (; *g_cmpFiles[i].name; i++)
         if (strcmp(g_cmpFiles[i].name, name) == 0)
-            return g_cmpFiles[i].value;
+            return g_cmpFiles[i].disk;
     fatal(msg_err_disk_num);
 }
 
@@ -307,36 +298,36 @@ void show_error(void)
     set_window(g_errWindow);
     alloc = 0;
     if (g_errSaveBuf == 0) {
-        sz = win_w * win_h;
+        sz = g_win.w * g_win.h;
         alloc = 5;
-        if (g_videoMode == 3)
+        if (g_videoMode == VM_MODE3)
             alloc = 6;
         sz <<= alloc;
         g_errSaveBuf = farmalloc(sz);
         alloc = 1;
     }
-    save_window(win_x, win_y, win_w, win_h, g_errSaveBuf);
+    save_window(g_win.x, g_win.y, g_win.w, g_win.h, g_errSaveBuf);
     redraw_rect();
-    draw_line(win_x << 3, win_y << 3, ((win_x + win_w) << 3) - 1, win_y << 3, 15);
-    draw_line(win_x << 3, ((win_y + win_h) << 3) - 1, ((win_x + win_w) << 3) - 1, ((win_y + win_h) << 3) - 1, 15);
-    draw_line(win_x << 3, win_y << 3, win_x << 3, ((win_y + win_h) << 3) - 1, 15);
-    draw_line(((win_x + win_w) << 3) - 1, win_y << 3, ((win_x + win_w) << 3) - 1, ((win_y + win_h) << 3) - 1, 15);
+    draw_line(g_win.x << 3, g_win.y << 3, ((g_win.x + g_win.w) << 3) - 1, g_win.y << 3, 15);
+    draw_line(g_win.x << 3, ((g_win.y + g_win.h) << 3) - 1, ((g_win.x + g_win.w) << 3) - 1, ((g_win.y + g_win.h) << 3) - 1, 15);
+    draw_line(g_win.x << 3, g_win.y << 3, g_win.x << 3, ((g_win.y + g_win.h) << 3) - 1, 15);
+    draw_line(((g_win.x + g_win.w) << 3) - 1, g_win.y << 3, ((g_win.x + g_win.w) << 3) - 1, ((g_win.y + g_win.h) << 3) - 1, 15);
     inset_rect(-1);
     if (g_errMsg == msg_insert_disk_n) {
         g_errMsg[12] = ch + g_diskNum;
-        if (g_noDiskCheck == 0)
-            g_errMsg[23] = g_multiDisk + 'A';
+        if (g_fixedDrive == 0)
+            g_errMsg[23] = g_driveB + 'A';
     }
-    fg = g_textFg;
-    bg = g_textBg;
-    g_textFg = 15;
-    g_textBg = 0;
+    fg = g_win.fg;
+    bg = g_win.bg;
+    g_win.fg = 15;
+    g_win.bg = 0;
     print_wrapped(g_errMsg);
-    g_textFg = fg;
-    g_textBg = bg;
+    g_win.fg = fg;
+    g_win.bg = bg;
     get_key();
     inset_rect(1);
-    blit_generic(win_x, win_y, win_w, win_h, g_errSaveBuf);
+    blit_generic(g_win.x, g_win.y, g_win.w, g_win.h, g_errSaveBuf);
     set_window(oldwin);
     if (alloc) {
         farfree(g_errSaveBuf);
@@ -352,7 +343,7 @@ void error_msg(void)
 }
 
 /* FUNCTION: DONALD 06F0:098D */
-void free_all(void)
+void free_resident(void)
 {
     register int i;
 
@@ -361,8 +352,8 @@ void free_all(void)
             farfree(g_cmpFiles[i].data);
             g_cmpFiles[i].data = 0L;
         }
-    for (i = 0; i < 10; i++)
-        if (g_fileHandles[i] != 0x7fff)
+    for (i = 0; i < NUM_FILES; i++)
+        if (g_fileHandles[i] != FH_FREE)
             fatal(msg_err_open_files);
 }
 
@@ -375,14 +366,14 @@ void load_resources(void)
     register int i;
     register int fd;
 
-    for (i = 0; i < 10; i++)
-        g_fileHandles[i] = 0x7fff;
+    for (i = 0; i < NUM_FILES; i++)
+        g_fileHandles[i] = FH_FREE;
     avail = dos_free_kb() - g_memReserve;
     i = 0;
-    g_diskSwapOn = i;
+    g_multiDisk = i;
     while (*g_cmpFiles[i].name) {
-        g_diskSwapOn |= g_cmpFiles[i].value;
-        if (g_errHooked) {
+        g_multiDisk |= g_cmpFiles[i].disk;
+        if (g_preload) {
             g_cmpFiles[i].name = strupr(g_cmpFiles[i].name);
             need = g_cmpFiles[i].size / 1024L + 1;
             if (avail >= need)
@@ -431,7 +422,7 @@ int is_loaded(char far *name)
 }
 
 /* FUNCTION: DONALD 06F0:0C83 */
-int find_name(char far *name)
+int Get_Resident_Index(char far *name)
 {
     register int i = 0;
 
@@ -443,7 +434,7 @@ int find_name(char far *name)
 }
 
 /* FUNCTION: DONALD 06F0:0CF4 */
-long mem_read(register int i, char far *buf, long len)
+long Read_Resident(register int i, char far *buf, long len)
 {
     char far *src;
 
@@ -458,8 +449,8 @@ long mem_read(register int i, char far *buf, long len)
 /* FUNCTION: DONALD 06F0:0DF9 */
 void inset_rect(register int n)
 {
-    win_x -= n;
-    win_y -= n;
-    win_w += n * 2;
-    win_h += n * 2;
+    g_win.x -= n;
+    g_win.y -= n;
+    g_win.w += n * 2;
+    g_win.h += n * 2;
 }

@@ -27,7 +27,7 @@ void blit_ega(register int x, register int y, int sx, int sy, int w, int h, char
         h += sy;
         sy = 0;
     }
-    if (g_videoMode != 2)
+    if (g_videoMode != VM_EGA)
         blit_ega_core(x, y, sx, sy, w, h, p1, p2);
     else {
         if (p1 == g_backBuf)
