@@ -18,7 +18,7 @@ void print_wrapped(char far *s)
     flag = wlen;
     idx = wlen = wlen;
     line[0] = 0;
-    col = g_1EE4;
+    col = g_textCol;
     while ((ch = s[idx++]) != 0 && !flag) {
         if (ch & 0x80) {
             ch &= 0x7f;
@@ -44,8 +44,8 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            col = g_1EE4;
-            g_1EE2 = s[idx];
+            col = g_textCol;
+            g_textBg = s[idx];
             idx++;
         } else if (ch == 6) {
             word[wlen] = 0;
@@ -57,8 +57,8 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            col = g_1EE4;
-            g_1EE0 = s[idx];
+            col = g_textCol;
+            g_textFg = s[idx];
             idx++;
         } else if (ch == 9) {
             word[wlen] = 0;
@@ -70,17 +70,17 @@ void print_wrapped(char far *s)
                 print_word(word, 0);
             }
             wlen = 0;
-            g_1EE4 = col = s[idx];
+            g_textCol = col = s[idx];
             idx++;
-            if (g_1EE4 >= win_w) {
+            if (g_textCol >= win_w) {
                 col = 0;
-                g_1EE4 = col;
+                g_textCol = col;
             }
         } else if (ch == 0x13) {
             cnt = s[idx];
             idx++;
-            if (g_1EE4 < cnt) {
-                while (g_1EE4 < cnt) {
+            if (g_textCol < cnt) {
+                while (g_textCol < cnt) {
                     word[wlen] = ' ';
                     wlen++;
                     cnt--;

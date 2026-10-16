@@ -41,3 +41,6 @@
     db OPB_%1, 0xC0 | (R8_%2 << 3) | R8_%3
 %endif
 %endmacro
+
+; GFX_DATA variables shared by the graphics modules (offsets in frame 0B7F)
+%define GV_MODE 0x286   ; video type 0 CGA, 1 Tandy, 2 EGA (written by set_video_type)

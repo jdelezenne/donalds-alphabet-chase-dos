@@ -8,6 +8,7 @@ ega_present,0000:01C9,31,asm,int 10h AH=12h BL=10h: EGA BIOS present
 set_text_mode,0000:01E8,22,asm,int 10h mode 3
 ega_select_palette,0000:01FE,25,asm,"int 10h AH=10h, palette 0/1"
 hspan,0000:0217,299,asm,"horizontal EGA span (x, y, n, colour)"
+copy_rect,0000:0342,120,asm,"rectangle copy (src, dst, x, y, w, h), x/w scaled by video mode; copy_rect_core dispatch"
 copy_rect_ega,0000:03BA,701,asm,"EGA rectangle copy (src, dst, x, y, w, h)"
 blit_ega_core,0000:0677,578,asm,EGA latch blit used by blit_ega
 clear_screen,0000:08B9,89,asm,clears video memory B800/A000 per mode
@@ -95,6 +96,10 @@ snd_init,0512:0354,68,asm,"hooks int 8, PIT channel 0 at 1000h"
 snd_shutdown,0512:0398,53,asm,"restores int 8 and the PIT, speaker off"
 snd_play,0512:03CD,36,asm,starts a tune (far pointer to a byte stream)
 snd_stop,0512:03F1,22,asm,sets the stop flag
+ctrlc_install,0512:0407,51,asm,int 23h -> IRET stub (Ctrl-C ignored)
+ctrlc_remove,0512:043A,34,asm,restores int 23h
+kbbreak_install,0512:045C,198,asm,int 9 filter swallowing ScrollLock/SysRq/Ctrl-Break
+kbbreak_remove,0512:0522,34,asm,restores int 9
 timer_ticks,0512:0544,20,asm,tick counter maintained by the int 8 handler
 play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
 stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c

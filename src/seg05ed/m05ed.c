@@ -2,8 +2,8 @@
 #include "donald.h"
 
 /* Module data: DGROUP 1E88-1EA1. */
-int g_1E88[] = {3, 1, 7, 0, 508, 510, 504, 511};
-int g_1E98[] = {2, 1, 3, 0, 0};
+int hline_masks[] = {3, 1, 7, 0, 508, 510, 504, 511};
+int hline_shift[] = {2, 1, 3, 0, 0};
 
 /* FUNCTION: DONALD 05ED:0007 */
 void hline(register int y, register int x, int x2, int c)
@@ -11,16 +11,16 @@ void hline(register int y, register int x, int x2, int c)
     int n;
     int mask;
 
-    mask = g_1E88[g_videoMode];
+    mask = hline_masks[g_videoMode];
     while ((x & mask) && x <= x2)
         vline(x++, y, y, c);
     if (x < x2) {
         n = x2 - x;
         if (g_videoMode != 3)
-            n >>= g_1E98[g_videoMode];
+            n >>= hline_shift[g_videoMode];
         if (n)
             hspan(x, y, n, c);
-        x = g_1E88[g_videoMode + 4] & x2;
+        x = hline_masks[g_videoMode + 4] & x2;
     }
     while (x <= x2)
         vline(x++, y, y, c);

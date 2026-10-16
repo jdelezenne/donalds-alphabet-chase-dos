@@ -9,8 +9,8 @@ segment _TEXT public align=1 class=CODE use16
 
 global _hspan
 _hspan equ L0217
-global _fn_0000_0342
-_fn_0000_0342 equ L0342
+global _copy_rect
+_copy_rect equ copy_rect
 global _copy_rect_ega
 _copy_rect_ega equ L03BA
 global _blit_ega_core
@@ -34,11 +34,11 @@ L0217:
     mov word [0x12], cx
     mov ax, word [bp + 0xc]
     mov word [0x14], ax
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     je short L0254
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L026F
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L02AF
     jmp near L02F5
 L0254:
@@ -153,7 +153,8 @@ L0335:
     jmp short L02EF
 
 ; FUNCTION: DONALD 0000:0342
-L0342:
+; copy_rect: rectangle copy (src, dst, x, y, w, h); scales x/w by the video mode, then copy_rect_core
+copy_rect:
     push bp
     rr mov, bp, sp
     push di
@@ -170,13 +171,13 @@ L0342:
     mov es, ax
     mov ax, word [bp + 0xe]
     shl ax, 1
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L037F
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L037F
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L037F
     shl ax, 1
 L037F:
@@ -185,20 +186,20 @@ L037F:
     mov word [0x1c], ax
     mov ax, word [bp + 0x12]
     shl ax, 1
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L03A8
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L03A8
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L03A8
     shl ax, 1
 L03A8:
     mov word [0x20], ax
     mov ax, word [bp + 0x14]
     mov word [0x22], ax
-    call L042E
+    call copy_rect_core
     pop es
     pop ds
     pop si
@@ -224,13 +225,13 @@ L03BA:
     mov ax, word [bp + 0xc]
     mov es, ax
     mov ax, word [bp + 0xe]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L03F5
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L03F5
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L03F5
     shl ax, 1
 L03F5:
@@ -238,32 +239,33 @@ L03F5:
     mov ax, word [bp + 0x10]
     mov word [0x1c], ax
     mov ax, word [bp + 0x12]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L041C
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L041C
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L041C
     shl ax, 1
 L041C:
     mov word [0x20], ax
     mov ax, word [bp + 0x14]
     mov word [0x22], ax
-    call L042E
+    call copy_rect_core
     pop es
     pop ds
     pop si
     pop di
     pop bp
     retf
-L042E:
-    cmp word [0x286], 0
+; copy_rect_core: clip to 40x200 and dispatch per mode (copy_rect_ega_latch = EGA write mode 1)
+copy_rect_core:
+    cmp word [GV_MODE], 0
     jne short L0438
     jmp near L05D9
 L0438:
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L0442
     jmp short L04B6
     db 0x90
@@ -295,7 +297,7 @@ L046E:
     add ax, word [0x18]
     rr add, di, ax
     rr add, si, ax
-L048B:
+copy_rect_ega_latch:
     mov dx, 0x3ce
     mov ax, 0x105
     out dx, al
@@ -318,7 +320,7 @@ L04A3:
 L04B3:
     jmp near L0564
 L04B6:
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L04C0
     jmp near L0565
 L04C0:
@@ -512,13 +514,13 @@ L0677:
     mov ds, ax
     push es
     mov ax, word [bp + 6]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L06AA
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L06AA
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L06AA
     mov bx, word [bp + 0x14]
     cmp bx, 0xa000
@@ -532,13 +534,13 @@ L06AA:
     shl ax, 1
     mov word [0x1c], ax
     mov ax, word [bp + 0xa]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L06E0
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L06E0
     shl ax, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L06E0
     mov bx, word [bp + 0x18]
     cmp bx, 0xa000
@@ -552,10 +554,10 @@ L06E0:
     shl ax, 1
     mov word [0x1e], ax
     mov ax, word [bp + 0xe]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L0704
     shl ax, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L0704
     shl ax, 1
 L0704:
@@ -574,7 +576,7 @@ L0704:
     mov es, ax
     mov ax, word [0x1c]
     mov dx, 0x28
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     jne short L073F
     cmp word [0x16], 0xa000
     jne short L073F
@@ -585,7 +587,7 @@ L073F:
     add word [0x24], ax
     mov ax, word [0x1e]
     mov dx, 0x28
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     jne short L0761
     cmp word [0x16], 0xa000
     jne short L0761
@@ -595,14 +597,14 @@ L0761:
     add ax, word [0x1a]
     rr add, di, ax
     mov si, word [0x24]
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L07C0
     ja short L0779
     jmp near L0872
 L0779:
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     je short L0786
-    call L048B
+    call copy_rect_ega_latch
     jmp near L086C
 L0786:
     mov ax, es

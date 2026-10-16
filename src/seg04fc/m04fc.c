@@ -18,9 +18,9 @@ main(int argc, char far **argv)
         snd_set_option(-1);
     else
         snd_set_option(60);
-    g_1F3E = 1;
-    g_1F2E = about;
-    g_3B6C = 1;
+    g_errWindow = 1;
+    g_errShowHook = about;
+    g_errHooked = 1;
     kbd_install();
     detect_video();
 #else
@@ -32,9 +32,9 @@ main(int argc, char far **argv)
         if (argc >= 3)
             set_video_type(g_videoMode = (int)atol(argv[2]));
     }
-    g_1F3E = 1;
-    g_1F2E = about;
-    g_3B6C = 1;
+    g_errWindow = 1;
+    g_errShowHook = about;
+    g_errHooked = 1;
     kbd_install();
     if (g_videoMode == -1)
         detect_video();
@@ -43,9 +43,9 @@ main(int argc, char far **argv)
     g_videoMem = (char far *)0xB8000000L;
     if (g_videoMode == 2)
         g_videoMem = (char far *)0xA0000000L;
-    g_1F38 = 0x39;
+    g_memReserve = 0x39;
     if (g_videoMode == 1)
-        g_1F38 += 0x10;
+        g_memReserve += 0x10;
     init_game();
     game();
     free_all();
@@ -56,14 +56,14 @@ main(int argc, char far **argv)
 void init_game(void)
 {
     snd_init();
-    g_3AF0 = 1;
-    g_3AFC = 0;
+    g_initDone = 1;
+    g_noDiskCheck = 0;
     install_harderr();
     gfx_init();
     calibrate();
     g_backBuf = xalloc(0x8000L);
     g_workBuf = g_packBuf = xalloc(0x8000L);
-    g_1F3A = g_backBuf;
+    g_errSaveBuf = g_backBuf;
     load_resources();
 }
 

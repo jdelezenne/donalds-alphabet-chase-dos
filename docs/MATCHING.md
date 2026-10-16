@@ -120,7 +120,7 @@ C0L.OBJ and CL.LIB from the toolchain); the original EXE is read only for the fi
   (`g_1ABA` = `g_1AAA[1].a`, `g_1E32` = `g_tunes[4]`).
 - **`GFX_DATA`** (frame 0B7F, 0E-14DF) is `db` in the asm modules that address it: seg0000_0217 0E-25,
   seg0000_08b9 26-14B5, seg0000_2a15 14B6-14DF (split by which module touches which offsets; the 14B6 cut is anywhere
-  in 14B6-14BC). Offsets used from C are publics (`_g_23B2`, ...).
+  in 14B6-14BC). Offsets used from C are publics (`_gfx_clip_x1`, ...).
 - **`_BSS`** is real tentative definitions with sizes: m0304 3868-3AE3, m05d5 3AE4, m061f 3AE6-3AEF, music.c 3AF0-3B4D,
   m06f0 3B4E-3B6D (each owner references a variable in its range; the split keeps the link order monotonic). Gaps nobody
   references are `char g_XXXX[n]`. Overlapping placeholders were really array elements: `g_3874` = `g_386A[5]`,
@@ -145,3 +145,29 @@ while editing). The relink above supersedes it as the proof.
   their paragraph (0512 at offset 9, 056A at offset 8), and their TASM-style hard-coded `cs:` offsets move with them.
   They are written as `CSO(n)` (= `n`, or `n + 8` under `DONALD_ALT`).
 Only units that mention `DONALD_ALT` are rebuilt for the alt target (`build/alt/obj`, `build/alt/asm`). Everything else is shared.
+
+## Names (batch 6)
+
+Every `g_XXXX`, `scr_XXXX`, `tune_XXXX`, `d_XXXX` and `fn_` placeholder now has a name based on how it is used
+(the old address is kept in `config/retail/data.csv` notes). The binary has no symbols. Its only strings are the
+messages and file names, and those name the message globals (`msg_*`, `msg_err_*`). How the names were made:
+- **BSS link names stay put.** Only the left side of the `#define name g_XXXX_` lines in `donald.h` changed, so TC
+  still hashes the same link names and lays out `_BSS` exactly as before.
+- **Slot arrays are 8 long.** `g_3896`, `g_38CE/D2/D6`, `g_3914`, `g_3936` and the 4-byte fillers after them were
+  slots 5-7 of `slot_frame`, `slot_pc`, `slot_delay` and `slot_timer`. They are now `slot_*[5..7]`. Same addresses,
+  same code.
+- **One script table.** `g_1332`..`g_145A` and the unnamed `d_133A/13EE/1456` were all entries of one 127-entry
+  `g_scriptTable`. The code reads them as `g_scriptTable[SCR_*]`, which gives the same direct loads.
+- Bytes patched inside scripts keep their own variables: `bubble_frame`/`bubble_arg1`/`bubble_arg2` in `scr_bubble`,
+  and `pick_frame1/2` in `scr_pick_helper`. The script pieces around them are `scr_bubble_2/3` and `scr_pick_helper_2`.
+- CGA/Tandy colour maps (`g_palettes[]`) are `pal_<first picture that uses it>`. Tunes are `tune_NN` by `g_tunes` index.
+- `struct window` is now `{x, y, w, h, fg, bg, col, row}`: set_window swaps the last four with
+  `g_textFg/g_textBg/g_textCol/g_textRow`.
+- New asm names: `copy_rect` (0000:0342) with its helpers `copy_rect_core`/`copy_rect_ega_latch`, and in seg0512
+  `ctrlc_install/remove` (int 23h) and `kbbreak_install/remove` (int 9). Internal helpers: `take_nibble`,
+  `smc_merge_nibble`, `smc_merge_shifted`, `expand_bits4`. `GV_MODE` (tasm.inc) names GFX_DATA:0286. The other
+  `Lxxxx` labels are branch targets or aliases of named publics.
+- Left as `unused_XXXX`: `unused_1ED0`, `unused_38E2`, `unused_3A9C`, `unused_3AE8`, `unused_3AFE`. Nothing references
+  them; they only fill layout gaps. `arrow_scancodes` and `msg_err_write_io` are named from their contents, but nothing
+  references them either.
+

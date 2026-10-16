@@ -1,10 +1,10 @@
 #include "donald.h"
 
 /* Module data: DGROUP 1E86. */
-int g_1E86 = 40;
+int g_textCols = 40;
 
 /* Uninitialised data (_BSS): DGROUP 3AE4-3AE5 (ownership inferred, see docs/MATCHING.md). */
-int g_3AE4;
+int g_textWraps;
 
 /* FUNCTION: DONALD 05D5:000D */
 void print_text(char far *s, register int col, int y, int fg, int bg)
@@ -31,9 +31,9 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
         } else {
             ch = (*p & 0x7f) << 3;
             p++;
-            if (col > g_1E86 - 1) {
+            if (col > g_textCols - 1) {
                 col = x0;
-                g_3AE4++;
+                g_textWraps++;
                 off += 320;
                 if (g_videoMode == 3)
                     off += 0x8c0;

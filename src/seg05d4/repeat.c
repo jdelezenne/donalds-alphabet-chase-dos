@@ -4,5 +4,5 @@
 void repeat_call(int n)
 {
     while (n--)
-        wait_vretrace(g_382D);
+        wait_vretrace(g_retraceWait);
 }

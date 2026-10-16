@@ -11,10 +11,10 @@ void draw_pic(char far *p, char far *dst)
         cmp_unpack_cga(p, dst);
     if (g_videoMode == 0) {
         n = 80;
-        if (g_1ECE)
+        if (g_cgaSmallWin)
             n = 4;
         cga_convert(dst, dst, n, 16000);
-        if (g_1ECE)
+        if (g_cgaSmallWin)
             cga_shift_rows(dst);
     }
 }

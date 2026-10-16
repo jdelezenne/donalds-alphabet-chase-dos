@@ -11,61 +11,52 @@ int far run_script(int i);
 int far ending(void);
 
 /* Module data: DGROUP 0094-0209 (detect_video's messages, palette maps, disk prompt). */
-char g_0094[] = "\n\r\nA CGA ";
-char g_009E[] = "\n\r\nAn EGA ";
-char g_00A9[] = "\n\r\nA TANDY ";
-char g_00B5[] = "graphic card has been detected.  If you wish to\n\roverride this choice, you will have 20 seconds to do so.\n\r\n\rInput graphics mode, 1:CGA 2:EGA/VGA 3:TANDY";
-char g_014F = 10;
-char g_0150 = 13;
-char d_0151[1] = {0};
-char g_0152[16] = {0, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
-int g_0162[] = {15, 13, 12, 14, 17, 16};
-int g_016E[] = {5, 3, 1, 7, 2, 0};
-int g_017A[] = {6, 11, 4, 9, 8, 10};
-char g_0186[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
-char g_0196[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
-char g_01A6[100] = "Please make sure that Donald's Alphabet Chase disk is in the disk drive, then press the space bar.";
+char msg_cga[] = "\n\r\nA CGA ";
+char msg_ega[] = "\n\r\nAn EGA ";
+char msg_tandy[] = "\n\r\nA TANDY ";
+char msg_detected[] = "graphic card has been detected.  If you wish to\n\roverride this choice, you will have 20 seconds to do so.\n\r\n\rInput graphics mode, 1:CGA 2:EGA/VGA 3:TANDY";
+char str_lf = 10;
+char str_cr = 13;
+char pad_0151[1] = {0};
+char pal_level[16] = {0, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+int group_scene_pic[] = {15, 13, 12, 14, 17, 16};
+int group_letters_pic[] = {5, 3, 1, 7, 2, 0};
+int group_donald_pic[] = {6, 11, 4, 9, 8, 10};
+char pal_title[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+char pal_ending[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+char msg_insert_disk[100] = "Please make sure that Donald's Alphabet Chase disk is in the disk drive, then press the space bar.";
 
 /* Uninitialised data (_BSS): DGROUP 3868-3AE3 (ownership inferred, see docs/MATCHING.md). */
-int g_3868;
+int jump_right;
 int slot_x[8];
 int slot_y[8];
 int g_group;
-int slot_frame[5];
-int g_3896;
-char g_3898[4];
-int g_389C;
+int slot_frame[8];
+int jump_x_major;
 int slot_shown[8];
-int g_38AE;
-int g_38B0;
-int g_38B2;
+int jump_major;
+int jump_minor;
+int g_keysEnabled;
 char far *g_packBuf;
-int g_38B8;
-char far *slot_pc[5];
-char far *g_38CE;
-char far *g_38D2;
-char far *g_38D6;
-int g_38DA;
-int g_38DC;
-int g_38DE;
-int g_38E0;
-char g_38E2[40];
-int slot_delay[5];
-int g_3914;
-char g_3916[4];
-int g_391A;
+int jump_steps;
+char far *slot_pc[8];
+int g_letterPicked;
+int jump_err;
+int g_idleTicks;
+int g_pickedLetter;
+char unused_38E2[40];
+int slot_delay[8];
+int g_gameWon;
 int slot_w[8];
-int slot_timer[5];
-int g_3936;
-char g_3938[4];
+int slot_timer[8];
 char far *g_workBuf;
 int g_letterDone[26];
 int slot_flag[8];
 char far *g_sprites[70];
-char g_3A9C[2];
+char unused_3A9C[2];
 int slot_h[8];
 int g_letterScore[26];
-int g_3AE2;
+int g_jumping;
 
 /* FUNCTION: DONALD 0304:000C */
 
@@ -111,23 +102,23 @@ void check_collisions(void)
 
 /* FUNCTION: DONALD 0304:0187 */
 
-void draw_items(int p)
+void draw_items(int mode)
 {
     register int i;
-    register int d;
-    int a, b;
+    register int grow;
+    int padX, padY;
 
     for (i = 0; i < 8; i++) {
-        a = 1;
-        b = 8;
-        d = 2;
+        padX = 1;
+        padY = 8;
+        grow = 2;
         if (slot_h[i] != 3 && slot_h[i] != 8) {
-            a = d;
-            b = 16;
-            d = 4;
+            padX = grow;
+            padY = 16;
+            grow = 4;
         }
         if (slot_shown[i] != -1)
-            draw_item(p, (slot_x[i] >> 3) - a, slot_y[i] - b, slot_w[i] + d, (slot_h[i] + d) << 3);
+            draw_item(mode, (slot_x[i] >> 3) - padX, slot_y[i] - padY, slot_w[i] + grow, (slot_h[i] + grow) << 3);
     }
 }
 
@@ -209,18 +200,18 @@ void draw_item(int mode, register int x, register int y, int w, int h)
 /* FUNCTION: DONALD 0304:0383 */
 void step(register int i)
 {
-    if (g_389C) {
-        if (g_3868)
+    if (jump_x_major) {
+        if (jump_right)
             slot_x[i] += 8;
         else
             slot_x[i] -= 8;
     } else
         slot_y[i] -= 8;
-    g_38DC -= g_38B0;
-    if (g_38DC < 0) {
-        g_38DC += g_38AE;
-        if (!g_389C) {
-            if (g_3868)
+    jump_err -= jump_minor;
+    if (jump_err < 0) {
+        jump_err += jump_major;
+        if (!jump_x_major) {
+            if (jump_right)
                 slot_x[i] += 8;
             else
                 slot_x[i] -= 8;
@@ -272,7 +263,7 @@ void next_level(void)
             sum = 0;
             for (i = g_groupFirst[g_group]; i < g_groupFirst[g_group + 1]; i++)
                 sum += g_letterScore[i];
-        } while (sum == g_146D[g_group]);
+        } while (sum == group_letter_count[g_group]);
         i = 0;
         if (key_ready())
             i = handle_key();
@@ -281,7 +272,7 @@ void next_level(void)
             reset_actors();
         }
     } else
-        g_391A = 1;
+        g_gameWon = 1;
 }
 
 /* FUNCTION: DONALD 0304:05C0 */
@@ -304,26 +295,26 @@ void detect_video(void)
 
     set_text_mode();
     for (i = 0; i < 8; i++) {
-        dos_putc(g_014F);
-        dos_putc(g_0150);
+        dos_putc(str_lf);
+        dos_putc(str_cr);
     }
     i = 0;
     if (rom_check()) {
         g_videoMode = 1;
-        while (g_00A9[i])
-            dos_putc(g_00A9[i++]);
+        while (msg_tandy[i])
+            dos_putc(msg_tandy[i++]);
     } else if (ega_present()) {
         g_videoMode = 2;
-        while (g_009E[i])
-            dos_putc(g_009E[i++]);
+        while (msg_ega[i])
+            dos_putc(msg_ega[i++]);
     } else {
         g_videoMode = 0;
-        while (g_0094[i])
-            dos_putc(g_0094[i++]);
+        while (msg_cga[i])
+            dos_putc(msg_cga[i++]);
     }
     i = 0;
-    while (g_00B5[i])
-        dos_putc(g_00B5[i++]);
+    while (msg_detected[i])
+        dos_putc(msg_detected[i++]);
     i = 0;
     time(&t0);
     do {
@@ -331,7 +322,7 @@ void detect_video(void)
             i = get_key();
         time(&t1);
     } while (!i && t1 - t0 < 20);
-    time(&g_25FB);
+    time(&g_randSeed);
     if (i) {
         switch (i) {
         case '1':
@@ -356,7 +347,7 @@ int level_sum(void)
 
     for (i = g_groupFirst[g_group]; i < g_groupFirst[g_group + 1]; i++)
         sum += g_letterScore[i];
-    if (g_146D[g_group] > sum)
+    if (group_letter_count[g_group] > sum)
         sum = 0;
     return sum;
 }
@@ -373,23 +364,23 @@ void aim(int i)
     y = slot_y[i] >> 3;
     if (x >= target) {
         d = x - target;
-        g_3868 = 0;
+        jump_right = 0;
     } else {
         d = target - x;
-        g_3868 = 1;
+        jump_right = 1;
     }
     t = y;
     if (d >= t) {
-        g_38AE = d;
-        g_38B0 = t;
-        g_389C = 1;
+        jump_major = d;
+        jump_minor = t;
+        jump_x_major = 1;
     } else {
-        g_38AE = t;
-        g_38B0 = d;
-        g_389C = 0;
+        jump_major = t;
+        jump_minor = d;
+        jump_x_major = 0;
     }
-    g_38DC = g_38AE >> 1;
-    g_38B8 = g_38AE;
+    jump_err = jump_major >> 1;
+    jump_steps = jump_major;
 }
 
 /* FUNCTION: DONALD 0304:080E */
@@ -399,18 +390,18 @@ void reset_actors(void)
 
     for (i = 0; i < 8; i++) {
         slot_w[i] = slot_h[i] = 3;
-        slot_pc[i] = g_1332;
+        slot_pc[i] = g_scriptTable[SCR_IDLE];
         slot_x[i] = -160;
         slot_y[i] = 0;
         slot_timer[i] = slot_delay[i] = 10;
         slot_frame[i] = -1;
     }
     slot_w[7] = slot_h[7] = 8;
-    g_38D6 = g_13EA;
-    g_38CE = g_1336;
+    slot_pc[7] = g_scriptTable[SCR_DONALD];
+    slot_pc[5] = g_scriptTable[SCR_BUBBLE];
     slot_x[5] = 0x128;
-    slot_y[5] = g_3896 = 0;
-    g_3936 = g_3914 = 20;
+    slot_y[5] = slot_frame[5] = 0;
+    slot_timer[5] = slot_delay[5] = 20;
     init_slots();
 }
 
@@ -422,13 +413,13 @@ void setup_level(int lv)
     for (i = 0; i < 8; i++)
         slot_timer[i] = 0;
     for (i = 0; i < 5; i++) {
-        slot_pc[i] = g_145A;
+        slot_pc[i] = g_scriptTable[SCR_PICK_LETTER];
         slot_h[i] = 3;
     }
     slot_h[5] = 3;
     slot_h[6] = 3;
-    g_021D = g_021E = g_1493[lv];
-    g_38D2 = g_1452;
+    pick_frame1 = pick_frame2 = letter_frame[lv];
+    slot_pc[6] = g_scriptTable[SCR_PICK_HELPER];
     init_slots();
 }
 
@@ -438,7 +429,7 @@ void show_picture(register int n)
     char c;
 
     load_file(g_cmpFiles[n].name, g_workBuf);
-    if (g_173C[n]) {
+    if (pic_needs_ega[n]) {
         c = 0;
         if (g_videoMode == 0) {
             set_palette16(g_palettes[n]);
@@ -478,20 +469,20 @@ void load_level_gfx(void)
             free(g_sprites[i]);
             g_sprites[i] = (char far *)-1L;
         }
-    show_picture(g_016E[g_group]);
+    show_picture(group_letters_pic[g_group]);
     for (i = 1; i < 28; i++)
         g_sprites[i + 3] = grab(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
-    show_picture(g_017A[g_group]);
+    show_picture(group_donald_pic[g_group]);
     for (i = 57; i < 65; i++)
         g_sprites[i] = grab(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
-    show_picture(g_0162[g_group]);
+    show_picture(group_scene_pic[g_group]);
     if (g_videoMode)
         ega_select_palette(0);
-    set_palette(g_0152);
+    set_palette(pal_level);
     blit_dispatch(g_backBuf, 0, 0, 40, 200);
     draw_item(0, 0, 0, 40, 200);
     draw_item(4, 0, 0, 40, 200);
-    g_38DE = 0;
+    g_idleTicks = 0;
 }
 
 /* FUNCTION: DONALD 0304:0C0D */
@@ -505,7 +496,7 @@ void game(void)
 
     for (i = key = 0; i < 70; i++)
         g_sprites[i] = (char far *)-1L;
-    set_palette(g_0186);
+    set_palette(pal_title);
     if (g_videoMode)
         ega_select_palette(1);
     kbd_flush();
@@ -541,14 +532,14 @@ void game(void)
     while (key != 27) {
         for (i = 0; i < 26; i++)
             g_letterScore[i] = g_letterDone[i] = 0;
-        i = 0; g_391A = 0; g_38DE = 0; g_38DA = 0; g_38B2 = g_group = g_3AE2 = 0;
+        i = 0; g_gameWon = 0; g_idleTicks = 0; g_letterPicked = 0; g_keysEnabled = g_group = g_jumping = 0;
         load_level_gfx();
         reset_actors();
         last = now = timer_ticks();
         for (i = 0; i < 8; i++)
             draw_item(4, (slot_x[i] >> 3) - 1, slot_y[i] - 8, slot_w[i] + 2, (slot_h[i] + 2) << 3);
         for (;;) {
-            g_38DE++;
+            g_idleTicks++;
             draw_items(3);
             for (i = 0; i < 8; i++) {
                 slot_shown[i] = run_script(i);
@@ -589,7 +580,7 @@ void game(void)
                 if (key == 27)
                     break;
             }
-            if (g_391A) {
+            if (g_gameWon) {
                 key = ending();
                 break;
             }
@@ -607,7 +598,7 @@ int handle_key(void)
     register int key = 0;
     register int r;
 
-    if (!g_38B2) {
+    if (!g_keysEnabled) {
         kbd_flush();
         goto done;
     }
@@ -619,14 +610,14 @@ int handle_key(void)
         if ((key < 'A' || key > 'Z') && key != 27 && key != '1')
             key = 0;
     }
-    if (key && key != 27 && !g_38DA && key != '1') {
+    if (key && key != 27 && !g_letterPicked && key != '1') {
         r = level_sum();
         if (r)
             goto done;
         key -= 'A';
         if (g_letterScore[key])
             goto clear;
-        g_38DE = 0;
+        g_idleTicks = 0;
         for (r = 5; r >= 0; r--)
             if (g_groupFirst[r] <= key)
                 break;
@@ -634,24 +625,24 @@ int handle_key(void)
             g_group = r;
             load_level_gfx();
             reset_actors();
-        } else if (key != g_145E)
+        } else if (key != g_curLetter)
             setup_level(key);
         else
             play_sound(0);
-        g_145E = g_38E0 = key;
-        g_38DA = 1;
-        g_letterDone[g_38E0] = 1;
-        g_38CE = g_1336;
-        g_0211 = 0;
-        g_0210 = 3;
-        g_020C = (key - g_groupFirst[g_group]) * 4 + 1;
+        g_curLetter = g_pickedLetter = key;
+        g_letterPicked = 1;
+        g_letterDone[g_pickedLetter] = 1;
+        slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+        bubble_arg2 = 0;
+        bubble_arg1 = 3;
+        bubble_frame = (key - g_groupFirst[g_group]) * 4 + 1;
         goto done;
     }
     if (key != '1')
         goto done;
     snd_play(g_tunes[4]);
-    g_1460 ^= 1;
-    if (!g_1460)
+    g_soundOn ^= 1;
+    if (!g_soundOn)
         stop_sound();
 clear:
     key = 0;
@@ -703,7 +694,7 @@ int run_script(register int i)
             break;
         case -2:
             r = cont = -1;
-            slot_pc[i] = g_1332;
+            slot_pc[i] = g_scriptTable[SCR_IDLE];
             break;
         case -3:
             slot_x[i] = *slot_pc[i]++ << 3;
@@ -714,29 +705,29 @@ int run_script(register int i)
             break;
         case -5:
             if ((t = level_sum()) != 0) {
-                slot_pc[i] = g_13E2;
+                slot_pc[i] = g_scriptTable[SCR_LEVEL_DONE];
                 break;
             }
-            if (!g_38DA) {
-                if (g_38DE > 5000) {
-                    slot_pc[i] = g_13E6;
-                    g_38DE = 0;
+            if (!g_letterPicked) {
+                if (g_idleTicks > 5000) {
+                    slot_pc[i] = g_scriptTable[SCR_IDLE_TIMEOUT];
+                    g_idleTicks = 0;
                     break;
                 }
                 do
-                    j = roll(1, g_146D[g_group], g_1479[g_group]);
+                    j = roll(1, group_letter_count[g_group], group_roll_base[g_group]);
                 while (g_letterScore[j]);
                 slot_pc[j - g_groupFirst[g_group]] = g_scriptTable[j];
-                g_145E = j;
-                g_38CE = g_1336;
-                g_0210 = 3;
-                g_0211 = 0;
-                g_020C = ((j - g_groupFirst[g_group]) << 2) + 1;
+                g_curLetter = j;
+                slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+                bubble_arg1 = 3;
+                bubble_arg2 = 0;
+                bubble_frame = ((j - g_groupFirst[g_group]) << 2) + 1;
                 break;
             } else {
-                if (g_145E == g_38E0)
+                if (g_curLetter == g_pickedLetter)
                     break;
-                g_145E = j = g_38E0;
+                g_curLetter = j = g_pickedLetter;
                 slot_pc[j - g_groupFirst[g_group]] = g_scriptTable[j];
                 break;
             }
@@ -815,25 +806,25 @@ int run_script(register int i)
             }
             break;
         case -19:
-            g_38D6[3] = *slot_pc[i]++ + (slot_x[i] >> 3);
+            slot_pc[7][3] = *slot_pc[i]++ + (slot_x[i] >> 3);
             break;
         case -20:
-            if (!g_3AE2) {
+            if (!g_jumping) {
                 slot_timer[i] = slot_delay[i] = 4;
-                g_3AE2++;
+                g_jumping++;
                 aim(i);
-                g_0210 = g_0211 = 0;
-                g_38CE = g_1336;
-                g_020C = 0x25;
+                bubble_arg1 = bubble_arg2 = 0;
+                slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+                bubble_frame = 0x25;
                 play_sound(11);
             }
-            if (g_38B8) {
+            if (jump_steps) {
                 step(i);
-                g_38B8--;
+                jump_steps--;
             }
-            if (!g_38B8) {
-                g_38DA = 0;
-                g_3AE2 = 0;
+            if (!jump_steps) {
+                g_letterPicked = 0;
+                g_jumping = 0;
                 slot_pc[i]++;
                 play_sound(10);
             } else
@@ -844,7 +835,7 @@ int run_script(register int i)
             init_slots();
             break;
         case -23:
-            slot_pc[0] = g_scriptTable[g_1461[g_group]];
+            slot_pc[0] = g_scriptTable[group_intro_script[g_group]];
             break;
         case -24:
             if (*slot_pc[i]++ == g_group)
@@ -915,34 +906,34 @@ int run_script(register int i)
             r = slot_frame[i];
             break;
         case -42:
-            g_145E = -1;
-            g_0210 = g_0211 = 0;
-            g_38CE = g_1336;
-            g_020C = 0x25;
+            g_curLetter = -1;
+            bubble_arg1 = bubble_arg2 = 0;
+            slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+            bubble_frame = 0x25;
             break;
         case -43:
-            if (!g_38DA)
+            if (!g_letterPicked)
         inc:
                 slot_pc[i]++;
             else
-                setup_level(g_145E);
+                setup_level(g_curLetter);
             break;
         case -44:
             slot_x[i] = slot_x[7] + 16;
             slot_y[i] = 0x60;
             break;
         case -45:
-            g_145E = -1;
+            g_curLetter = -1;
             break;
         case -46:
             j = *slot_pc[i]++;
             play_sound(j);
             break;
         case -47:
-            g_38B2 = 1;
+            g_keysEnabled = 1;
             break;
         case -48:
-            g_38B2 = 0;
+            g_keysEnabled = 0;
             break;
         }
     }
@@ -973,12 +964,12 @@ void init_slots(void)
 {
     register int i;
 
-    for (i = 0; i < g_146D[g_group]; i++)
+    for (i = 0; i < group_letter_count[g_group]; i++)
         if (g_letterScore[g_groupFirst[g_group] + i]) {
             slot_x[i] = (i * 4 + 1) * 8;
             slot_y[i] = 0;
-            slot_frame[i] = g_1493[g_groupFirst[g_group] + i];
-            slot_pc[i] = g_14AD;
+            slot_frame[i] = letter_frame[g_groupFirst[g_group] + i];
+            slot_pc[i] = scr_letter_wait;
             slot_timer[i] = 0;
         }
 }
@@ -1045,7 +1036,7 @@ int ending(void)
     load_file(g_cmpFiles[22].name, g_workBuf);
     if (g_videoMode == 0)
         set_palette16(g_palettes[22]);
-    set_palette(g_0196);
+    set_palette(pal_ending);
     if (g_videoMode)
         ega_select_palette(1);
     draw_pic(g_workBuf, g_backBuf);
@@ -1067,7 +1058,7 @@ void about(void)
     draw_line((win_x - 1) << 3, ((win_y + win_h + 1) << 3) - 1, ((win_x + win_w + 1) << 3) - 1, ((win_y + win_h + 1) << 3) - 1, 15);
     draw_line((win_x - 1) << 3, (win_y - 1) << 3, (win_x - 1) << 3, ((win_y + win_h + 1) << 3) - 1, 15);
     draw_line(((win_x + win_w + 1) << 3) - 1, (win_y - 1) << 3, ((win_x + win_w + 1) << 3) - 1, ((win_y + win_h + 1) << 3) - 1, 15);
-    print_wrapped(g_01A6);
+    print_wrapped(msg_insert_disk);
     get_key();
     clear_screen();
 }
