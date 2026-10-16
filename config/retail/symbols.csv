@@ -31,6 +31,7 @@ init_slots,0304:1ABA,125,matched,100.0% src/seg0304/init_slots.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/wait_key.c
 main,04FC:0009,214,matched,100.0% src/seg04fc/main.c
 init_game,04FC:00DF,99,matched,100.0% src/seg04fc/m04fc.c
+shutdown,04FC:0142,31,matched,100.0% src/seg04fc/m04fc.c
 play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
 stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
 key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
@@ -47,8 +48,10 @@ xalloc,0612:0009,124,matched,100.0% src/seg0612/m0612.c
 load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
 calibrate,061F:0007,222,matched,100.0% src/seg061f/m061f.c
 music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
+set_window,065E:0008,272,matched,100.0% src/seg065e/m065e.c
 redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
 draw_sprite,06C3:000F,253,matched,100.0% src/seg06c3/m06c3.c
+draw_sprite_masked,06D3:000C,253,matched,100.0% src/seg06d3/m06d3.c
 harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
 install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr_handler.c
 harderr_local,06E3:0024,56,lib,CL.LIB:HARDERR

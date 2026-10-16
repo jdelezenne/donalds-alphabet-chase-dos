@@ -16,3 +16,12 @@ void init_game(void)
     g_1F3A = g_3AF2;
     fn_06F0_0A23();
 }
+
+/* FUNCTION: DONALD 04FC:0142 */
+void shutdown(void)
+{
+    fn_0000_14DD(2);
+    fn_0512_0398();
+    fn_056A_0562();
+    exit(g_3B4E);
+}

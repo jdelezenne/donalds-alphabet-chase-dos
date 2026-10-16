@@ -1,7 +1,5 @@
 #include "donald.h"
 
-struct sprite_rect { int a, b, c, d; char pad[8]; };
-extern struct sprite_rect g_1AAA[];
 
 /* FUNCTION: DONALD 06C3:000F */
 void draw_sprite(char far *dst, char far *src, register int x, register int y, int idx)
