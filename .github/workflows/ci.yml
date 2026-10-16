@@ -8,3 +8,11 @@ jobs:
       - run: python3 -m py_compile tools/*.py && bash -n tools/*.sh
       - name: no game binaries committed
         run: "! git ls-files | grep -iE '\\.(exe|cmp|com|obj|lib|img|ima)$|^game/DONALD$'"
+  relink:
+    # Needs game/DONALD.EXE and Turbo C 2.0 (TC_ROOT) + DOSBox-X + NASM, which cannot live in the repo:
+    # runs only on a self-hosted runner that has them (set repository variable DAC_SELF_HOSTED=true).
+    if: ${{ vars.DAC_SELF_HOSTED == 'true' }}
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - run: tools/relink.sh   # verify.py (all functions) + mkdata.py + TLINK + whole-EXE byte compare

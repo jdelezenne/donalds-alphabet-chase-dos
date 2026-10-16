@@ -151,13 +151,13 @@ long write_file(register int slot, char far *buf, long len)
         fatal(g_1F16);
     total = 0;
     while (len > 0xFA00L) {
-        n = read(g_3B58[slot], buf, 0xFA00);
+        n = write(g_3B58[slot], buf, 0xFA00);
         if (n == -1)
             return 0L;
         len -= 0xFA00;
         total += n;
     }
-    n = read(g_3B58[slot], buf, len);
+    n = write(g_3B58[slot], buf, len);
     if (n == -1)
         return 0L;
     return n + total;
@@ -269,7 +269,7 @@ void show_error(void)
     if (g_1F3A == 0) {
         sz = g_1EDC * g_1EDE;
         alloc = 5;
-        if (g_3B4E == 3)
+        if (g_videoMode == 3)
             alloc = 6;
         sz <<= alloc;
         g_1F3A = farmalloc(sz);
@@ -318,7 +318,7 @@ void free_all(void)
 
     for (i = 0; *g_1772[i].name; i++)
         if (g_1772[i].data) {
-            free(g_1772[i].data);
+            farfree(g_1772[i].data);
             g_1772[i].data = 0L;
         }
     for (i = 0; i < 10; i++)

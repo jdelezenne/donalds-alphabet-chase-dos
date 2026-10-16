@@ -118,7 +118,7 @@ void draw_item(int mode, register int x, register int y, int w, int h)
         dst = (char far *)0xA0000000L;
         break;
     }
-    if (g_3B4E != 2) {
+    if (g_videoMode != 2) {
         switch (mode) {
         case 0:
             src = g_3AF8;
@@ -178,7 +178,7 @@ void draw_frame(int mode, register int i, register int x, int y)
     char far *p;
 
     p = g_3AF2;
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         p = (char far *)0xA8000000L;
     g_1ABA = 0;
     g_1ABE = 40;
@@ -252,15 +252,15 @@ void detect_video(void)
     }
     i = 0;
     if (rom_check()) {
-        g_3B4E = 1;
+        g_videoMode = 1;
         while (g_00A9[i])
             fn_0000_1180(g_00A9[i++]);
     } else if (fn_0000_01C9()) {
-        g_3B4E = 2;
+        g_videoMode = 2;
         while (g_009E[i])
             fn_0000_1180(g_009E[i++]);
     } else {
-        g_3B4E = 0;
+        g_videoMode = 0;
         while (g_0094[i])
             fn_0000_1180(g_0094[i++]);
     }
@@ -278,17 +278,17 @@ void detect_video(void)
     if (i) {
         switch (i) {
         case '1':
-            g_3B4E = 0;
+            g_videoMode = 0;
             break;
         case '2':
-            g_3B4E = 2;
+            g_videoMode = 2;
             break;
         case '3':
-            g_3B4E = 1;
+            g_videoMode = 1;
             break;
         }
     }
-    fn_0000_14C7(g_3B4E);
+    fn_0000_14C7(g_videoMode);
 }
 
 /* FUNCTION: DONALD 0304:0737 */
@@ -383,25 +383,25 @@ void show_picture(register int n)
     load_file(g_1772[n].name, g_393C);
     if (g_173C[n]) {
         c = 0;
-        if (g_3B4E == 0) {
+        if (g_videoMode == 0) {
             fn_0000_0FF2(g_16D0[n]);
-            c = g_3B4E = 1;
-            fn_0000_14C7(g_3B4E);
+            c = g_videoMode = 1;
+            fn_0000_14C7(g_videoMode);
         }
         draw_pic(g_393C, g_3AF2);
         if (c) {
-            g_3B4E = 0;
+            g_videoMode = 0;
             fn_0000_14C7(0);
             fn_0000_10D2(g_3AF2, 0);
         }
     } else {
-        if (g_3B4E == 0)
+        if (g_videoMode == 0)
             fn_0000_0FF2(g_16D0[n]);
         draw_pic(g_393C, g_3AF2);
-        if (g_3B4E == 2)
+        if (g_videoMode == 2)
             fn_0000_0A6B(g_3AF2, 0xA800);
     }
-    if (g_3B4E == 0)
+    if (g_videoMode == 0)
         fn_0000_1478(1);
 }
 
@@ -428,7 +428,7 @@ void load_level_gfx(void)
     for (i = 57; i < 65; i++)
         g_3984[i] = grab(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
     show_picture(g_0162[g_388A]);
-    if (g_3B4E)
+    if (g_videoMode)
         fn_0000_01FE(0);
     set_palette(g_0152);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
@@ -449,7 +449,7 @@ void game(void)
     for (i = key = 0; i < 70; i++)
         g_3984[i] = (char far *)-1L;
     set_palette(g_0186);
-    if (g_3B4E)
+    if (g_videoMode)
         fn_0000_01FE(1);
     fn_056A_019E();
     show_picture(26);
@@ -612,7 +612,7 @@ int run_script(register int i)
 
     if (g_392C[i]) {
         g_392C[i]--;
-        if (g_3B4E == 1 && g_392C[i])
+        if (g_videoMode == 1 && g_392C[i])
             g_392C[i]--;
         return -1;
     }
@@ -953,29 +953,29 @@ int ending(void)
     load_file(g_1772[19].name, g_393C + 0x1b8a);
     load_file(g_1772[20].name, g_393C + 0x3714);
     load_file(g_1772[21].name, g_393C + 0x5910);
-    if (g_3B4E == 0)
+    if (g_videoMode == 0)
         fn_0000_0FF2(g_16D0[18]);
     draw_pic(g_393C, g_3AF2);
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         fn_0000_0A6B(g_3AF2, 0xA800);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     play_sound(24);
     draw_pic(g_393C + 0x1b8a, g_3AF2);
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         fn_0000_0A6B(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
         return k;
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     draw_pic(g_393C + 0x3714, g_3AF2);
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         fn_0000_0A6B(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
         return k;
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     draw_pic(g_393C + 0x5910, g_3AF2);
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         fn_0000_0A6B(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
@@ -986,13 +986,13 @@ int ending(void)
         return k;
     play_sound(17);
     load_file(g_1772[22].name, g_393C);
-    if (g_3B4E == 0)
+    if (g_videoMode == 0)
         fn_0000_0FF2(g_16D0[22]);
     set_palette(g_0196);
-    if (g_3B4E)
+    if (g_videoMode)
         fn_0000_01FE(1);
     draw_pic(g_393C, g_3AF2);
-    if (g_3B4E == 2)
+    if (g_videoMode == 2)
         fn_0000_0A6B(g_3AF2, 0xA800);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     k = wait_key(1);

@@ -1,0 +1,41 @@
+# TLINK object order for DONALD.EXE, recovered from the MZ relocation table: TLINK writes relocations module by
+# module in link order, so the order in which each module's relocation entries first appear is the link order
+# (see docs/MATCHING.md "Relink"). One line per object: DOS name, source (build object). "@data N" lines insert the
+# build-time generated data module N (tools/mkdata.py) at that point.
+C0L      lib:C0L.OBJ
+M0304    obj:m0304
+@data    0304
+M04FC    obj:m04fc
+A01C9    asm:seg0000_01c9
+A0512    asm:seg0512
+@data    0512
+M0567    obj:sound
+A056A    asm:seg056a
+M05C2    obj:input
+A0217    asm:seg0000_0217
+M05C5    obj:m05c5
+A08B9    asm:seg0000_08b9
+M05D4    obj:repeat
+M05D5    obj:m05d5
+M05E7    obj:m05e7
+M05ED    obj:m05ed
+M0604    obj:m0604
+M060B    obj:m060b
+M0612    obj:m0612
+A277E    asm:seg0000_277e
+M061A    obj:m061a
+M061F    obj:m061f
+M062D    obj:m062d
+M065B    obj:music
+M065E    obj:m065e
+M066F    obj:redraw
+M0671    obj:m0671
+M06AD    obj:m06ad
+M06C3    obj:m06c3
+M06D3    obj:m06d3
+M06E3    obj:harderr
+A2A15    asm:seg0000_2a15
+M06EF    obj:m06ef
+@data    06EF
+M06F0    obj:m06f0
+@data    06F0

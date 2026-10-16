@@ -27,7 +27,7 @@ void blit_ega(register int x, register int y, int sx, int sy, int w, int h, char
         h += sy;
         sy = 0;
     }
-    if (g_3B4E != 2)
+    if (g_videoMode != 2)
         fn_0000_0677(x, y, sx, sy, w, h, p1, p2);
     else {
         if (p1 == g_3AF2)
