@@ -435,6 +435,113 @@ void load_level_gfx(void)
     g_38DE = 0;
 }
 
+/* FUNCTION: DONALD 0304:0C0D */
+void game(void)
+{
+    int now;
+    int last;
+    int dt;
+    register int i;
+    register int key;
+
+    for (i = key = 0; i < 70; i++)
+        g_3984[i] = (char far *)-1L;
+    set_palette(g_0186);
+    if (g_3B4E)
+        fn_0000_01FE(1);
+    fn_056A_019E();
+    show_picture(26);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    play_sound(24);
+    for (i = 0; i < 1000; i++) {
+        repeat_call(1);
+        if (key_ready()) {
+            get_key();
+            break;
+        }
+    }
+    play_sound(17);
+    show_picture(25);
+    for (i = 41; i < 56; i++)
+        g_3984[i] = fn_062D_0005(((i - 41) % 5) * 8, ((i - 41) / 5) * 64, 8, 64);
+    show_picture(24);
+    g_3984[56] = fn_062D_0005(0, 0, 8, 64);
+    show_picture(23);
+    g_3984[1] = fn_062D_0005(0, 0, 1, 1);
+    g_3984[2] = fn_062D_0005(3, 0, 1, 1);
+    g_3984[3] = fn_062D_0005(6, 0, 3, 24);
+    for (i = 57; i < 65; i++)
+        g_3984[i] = fn_062D_0005(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
+    for (i = 1; i < 28; i++)
+        g_3984[i + 3] = fn_062D_0005(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
+    key = 1;
+    if (!key)
+        key = 27;
+    if (key != 27)
+        key = 0;
+    while (key != 27) {
+        for (i = 0; i < 26; i++)
+            g_3AAE[i] = g_3940[i] = 0;
+        i = 0; g_391A = 0; g_38DE = 0; g_38DA = 0; g_38B2 = g_388A = g_3AE2 = 0;
+        load_level_gfx();
+        reset_actors();
+        last = now = fn_0512_0544();
+        for (i = 0; i < 8; i++)
+            draw_item(4, (g_386A[i] >> 3) - 1, g_387A[i] - 8, g_391C[i] + 2, (g_3A9E[i] + 2) << 3);
+        for (;;) {
+            g_38DE++;
+            draw_items(3);
+            for (i = 0; i < 8; i++) {
+                g_389E[i] = fn_0304_11AA(i);
+                if (g_389E[i] != -1)
+                    g_388C[i] = g_389E[i];
+            }
+            for (i = 0; i < 8; i++)
+                if (g_389E[i] != -1) {
+                    i = 0;
+                    break;
+                }
+            if (!i) {
+                check_collisions();
+                draw_items(2);
+                for (i = 0; i < 8; i++)
+                    if (g_389E[i] != -1 && g_389E[i] != 0) {
+                        if (g_3974[i] == 0)
+                            draw_frame(1, g_388C[i], g_386A[i], g_387A[i]);
+                        else
+                            draw_frame(2, g_388C[i], g_386A[i], g_387A[i]);
+                    }
+                draw_items(1);
+            }
+            do {
+                now = fn_0512_0544();
+                if (last < 0)
+                    last = now;
+                if (last > now)
+                    now += 0x123;
+            } while ((dt = now - last) <= 4);
+            last = fn_0512_0544();
+            if (!fn_0512_00EE()) {
+                key = 27;
+                break;
+            }
+            if (key_ready()) {
+                key = handle_key();
+                if (key == 27)
+                    break;
+            }
+            if (g_391A) {
+                key = fn_0304_1B74();
+                break;
+            }
+        }
+    }
+    for (i = 1; i < 65; i++)
+        if (g_3984[i] != (char far *)-1L)
+            free(g_3984[i]);
+    free(g_393C);
+}
+
 /* FUNCTION: DONALD 0304:1061 */
 int handle_key(void)
 {
