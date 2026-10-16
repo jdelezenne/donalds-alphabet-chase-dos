@@ -1,2 +1,5 @@
 name,offset,notes
-g_videoMode,3B4E,"0 CGA, 1 ?, 2 EGA; set from argv[2] or detect_video()"
+g_videoMode,3B4E,"0 CGA, 1 Tandy, 2 EGA (see g_biosVideoMode); set from argv[2] or detect_video()"
+g_cmpFiles,1772,"28 x {name, size, data, value, pos}: the .CMP picture files (sizes match the game disk); names are seg0304/tables.c's literal pool"
+g_biosVideoMode,1ADA,"{4, 9, 0x0D}: BIOS mode per g_videoMode (CGA 320x200x4, Tandy 320x200x16, EGA 320x200x16), passed to fn_0000_14DD by main"
+g_tunes,1E22,"25 far pointers to the music-driver byte streams (tune_XXXX) played through fn_0512_03CD"

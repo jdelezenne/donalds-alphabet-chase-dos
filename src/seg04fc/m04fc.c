@@ -5,6 +5,10 @@ char far *xalloc();
 void init_game(void);
 void shutdown(void);
 
+/* Module data: DGROUP 1AAA-1ADF (text windows for set_window; BIOS video mode per g_videoMode). */
+struct sprite_rect g_1AAA[] = {{0, 0, 40, 25, 15, 0, 0, 0}, {0, 8, 30, 10, 15, 0, 0, 0}, {5, 10, 30, 4, 15, 0, 0, 0}};
+int g_biosVideoMode[] = {4, 9, 13};
+
 /* FUNCTION: DONALD 04FC:0009 */
 main(int argc, char far **argv)
 {
@@ -22,7 +26,7 @@ main(int argc, char far **argv)
     fn_056A_029A();
     if (g_videoMode == -1)
         detect_video();
-    fn_0000_14DD(g_1ADA[g_videoMode]);
+    fn_0000_14DD(g_biosVideoMode[g_videoMode]);
     g_3AF8 = (char far *)0xB8000000L;
     if (g_videoMode == 2)
         g_3AF8 = (char far *)0xA0000000L;

@@ -1,6 +1,10 @@
 /* Module 05ED: clipped lines / rectangles. */
 #include "donald.h"
 
+/* Module data: DGROUP 1E88-1EA1. */
+int g_1E88[] = {3, 1, 7, 0, 508, 510, 504, 511};
+int g_1E98[] = {2, 1, 3, 0, 0};
+
 /* FUNCTION: DONALD 05ED:0007 */
 void hline(register int y, register int x, int x2, int c)
 {

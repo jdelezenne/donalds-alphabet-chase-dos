@@ -1,14 +1,14 @@
 # TLINK object order for DONALD.EXE, recovered from the MZ relocation table: TLINK writes relocations module by
 # module in link order, so the order in which each module's relocation entries first appear is the link order
-# (see docs/MATCHING.md "Relink"). One line per object: DOS name, source (build object). "@data N" lines insert the
-# build-time generated data module N (tools/mkdata.py) at that point.
+# (see docs/MATCHING.md "Relink"). One line per object: DOS name, source (build object).
+# DSCRIPTS/DTABLES are data-only C units (src/data/) whose relocations follow seg0304's code ones.
 C0L      lib:C0L.OBJ
 M0304    obj:m0304
-@data    0304
+DSCRIPTS obj:scripts
+DTABLES  obj:tables
 M04FC    obj:m04fc
 A01C9    asm:seg0000_01c9
 A0512    asm:seg0512
-@data    0512
 M0567    obj:sound
 A056A    asm:seg056a
 M05C2    obj:input

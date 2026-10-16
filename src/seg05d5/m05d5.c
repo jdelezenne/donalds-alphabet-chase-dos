@@ -1,5 +1,11 @@
 #include "donald.h"
 
+/* Module data: DGROUP 1E86. */
+int g_1E86 = 40;
+
+/* Uninitialised data (_BSS): DGROUP 3AE4-3AE5 (ownership inferred, see docs/MATCHING.md). */
+int g_3AE4;
+
 /* FUNCTION: DONALD 05D5:000D */
 void print_text(char far *s, register int col, int y, int fg, int bg)
 {

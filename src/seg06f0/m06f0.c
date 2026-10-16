@@ -42,6 +42,14 @@ int g_1F38 = 200;                       /* memory reserve (paragraphs?) */
 char far *g_1F3A = 0;                   /* saved screen under the error box */
 int g_1F3E = 0;
 
+/* Uninitialised data (_BSS): DGROUP 3B4E-3B6D (ownership inferred, see docs/MATCHING.md). */
+int g_videoMode;
+char far *g_3B50;
+int g_3B54;
+int g_3B56;
+int g_3B58[10];
+int g_3B6C;
+
 /* FUNCTION: DONALD 06F0:000E */
 void fatal(char far *msg)
 {
@@ -118,7 +126,7 @@ int open_slot(char far *name, int mode)
         }
     } else {
         fd = find_name(name);
-        g_1772[fd].pos = 0;
+        g_cmpFiles[fd].pos = 0;
         fd = fd | 0x8000;
     }
     slot = 10;
@@ -205,19 +213,19 @@ long seek_slot(register int slot, long off, int whence)
         fatal(g_1F0E);
     if (g_3B58[slot] & 0x8000) {
         i = g_3B58[slot] & 0x7fff;
-        pos = g_1772[i].pos;
+        pos = g_cmpFiles[i].pos;
         switch (whence) {
         case 0:
-            if (g_1772[i].size < off)
-                pos = g_1772[i].size;
+            if (g_cmpFiles[i].size < off)
+                pos = g_cmpFiles[i].size;
             else
                 pos = off;
             break;
         case 2:
-            pos = g_1772[i].size;
+            pos = g_cmpFiles[i].size;
         case 1:
-            if (pos + off > g_1772[i].size)
-                pos = g_1772[i].size;
+            if (pos + off > g_cmpFiles[i].size)
+                pos = g_cmpFiles[i].size;
             else if (pos + off < 0)
                 pos = 0;
             else
@@ -227,7 +235,7 @@ long seek_slot(register int slot, long off, int whence)
             fatal(g_1F12);
             break;
         }
-        g_1772[i].pos = pos;
+        g_cmpFiles[i].pos = pos;
         return pos;
     }
     switch (whence) {
@@ -278,9 +286,9 @@ int lookup_value(char far *name)
     register int i = 0;
 
     name = strupr(name);
-    for (; *g_1772[i].name; i++)
-        if (strcmp(g_1772[i].name, name) == 0)
-            return g_1772[i].value;
+    for (; *g_cmpFiles[i].name; i++)
+        if (strcmp(g_cmpFiles[i].name, name) == 0)
+            return g_cmpFiles[i].value;
     fatal(g_1F1A);
 }
 
@@ -348,10 +356,10 @@ void free_all(void)
 {
     register int i;
 
-    for (i = 0; *g_1772[i].name; i++)
-        if (g_1772[i].data) {
-            farfree(g_1772[i].data);
-            g_1772[i].data = 0L;
+    for (i = 0; *g_cmpFiles[i].name; i++)
+        if (g_cmpFiles[i].data) {
+            farfree(g_cmpFiles[i].data);
+            g_cmpFiles[i].data = 0L;
         }
     for (i = 0; i < 10; i++)
         if (g_3B58[i] != 0x7fff)
@@ -372,27 +380,27 @@ void load_resources(void)
     avail = fn_0000_0EFE() - g_1F38;
     i = 0;
     g_3B56 = i;
-    while (*g_1772[i].name) {
-        g_3B56 |= g_1772[i].value;
+    while (*g_cmpFiles[i].name) {
+        g_3B56 |= g_cmpFiles[i].value;
         if (g_3B6C) {
-            g_1772[i].name = strupr(g_1772[i].name);
-            need = g_1772[i].size / 1024L + 1;
+            g_cmpFiles[i].name = strupr(g_cmpFiles[i].name);
+            need = g_cmpFiles[i].size / 1024L + 1;
             if (avail >= need)
-                buf = farmalloc(g_1772[i].size);
+                buf = farmalloc(g_cmpFiles[i].size);
             else
                 buf = 0;
             if (buf == 0) {
                 i++;
                 continue;
             }
-            fd = open(g_1772[i].name, 0x8001);
+            fd = open(g_cmpFiles[i].name, 0x8001);
             if (fd == -1) {
                 farfree(buf);
                 i++;
                 continue;
             }
-            if ((long)read(fd, buf, g_1772[i].size) == g_1772[i].size) {
-                g_1772[i].data = buf;
+            if ((long)read(fd, buf, g_cmpFiles[i].size) == g_cmpFiles[i].size) {
+                g_cmpFiles[i].data = buf;
                 close(fd);
                 i++;
                 avail -= need;
@@ -412,9 +420,9 @@ int is_loaded(char far *name)
     register int i = 0;
 
     name = strupr(name);
-    for (; *g_1772[i].name; i++)
-        if (strcmp(g_1772[i].name, name) == 0) {
-            if (g_1772[i].data)
+    for (; *g_cmpFiles[i].name; i++)
+        if (strcmp(g_cmpFiles[i].name, name) == 0) {
+            if (g_cmpFiles[i].data)
                 return 1;
             else
                 return 0;
@@ -428,8 +436,8 @@ int find_name(char far *name)
     register int i = 0;
 
     name = strupr(name);
-    for (; *g_1772[i].name; i++)
-        if (strcmp(g_1772[i].name, name) == 0)
+    for (; *g_cmpFiles[i].name; i++)
+        if (strcmp(g_cmpFiles[i].name, name) == 0)
             return i;
     fatal(g_1F1E);
 }
@@ -439,11 +447,11 @@ long mem_read(register int i, char far *buf, long len)
 {
     char far *src;
 
-    if (g_1772[i].pos + len > g_1772[i].size)
-        len = g_1772[i].size - g_1772[i].pos;
-    src = fn_0000_115F(g_1772[i].data + g_1772[i].pos);
+    if (g_cmpFiles[i].pos + len > g_cmpFiles[i].size)
+        len = g_cmpFiles[i].size - g_cmpFiles[i].pos;
+    src = fn_0000_115F(g_cmpFiles[i].data + g_cmpFiles[i].pos);
     fn_0000_0A2E(src, buf, len);
-    g_1772[i].pos += len;
+    g_cmpFiles[i].pos += len;
     return len;
 }
 

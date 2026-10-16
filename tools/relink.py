@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Relink DONALD.EXE with the Turbo C 2.0 TLINK from build objects and compare the whole EXE with the original.
-Inputs: build/obj/*.OBJ (tools/build.sh), build/asm/*.OBJ (tools/verify.py), build/gen/*.OBJ (tools/mkdata.py),
+Inputs: build/obj/*.OBJ (tools/build.sh), build/asm/*.OBJ (tools/verify.py),
 C:\\LIB\\C0L.OBJ + C:\\LIB\\CL.LIB from $TC_ROOT, object order from config/retail/link.txt.
 Output: build/link/DONALD.EXE (+ DONALD.MAP); prints the first differences. Exit 0 only if byte-identical.
 Usage: relink.py [-q]"""
@@ -13,11 +13,10 @@ objs = []
 for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
     if not line.strip() or line.startswith("#"): continue
     n, s = line.split()[:2]
-    if n == "@data": n, s = "D" + s, "gen:d" + s.lower()
     kind, name = s.split(":")
     if kind == "lib": objs.append("C:\\LIB\\" + name); continue
-    src = ROOT / {"obj": "build/obj", "asm": "build/asm", "gen": "build/gen"}[kind] / (name + ".OBJ")
-    if not src.exists(): sys.exit(f"missing {src} (run tools/build.sh, tools/verify.py, tools/mkdata.py)")
+    src = ROOT / {"obj": "build/obj", "asm": "build/asm"}[kind] / (name + ".OBJ")
+    if not src.exists(): sys.exit(f"missing {src} (run tools/build.sh, tools/verify.py)")
     shutil.copy(src, L / (n + ".OBJ")); objs.append(n)
 rsp = "/m /s /l /c " + " +\r\n".join(objs) + "\r\nDONALD\r\nDONALD\r\nC:\\LIB\\CL\r\n"
 (L / "LINK.RSP").write_bytes(rsp.encode())
