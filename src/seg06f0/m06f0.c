@@ -31,6 +31,30 @@ void close_slot(register int i)
     g_3B58[i] = 0x7fff;
 }
 
+/* FUNCTION: DONALD 06F0:0373 */
+long read_file(register int slot, char far *buf, long len)
+{
+    register unsigned n;
+    long total;
+
+    if (g_3B58[slot] == 0x7fff)
+        fatal(g_1F0A);
+    if (g_3B58[slot] & 0x8000)
+        fatal(g_1F16);
+    total = 0;
+    while (len > 0xFA00L) {
+        n = read(g_3B58[slot], buf, 0xFA00);
+        if (n == -1)
+            return 0L;
+        len -= 0xFA00;
+        total += n;
+    }
+    n = read(g_3B58[slot], buf, len);
+    if (n == -1)
+        return 0L;
+    return n + total;
+}
+
 /* FUNCTION: DONALD 06F0:0620 */
 int file_exists(char far *name)
 {

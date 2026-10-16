@@ -14,7 +14,7 @@ if "-n" not in sys.argv and "--no-build" not in sys.argv:
     subprocess.run([str(ROOT / "tools/build.sh"), *map(str, srcs)], check=False, stdout=subprocess.DEVNULL)
 exe = (ROOT / "game/DONALD.EXE").read_bytes(); img = exe[struct.unpack_from("<H", exe, 8)[0] * 16:]
 ANN = re.compile(r"/\*\s*FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\s*\*/")
-DEF = re.compile(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;]*$")
+DEF = re.compile(r"^(?:[A-Za-z_][\w \*]*?[\s\*])?(\w+)\s*\([^;]*$")
 res = {}
 for src in srcs:
     lines = src.read_text().splitlines(); want = []
@@ -66,10 +66,10 @@ for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
 fn = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
 ctot = sum(int(r["size"]) for r in fn if r["kind"] == "c")
 code_end = struct.unpack_from("<H", img, 1)[0] * 16       # DGROUP start = end of code
-mc = sum(v[1] for v in res.values() if v[3] == "matched")
+mc = sum(int(r["size"] or 0) for r in rows if r["status"] == "matched")
 lib = sum(int(r["size"]) for r in rows if r["status"] == "lib")
-nm = sum(1 for v in res.values() if v[3] == "matched")
-print(f"matched {nm}/{len(res)} annotated; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
+nm = sum(1 for r in rows if r["status"] == "matched")
+print(f"checked {len(res)}, all matched {nm}; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
       f"code {mc+lib}/{code_end} bytes = {100*(mc+lib)/code_end:.2f}% (incl. {lib} lib)")
 (ROOT / "build").mkdir(exist_ok=True)
 (ROOT / "build/progress.txt").write_text(f"{100*mc/ctot:.2f}\n")
