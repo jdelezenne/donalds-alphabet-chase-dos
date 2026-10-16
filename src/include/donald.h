@@ -28,6 +28,9 @@ extern int g_3B58[];
 extern char far *g_1F02;
 extern int g_1EE2, g_1EE4, g_1EE6;
 extern int g_388A;
+extern int g_3B4E;
+extern int g_1E88[];
+extern int g_1E98[];
 extern int g_1485[], g_146D[], g_3AAE[];
 
 void far quit(int code);

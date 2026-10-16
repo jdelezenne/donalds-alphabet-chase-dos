@@ -9,7 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent)); import omf
 ROOT = Path(__file__).resolve().parents[1]
 args = [a for a in sys.argv[1:] if not a.startswith("-")]
-srcs = [Path(a) for a in args] or sorted((ROOT / "src").rglob("*.c"))
+srcs = [Path(a).resolve() for a in args] or sorted((ROOT / "src").rglob("*.c"))
 if "-n" not in sys.argv and "--no-build" not in sys.argv:
     subprocess.run([str(ROOT / "tools/build.sh"), *map(str, srcs)], check=False, stdout=subprocess.DEVNULL)
 exe = (ROOT / "game/DONALD.EXE").read_bytes(); img = exe[struct.unpack_from("<H", exe, 8)[0] * 16:]
