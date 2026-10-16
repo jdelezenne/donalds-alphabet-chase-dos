@@ -42,3 +42,12 @@ is a full-layout TLINK rebuild compared with `cmp`.
 ## Library identification
 `tools/libmatch.py /opt/tc20/LIB -m l --csv ...` does a relocation-masked search of every code segment of `C0L.OBJ`, `CL.LIB`, `MATHL.LIB`, `EMU.LIB`, `FP87.LIB`, `GRAPHICS.LIB`. Results are merged into `config/retail/symbols.csv` with `status=lib`; `functions.csv` has `kind` = `lib` / `asm?` / `c`.
 (`GFREEMEM`, 18 bytes, overlaps `FFREE` and was dropped as a false hit.)
+
+## Batch-1 workflow additions
+- Annotate every function: `/* FUNCTION: DONALD SSSS:OOOO */` right before the definition (TC 2.0 has no `//`).
+- `python3 tools/verify.py` (clean: `rm -rf build` first) builds, checks all annotated functions with fixups masked, updates `config/retail/symbols.csv` and prints byte progress (`build/progress.txt`).
+- `tools/permute.py file.perm target.c --flags "-ml|-ml -O -Z"` brute-forces `@P{a|b}` source alternatives × flags.
+- `tools/dumpfn.py --list` lists unmatched C functions; `tools/cmpobj.py OBJ name=SSSS:OOOO` shows a side-by-side diff.
+- Per-module flags live in `config/retail/cflags.txt` (glob relative to src/, last match wins).
+- One source file per original code segment (calls to earlier functions in the same TU become `push cs; call near`).
+- TC quirks: first local = lowest address; `a=b=0` stores b first; -O reorders if/else and tail-merges; branch polarity follows source (`if (x != 3) {...} else` vs `if (x == 3)`).

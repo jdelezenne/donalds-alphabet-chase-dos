@@ -54,6 +54,8 @@ set_palette,060B:000F,106,matched,100.0% src/seg060b/m060b.c
 xalloc,0612:0009,124,matched,100.0% src/seg0612/m0612.c
 load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
 calibrate,061F:0007,222,matched,100.0% src/seg061f/m061f.c
+grab,062D:0005,417,matched,100.0% src/seg062d/m062d.c
+grab_vga,062D:01A6,326,matched,100.0% src/seg062d/m062d.c
 music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
 set_window,065E:0008,272,matched,100.0% src/seg065e/m065e.c
 redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
