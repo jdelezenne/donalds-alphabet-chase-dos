@@ -12,9 +12,9 @@ char far *grab(int x, register int y, int w, register int h)
     unsigned size;
     char far *res;
 
-    if (g_3B4E != 3) {
+    if (g_videoMode != 3) {
         size = (w * h) << 2;
-        if (g_3B4E != 2) {
+        if (g_videoMode != 2) {
             res = xalloc((long)(size + 4));
             if (res) {
                 res[1] = h - 1;
@@ -24,7 +24,7 @@ char far *grab(int x, register int y, int w, register int h)
                 w <<= 1;
                 stride = 160;
                 fn_0000_0D56(g_3AF2 + y + x, res + 4, w, h, stride - w * 2);
-                if (g_3B4E == 0)
+                if (g_videoMode == 0)
                     fn_0000_0D56(g_3AF2 + y + x + 1, res + (size >> 1) + 4, w, h, stride - w * 2);
             }
         } else {

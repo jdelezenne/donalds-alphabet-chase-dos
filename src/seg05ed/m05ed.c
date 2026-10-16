@@ -7,16 +7,16 @@ void hline(register int y, register int x, int x2, int c)
     int n;
     int mask;
 
-    mask = g_1E88[g_3B4E];
+    mask = g_1E88[g_videoMode];
     while ((x & mask) && x <= x2)
         fn_0000_2584(x++, y, y, c);
     if (x < x2) {
         n = x2 - x;
-        if (g_3B4E != 3)
-            n >>= g_1E98[g_3B4E];
+        if (g_videoMode != 3)
+            n >>= g_1E98[g_videoMode];
         if (n)
             fn_0000_0217(x, y, n, c);
-        x = g_1E88[g_3B4E + 4] & x2;
+        x = g_1E88[g_videoMode + 4] & x2;
     }
     while (x <= x2)
         fn_0000_2584(x++, y, y, c);

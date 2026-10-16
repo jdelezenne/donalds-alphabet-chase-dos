@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Compile src/*.c (or the given files) with Turbo C 2.0 inside headless DOSBox-X into build/obj/<name>.OBJ.
-# DOS needs 8.3 names, so each file is compiled as Cnnn.C in build/dos and the object renamed back.
+# DOS needs 8.3 names: a longer name is compiled as Cnnn.C in build/dos and the object renamed back.
 # Flags: config/retail/cflags.txt line 1 (default) + optional per-file override "name.c: flags".
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; OUT="$ROOT/build/obj"; DOS="$ROOT/build/dos"
@@ -12,6 +12,9 @@ cmds=(); names=(); i=0
 for f in "${FILES[@]}"; do
   [ -f "$f" ] || continue
   base=$(basename "$f" .c); short=$(printf 'C%03d' $i); i=$((i+1))
+  # 8.3-safe names compile under their own name: TCC names the code segment NAME_TEXT after the file, and TLINK
+  # combines equal segment names (seg06e3/harderr.c shares HARDERR_TEXT with CL.LIB's HARDERR module)
+  [[ "$base" =~ ^[A-Za-z0-9_]{1,8}$ ]] && short=$(echo "$base" | tr a-z A-Z)
   sed "s/\r*$/\r/" "$f" > "$DOS/$short.C"; names+=("$short:$base")
   rel=${f#"$ROOT/src/"}; over=""
   # override lines: "<glob relative to src/>: flags" (last match wins), e.g. "seg06f0/*: -ml -Z"

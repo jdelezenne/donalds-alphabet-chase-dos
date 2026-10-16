@@ -3,12 +3,44 @@
 
 long mem_read(int i, char far *buf, long len);
 
-char far *fn_08E1_0003();
+char far *strupr();
 char far *fn_0000_115F();
 char far *farmalloc();
 void far inset_rect(int n);
 void show_error(void);
-extern char far *g_1F0E, far *g_1F12, far *g_1F2A;
+void error_msg(void);
+
+/* Initialised data of this module: DGROUP 1ECE-2193 (pointer table, then TC's literal pool at 1F40).
+   Ownership of 1ECE-1EF1 is inferred (it lies after seg0612's literals and before this module's table). */
+int g_1ECE = 0;
+int g_1ED0[3] = {0, 0, 0};
+int g_1ED6 = 0;                         /* current window */
+int g_1ED8 = 0, g_1EDA = 0;             /* error box x, y (text cells) */
+int g_1EDC = 40, g_1EDE = 25;           /* error box w, h */
+int g_1EE0 = 15, g_1EE2 = 0;            /* text fg, bg */
+int g_1EE4 = 0, g_1EE6 = 0, g_1EE8 = 0;
+int g_1EEA[4] = {-72, -80, -75, -77};
+char far *g_1EF2 = "Could not create the file on disk...";
+char far *g_1EF6 = "Illegal MODE in Open_File...";
+char far *g_1EFA = "Insert disk _ in drive _: and press a key...";
+char far *g_1EFE = "Too many files open...";
+char far *g_1F02 = "Attempting to close unopened file...";
+char far *g_1F06 = "Attempting to read unopened file...";
+char far *g_1F0A = "Attempting to write unopened file...";
+char far *g_1F0E = "Attempting to seek unopened file...";
+char far *g_1F12 = "Illegal starting position in Seek_File...";
+char far *g_1F16 = "Attempting to write a resident file...";
+char far *g_1F1A = "Attempting to Find_Disk_Number on unknown file...";
+char far *g_1F1E = "Attempting to Get_Resident_Index on unknown file...";
+char far *g_1F22 = "You are exiting with open files...";
+char far *g_1F26 = "A write error has occurred.  Press a key.";
+char far *g_1F2A = "A fatal disk error has occurred.  Now returning to DOS.";
+void (far *g_1F2E)(void) = show_error;  /* error box hooks */
+void (far *g_1F32)(void) = error_msg;
+int g_1F36 = 3;                         /* disk retries */
+int g_1F38 = 200;                       /* memory reserve (paragraphs?) */
+char far *g_1F3A = 0;                   /* saved screen under the error box */
+int g_1F3E = 0;
 
 /* FUNCTION: DONALD 06F0:000E */
 void fatal(char far *msg)
@@ -22,7 +54,7 @@ void fatal(char far *msg)
 /* FUNCTION: DONALD 06F0:0030 */
 void quit(int code)
 {
-    fn_04FC_0142();
+    shutdown();
     exit(code);
 }
 
@@ -151,13 +183,13 @@ long write_file(register int slot, char far *buf, long len)
         fatal(g_1F16);
     total = 0;
     while (len > 0xFA00L) {
-        n = read(g_3B58[slot], buf, 0xFA00);
+        n = write(g_3B58[slot], buf, 0xFA00);
         if (n == -1)
             return 0L;
         len -= 0xFA00;
         total += n;
     }
-    n = read(g_3B58[slot], buf, len);
+    n = write(g_3B58[slot], buf, len);
     if (n == -1)
         return 0L;
     return n + total;
@@ -245,9 +277,9 @@ int lookup_value(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0)
+        if (strcmp(g_1772[i].name, name) == 0)
             return g_1772[i].value;
     fatal(g_1F1A);
 }
@@ -269,7 +301,7 @@ void show_error(void)
     if (g_1F3A == 0) {
         sz = g_1EDC * g_1EDE;
         alloc = 5;
-        if (g_3B4E == 3)
+        if (g_videoMode == 3)
             alloc = 6;
         sz <<= alloc;
         g_1F3A = farmalloc(sz);
@@ -318,7 +350,7 @@ void free_all(void)
 
     for (i = 0; *g_1772[i].name; i++)
         if (g_1772[i].data) {
-            free(g_1772[i].data);
+            farfree(g_1772[i].data);
             g_1772[i].data = 0L;
         }
     for (i = 0; i < 10; i++)
@@ -343,7 +375,7 @@ void load_resources(void)
     while (*g_1772[i].name) {
         g_3B56 |= g_1772[i].value;
         if (g_3B6C) {
-            g_1772[i].name = fn_08E1_0003(g_1772[i].name);
+            g_1772[i].name = strupr(g_1772[i].name);
             need = g_1772[i].size / 1024L + 1;
             if (avail >= need)
                 buf = farmalloc(g_1772[i].size);
@@ -379,9 +411,9 @@ int is_loaded(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0) {
+        if (strcmp(g_1772[i].name, name) == 0) {
             if (g_1772[i].data)
                 return 1;
             else
@@ -395,9 +427,9 @@ int find_name(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0)
+        if (strcmp(g_1772[i].name, name) == 0)
             return i;
     fatal(g_1F1E);
 }

@@ -39,7 +39,7 @@ init_slots,0304:1ABA,125,matched,100.0% src/seg0304/m0304.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/m0304.c
 ending,0304:1B74,743,matched,100.0% src/seg0304/m0304.c
 about,0304:1E5B,302,matched,100.0% src/seg0304/m0304.c
-main,04FC:0009,214,matched,100.0% src/seg04fc/main.c
+main,04FC:0009,214,matched,100.0% src/seg04fc/m04fc.c
 init_game,04FC:00DF,99,matched,100.0% src/seg04fc/m04fc.c
 shutdown,04FC:0142,31,matched,100.0% src/seg04fc/m04fc.c
 play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
@@ -67,8 +67,8 @@ print_wrapped,0671:000D,949,matched,100.0% src/seg0671/m0671.c
 print_word,06AD:0002,365,matched,100.0% src/seg06ad/m06ad.c
 draw_sprite,06C3:000F,253,matched,100.0% src/seg06c3/m06c3.c
 draw_sprite_masked,06D3:000C,253,matched,100.0% src/seg06d3/m06d3.c
-harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
-install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr_handler.c
+harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr.c
+install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr.c
 harderr_local,06E3:0024,56,lib,CL.LIB:HARDERR
 harderr,06E3:005C,32,lib,CL.LIB:HARDERR
 hardresume,06E3:007C,27,lib,CL.LIB:HARDERR

@@ -1,0 +1,2 @@
+name,offset,notes
+g_videoMode,3B4E,"0 CGA, 1 ?, 2 EGA; set from argv[2] or detect_video()"

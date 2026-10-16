@@ -63,14 +63,23 @@ rows = sorted(byaddr.values(), key=lambda r: int(r["addr"][:4], 16) * 16 + int(r
 w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"]); w.writeheader(); w.writerows(rows)
 for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
     if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st}")
-# assembly modules: src/asm/*.asm (NASM, `; SEGMENT: DONALD SSSS AAAA-BBBB` header) must assemble to the exact bytes
+# assembly modules: src/asm/*.asm (NASM -f obj, `; SEGMENT: DONALD SSSS AAAA-BBBB` header). The module's first CODE
+# segment must equal the original bytes with fixup (relocation) bytes masked; build/asm/<name>.OBJ feeds tools/relink.sh
+# and build/asm/<name>.bin (fixup bytes taken from the original) feeds tools/splice.py.
 asm_ok = 0; asm_bad = []
 for a in sorted((ROOT / "src/asm").glob("*.asm")):
     m = re.search(r"SEGMENT:\s*DONALD\s+([0-9A-Fa-f]{4})\s+([0-9A-Fa-f]{4})-([0-9A-Fa-f]{4})", a.read_text())
-    out = ROOT / "build/asm" / (a.stem + ".bin"); out.parent.mkdir(parents=True, exist_ok=True)
-    r = subprocess.run(["nasm", "-f", "bin", "-i", str(a.parent) + "/", "-o", str(out), str(a)], capture_output=True, text=True)
+    if not m: continue
+    out = ROOT / "build/asm" / (a.stem + ".OBJ"); out.parent.mkdir(parents=True, exist_ok=True)
+    r = subprocess.run(["nasm", "-f", "obj", "-i", str(a.parent) + "/", "-o", str(out), str(a)], capture_output=True, text=True)
     sg, s0, s1 = (int(x, 16) for x in m.groups()); want = img[sg * 16 + s0: sg * 16 + s1]
-    got = out.read_bytes() if r.returncode == 0 else b""
+    got, fx = b"", set()
+    if r.returncode == 0:
+        segs, _, data, fix = omf.read(out)
+        si = next(i for i, s in enumerate(segs) if s and s["class"].upper() == "CODE")
+        got, fx = bytes(data[si]), fix.get(si, set())
+    got = bytes(want[i] if i in fx and i < len(want) else c for i, c in enumerate(got))
+    (ROOT / "build/asm" / (a.stem + ".bin")).write_bytes(got)
     if got == want: asm_ok += len(want)
     else:
         asm_bad.append(a.name)

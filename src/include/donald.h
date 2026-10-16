@@ -68,7 +68,6 @@ extern char far *g_38B4;
 extern char far *g_393C;
 extern char far *g_1F3A;
 extern char far *g_1F1E;
-extern int g_3B4E;
 extern int g_1E88[];
 extern int g_1E98[];
 extern int g_1485[], g_146D[], g_3AAE[];

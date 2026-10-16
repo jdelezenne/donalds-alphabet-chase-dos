@@ -1,210 +1,210 @@
-addr,linear,size,kind
-0000:010D,0010D,101,lib
-0000:0172,00172,87,lib
-0000:01C9,001C9,31,asm
-0000:01E8,001E8,22,asm
-0000:01FE,001FE,25,asm
-0000:0217,00217,299,asm
-0000:0342,00342,120,asm
-0000:03BA,003BA,701,asm
-0000:0677,00677,578,asm
-0000:08B9,008B9,89,asm
-0000:0912,00912,284,asm
-0000:0A2E,00A2E,61,asm
-0000:0A6B,00A6B,195,asm
-0000:0B2E,00B2E,494,asm
-0000:0D1C,00D1C,58,asm
-0000:0D56,00D56,300,asm
-0000:0E82,00E82,124,asm
-0000:0EFE,00EFE,46,asm
-0000:0F2C,00F2C,87,asm
-0000:0F83,00F83,107,asm
-0000:0FEE,00FEE,2,asm
-0000:0FF0,00FF0,2,asm
-0000:0FF2,00FF2,121,asm
-0000:106B,0106B,103,asm
-0000:10D2,010D2,141,asm
-0000:115F,0115F,33,asm
-0000:1180,01180,23,asm
-0000:1197,01197,69,asm
-0000:11DC,011DC,645,asm
-0000:1461,01461,23,asm
-0000:1478,01478,25,asm
-0000:1491,01491,54,asm
-0000:14C7,014C7,22,asm
-0000:14DD,014DD,541,asm
-0000:16FA,016FA,1564,asm
-0000:1D16,01D16,1410,asm
-0000:2298,02298,129,asm
-0000:2319,02319,97,asm
-0000:237A,0237A,72,asm
-0000:23C2,023C2,91,asm
-0000:241D,0241D,83,asm
-0000:2470,02470,139,asm
-0000:24FB,024FB,64,asm
-0000:253B,0253B,24,asm
-0000:2553,02553,49,asm
-0000:2584,02584,410,asm
-0000:271E,0271E,96,asm
-0000:277E,0277E,309,asm
-0000:28B3,028B3,354,asm
-0000:2A15,02A15,459,asm
-0000:2BE0,02BE0,467,asm
-0000:2DB3,02DB3,254,lib
-0000:2EB1,02EB1,68,lib
-0000:2EF5,02EF5,91,lib
-0000:2F50,02F50,33,lib
-0000:2F71,02F71,25,lib
-0000:2F8A,02F8A,9,lib
-0000:2F93,02F93,154,lib
-0000:302D,0302D,31,lib
-0304:000C,0304C,90,c
-0304:0066,030A6,289,c
-0304:0187,031C7,154,c
-0304:0221,03261,354,c
-0304:0383,033C3,121,c
-0304:03FC,0343C,253,c
-0304:04F9,03539,199,c
-0304:05C0,03600,43,c
-0304:05EB,0362B,332,c
-0304:0737,03777,63,c
-0304:0776,037B6,152,c
-0304:080E,0384E,163,c
-0304:08B1,038F1,139,c
-0304:093C,0397C,274,c
-0304:0A4E,03A8E,447,c
-0304:0C0D,03C4D,1108,c
-0304:1061,040A1,329,c
-0304:11AA,041EA,2247,c
-0304:1A71,04AB1,73,c
-0304:1ABA,04AFA,125,c
-0304:1B37,04B77,61,c
-0304:1B74,04BB4,743,c
-0304:1E5B,04E9B,302,c
-04FC:0009,04FC9,214,c
-04FC:00DF,0509F,99,c
-04FC:0142,05102,30,c
-0512:00EE,0520E,20,asm
-0512:0102,05222,594,asm
-0512:0354,05474,68,asm
-0512:0398,054B8,53,asm
-0512:03CD,054ED,36,asm
-0512:03F1,05511,22,asm
-0512:0407,05527,51,asm
-0512:043A,0555A,34,asm
-0512:045C,0557C,198,asm
-0512:0522,05642,34,asm
-0512:0544,05664,20,asm
-0567:0008,05678,34,c
-0567:002A,0569A,6,c
-056A:0194,05834,10,asm
-056A:019E,0583E,11,asm
-056A:01A9,05849,34,asm
-056A:01CB,0586B,207,asm
-056A:029A,0593A,712,asm
-056A:0562,05C02,41,asm
-05C2:000B,05C2B,17,c
-05C2:001C,05C3C,28,c
-05C5:0008,05C58,234,c
-05D4:0002,05D42,27,c
-05D5:000D,05D5D,285,c
-05E7:000A,05E7A,93,c
-05ED:0007,05ED7,159,c
-05ED:00A6,05F76,177,c
-05ED:0157,06027,26,c
-0604:0001,06041,126,c
-060B:000F,060BF,106,c
-0612:0009,06129,124,c
-061A:0005,061A5,82,c
-061F:0007,061F7,222,c
-062D:0005,062D5,417,c
-062D:01A6,06476,326,c
-065B:000C,065BC,44,c
-065E:0008,065E8,272,c
-066F:0008,066F8,37,c
-0671:000D,0671D,949,c
-06AD:0002,06AD2,365,c
-06C3:000F,06C3F,253,c
-06D3:000C,06D3C,253,c
-06E3:0009,06E39,14,c
-06E3:0017,06E47,13,c
-06E3:005C,06E8C,32,lib
-06E3:007C,06EAC,27,lib
-06E3:0097,06EC7,52,lib
-06EF:000B,06EFB,19,c
-06F0:000E,06F0E,34,c
-06F0:0030,06F30,19,c
-06F0:0043,06F43,514,c
-06F0:0245,07145,72,c
-06F0:028D,0718D,230,c
-06F0:0373,07273,207,c
-06F0:0442,07342,478,c
-06F0:0620,07520,48,c
-06F0:0650,07550,25,c
-06F0:0669,07569,52,c
-06F0:069D,0759D,130,c
-06F0:071F,0761F,605,c
-06F0:097C,0787C,17,c
-06F0:098D,0788D,150,c
-06F0:0A23,07923,473,c
-06F0:0BFC,07AFC,135,c
-06F0:0C83,07B83,113,c
-06F0:0CF4,07BF4,261,c
-06F0:0DF9,07CF9,34,c
-07D1:000B,07D1B,60,lib
-07D5:0007,07D57,51,lib
-07D5:003A,07D8A,47,lib
-07DB:0009,07DB9,21,lib
-07DB:001E,07DCE,104,lib
-07DB:0086,07E36,176,lib
-07DB:0136,07EE6,110,lib
-07DB:01A4,07F54,102,lib
-07DB:020A,07FBA,271,lib
-080C:0009,080C9,144,lib
-080C:0099,08159,71,lib
-080C:00E0,081A0,123,lib
-0821:000B,0821B,32,lib
-0823:000B,0823B,31,lib
-0823:002A,0825A,20,lib
-0823:003E,0826E,365,lib
-083D:000B,083DB,77,lib
-0842:0008,08428,45,lib
-0845:0005,08455,49,lib
-0848:0006,08486,38,lib
-084A:000C,084AC,197,lib
-0857:0001,08571,32,lib
-0859:0001,08591,358,lib
-086F:0007,086F7,76,lib
-0874:0003,08743,45,lib
-0877:0000,08770,28,lib
-0878:000C,0878C,66,lib
-087C:000E,087CE,27,lib
-087E:0009,087E9,50,lib
-0881:000B,0881B,41,lib
-0884:0004,08844,38,lib
-0884:002A,0886A,31,lib
-0888:0009,08889,33,lib
-088A:000A,088AA,18,lib
-088A:001C,088BC,159,lib
-088A:00BB,0895B,120,lib
-088A:0133,089D3,229,lib
-088A:0218,08AB8,204,lib
-088A:02E4,08B84,74,lib
-08BC:000E,08BCE,119,lib
-08BC:0085,08C45,19,lib
-08C5:0008,08C58,22,lib
-08C5:001E,08C6E,22,lib
-08C8:0004,08C84,115,lib
-08CF:0007,08CF7,18,lib
-08CF:0019,08D09,17,lib
-08D1:000A,08D1A,21,lib
-08D1:001F,08D2F,21,lib
-08D4:0004,08D44,66,lib
-08D4:0046,08D86,90,lib
-08DE:0000,08DE0,51,lib
-08E1:0003,08E13,37,lib
-08E3:0008,08E38,307,lib
-08E3:013B,08F6B,548,lib
-0918:000F,0918F,485,lib
-0918:01F4,09374,218,lib
-0944:000E,0944E,34,lib
+addr,linear,size,kind,lang,evidence
+0000:010D,0010D,101,lib,lib,CL.LIB module match
+0000:0172,00172,87,lib,lib,CL.LIB module match
+0000:01C9,001C9,31,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:01E8,001E8,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:01FE,001FE,25,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:0217,00217,299,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0342,00342,120,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
+0000:03BA,003BA,701,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
+0000:0677,00677,578,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:08B9,008B9,89,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
+0000:0912,00912,284,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
+0000:0A2E,00A2E,61,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions"
+0000:0A6B,00A6B,195,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0B2E,00B2E,494,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0D1C,00D1C,58,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0D56,00D56,300,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0E82,00E82,124,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0EFE,00EFE,46,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:0F2C,00F2C,87,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0F83,00F83,107,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:0FEE,00FEE,2,asm,asm,ASM: non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)
+0000:0FF0,00FF0,2,asm,asm,ASM: non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)
+0000:0FF2,00FF2,121,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:106B,0106B,103,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:10D2,010D2,141,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:115F,0115F,33,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
+0000:1180,01180,23,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:1197,01197,69,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, carry-flag result, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:11DC,011DC,645,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:1461,01461,23,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:1478,01478,25,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:1491,01491,54,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:14C7,014C7,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
+0000:14DD,014DD,541,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:16FA,016FA,1564,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, carry-flag result, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:1D16,01D16,1410,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, carry-flag result, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2298,02298,129,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2319,02319,97,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:237A,0237A,72,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:23C2,023C2,91,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:241D,0241D,83,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2470,02470,139,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:24FB,024FB,64,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:253B,0253B,24,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O"
+0000:2553,02553,49,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O"
+0000:2584,02584,410,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:271E,0271E,96,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
+0000:277E,0277E,309,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
+0000:28B3,028B3,354,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2A15,02A15,459,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2BE0,02BE0,467,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:2DB3,02DB3,254,lib,lib,CL.LIB module match
+0000:2EB1,02EB1,68,lib,lib,CL.LIB module match
+0000:2EF5,02EF5,91,lib,lib,CL.LIB module match
+0000:2F50,02F50,33,lib,lib,CL.LIB module match
+0000:2F71,02F71,25,lib,lib,CL.LIB module match
+0000:2F8A,02F8A,9,lib,lib,CL.LIB module match
+0000:2F93,02F93,154,lib,lib,CL.LIB module match
+0000:302D,0302D,31,lib,lib,CL.LIB module match
+0304:000C,0304C,90,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:0066,030A6,289,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+0304:0187,031C7,154,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:0221,03261,354,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, switch jump table (TC), caller-cleans cdecl calls; ASM: cs:-relative data, carry-flag result, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0304:0383,033C3,121,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue"
+0304:03FC,0343C,253,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, switch jump table (TC), caller-cleans cdecl calls; ASM: cs:-relative data"
+0304:04F9,03539,199,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, TC epilogue"
+0304:05C0,03600,43,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+0304:05EB,0362B,332,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:0737,03777,63,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var)"
+0304:0776,037B6,152,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+0304:080E,0384E,163,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var)"
+0304:08B1,038F1,139,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, TC epilogue"
+0304:093C,0397C,274,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:0A4E,03A8E,447,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var), caller-cleans cdecl calls"
+0304:0C0D,03C4D,1108,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:1061,040A1,329,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var), caller-cleans cdecl calls"
+0304:11AA,041EA,2247,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, switch jump table (TC); ASM: cs:-relative data, port I/O, carry-flag result, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0304:1A71,04AB1,73,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+0304:1ABA,04AFA,125,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var)"
+0304:1B37,04B77,61,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0304:1B74,04BB4,743,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var), caller-cleans cdecl calls"
+0304:1E5B,04E9B,302,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+04FC:0009,04FC9,214,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+04FC:00DF,0509F,99,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+04FC:0142,05102,31,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+0512:00EE,0520E,20,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data"
+0512:0102,05222,594,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O"
+0512:0354,05474,68,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, direct int"
+0512:0398,054B8,53,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, port I/O, direct int"
+0512:03CD,054ED,36,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment"
+0512:03F1,05511,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment"
+0512:0407,05527,51,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), direct int"
+0512:043A,0555A,34,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, direct int"
+0512:045C,0557C,198,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...), direct int"
+0512:0522,05642,34,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, direct int"
+0512:0544,05664,20,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data"
+0567:0008,05678,34,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue"
+0567:002A,0569A,6,c,c,C: byte-matched by TCC 2.0
+056A:0194,05834,10,asm,asm,ASM: cs:-relative data
+056A:019E,0583E,11,asm,asm,"ASM: cs:-relative data, writes to code segment"
+056A:01A9,05849,34,asm,asm,"ASM: cs:-relative data, writes to code segment"
+056A:01CB,0586B,207,asm,asm,C: caller-cleans cdecl calls; ASM: cs:-relative data
+056A:029A,0593A,712,asm,asm,"C: caller-cleans cdecl calls; ASM: loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...), direct int"
+056A:0562,05C02,41,asm,asm,"ASM: cs:-relative data, direct int"
+05C2:000B,05C2B,17,c,c,C: byte-matched by TCC 2.0
+05C2:001C,05C3C,28,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+05C5:0008,05C58,234,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+05D4:0002,05D42,27,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+05D5:000D,05D5D,285,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+05E7:000A,05E7A,93,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+05ED:0007,05ED7,159,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+05ED:00A6,05F76,177,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+05ED:0157,06027,26,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue"
+0604:0001,06041,126,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+060B:000F,060BF,106,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+0612:0009,06129,124,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+061A:0005,061A5,82,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+061F:0007,061F7,222,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+062D:0005,062D5,417,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+062D:01A6,06476,326,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+065B:000C,065BC,44,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+065E:0008,065E8,272,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue"
+066F:0008,066F8,37,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+0671:000D,0671D,949,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
+06AD:0002,06AD2,365,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06C3:000F,06C3F,253,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06D3:000C,06D3C,253,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06E3:0009,06E39,14,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+06E3:0017,06E47,13,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+06E3:005C,06E8C,32,lib,lib,CL.LIB module match
+06E3:007C,06EAC,27,lib,lib,CL.LIB module match
+06E3:0097,06EC7,52,lib,lib,CL.LIB module match
+06EF:000B,06EFB,19,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+06F0:000E,06F0E,34,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+06F0:0030,06F30,19,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
+06F0:0043,06F43,514,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0245,07145,72,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:028D,0718D,230,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0373,07273,207,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0442,07342,478,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0620,07520,48,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0650,07550,25,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue"
+06F0:0669,07569,52,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:069D,0759D,130,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:071F,0761F,605,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:097C,0787C,17,c,c,C: byte-matched by TCC 2.0
+06F0:098D,0788D,150,c,c,"C: byte-matched by TCC 2.0, frameless push si (TC no-locals register var), caller-cleans cdecl calls"
+06F0:0A23,07923,473,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0BFC,07AFC,135,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0C83,07B83,113,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0CF4,07BF4,261,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"
+06F0:0DF9,07CF9,34,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue"
+07D1:000B,07D1B,60,lib,lib,CL.LIB module match
+07D5:0007,07D57,51,lib,lib,CL.LIB module match
+07D5:003A,07D8A,47,lib,lib,CL.LIB module match
+07DB:0009,07DB9,21,lib,lib,CL.LIB module match
+07DB:001E,07DCE,104,lib,lib,CL.LIB module match
+07DB:0086,07E36,176,lib,lib,CL.LIB module match
+07DB:0136,07EE6,110,lib,lib,CL.LIB module match
+07DB:01A4,07F54,102,lib,lib,CL.LIB module match
+07DB:020A,07FBA,271,lib,lib,CL.LIB module match
+080C:0009,080C9,144,lib,lib,CL.LIB module match
+080C:0099,08159,71,lib,lib,CL.LIB module match
+080C:00E0,081A0,123,lib,lib,CL.LIB module match
+0821:000B,0821B,32,lib,lib,CL.LIB module match
+0823:000B,0823B,31,lib,lib,CL.LIB module match
+0823:002A,0825A,20,lib,lib,CL.LIB module match
+0823:003E,0826E,365,lib,lib,CL.LIB module match
+083D:000B,083DB,77,lib,lib,CL.LIB module match
+0842:0008,08428,45,lib,lib,CL.LIB module match
+0845:0005,08455,49,lib,lib,CL.LIB module match
+0848:0006,08486,38,lib,lib,CL.LIB module match
+084A:000C,084AC,197,lib,lib,CL.LIB module match
+0857:0001,08571,32,lib,lib,CL.LIB module match
+0859:0001,08591,358,lib,lib,CL.LIB module match
+086F:0007,086F7,76,lib,lib,CL.LIB module match
+0874:0003,08743,45,lib,lib,CL.LIB module match
+0877:0000,08770,28,lib,lib,CL.LIB module match
+0878:000C,0878C,66,lib,lib,CL.LIB module match
+087C:000E,087CE,27,lib,lib,CL.LIB module match
+087E:0009,087E9,50,lib,lib,CL.LIB module match
+0881:000B,0881B,41,lib,lib,CL.LIB module match
+0884:0004,08844,38,lib,lib,CL.LIB module match
+0884:002A,0886A,31,lib,lib,CL.LIB module match
+0888:0009,08889,33,lib,lib,CL.LIB module match
+088A:000A,088AA,18,lib,lib,CL.LIB module match
+088A:001C,088BC,159,lib,lib,CL.LIB module match
+088A:00BB,0895B,120,lib,lib,CL.LIB module match
+088A:0133,089D3,229,lib,lib,CL.LIB module match
+088A:0218,08AB8,204,lib,lib,CL.LIB module match
+088A:02E4,08B84,74,lib,lib,CL.LIB module match
+08BC:000E,08BCE,119,lib,lib,CL.LIB module match
+08BC:0085,08C45,19,lib,lib,CL.LIB module match
+08C5:0008,08C58,22,lib,lib,CL.LIB module match
+08C5:001E,08C6E,22,lib,lib,CL.LIB module match
+08C8:0004,08C84,115,lib,lib,CL.LIB module match
+08CF:0007,08CF7,18,lib,lib,CL.LIB module match
+08CF:0019,08D09,17,lib,lib,CL.LIB module match
+08D1:000A,08D1A,21,lib,lib,CL.LIB module match
+08D1:001F,08D2F,21,lib,lib,CL.LIB module match
+08D4:0004,08D44,66,lib,lib,CL.LIB module match
+08D4:0046,08D86,90,lib,lib,CL.LIB module match
+08DE:0000,08DE0,51,lib,lib,CL.LIB module match
+08E1:0003,08E13,37,lib,lib,CL.LIB module match
+08E3:0008,08E38,307,lib,lib,CL.LIB module match
+08E3:013B,08F6B,548,lib,lib,CL.LIB module match
+0918:000F,0918F,485,lib,lib,CL.LIB module match
+0918:01F4,09374,218,lib,lib,CL.LIB module match
+0944:000E,0944E,34,lib,lib,CL.LIB module match

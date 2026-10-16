@@ -9,7 +9,7 @@ void draw_pic(char far *p, char far *dst)
         fn_0000_0F2C(p, dst);
     else
         fn_0000_0F83(p, dst);
-    if (g_3B4E == 0) {
+    if (g_videoMode == 0) {
         n = 80;
         if (g_1ECE)
             n = 4;

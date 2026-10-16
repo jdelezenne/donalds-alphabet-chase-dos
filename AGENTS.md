@@ -5,7 +5,8 @@
 3. Every function carries `/* FUNCTION: DONALD SSSS:OOOO */` on the line before its definition (no `//`: TC 2.0 rejects it). A function is `matched` only when `tools/verify.py` (clean build: `rm -rf build` first) reports it matched; anything else stays `nonmatching` with its %.
 4. One C file per original code segment, functions in address order: TC emits `push cs; call near` only for functions defined earlier in the same file. Per-module flags go in `config/retail/cflags.txt`.
 5. Evidence over guesses: decompiler output is a lead, never evidence. Record compiler quirks and every open question in `docs/MATCHING.md`.
-6. Prefer C. The asm modules (`src/asm/*.asm`, NASM) must assemble byte-exactly; keep `db` only for instructions NASM cannot encode the TASM way, with the mnemonic in a comment.
+6. Recover the original language: C stays C, hand-written asm stays asm (evidence in `functions.csv`, `tools/classify.py`). The asm modules (`src/asm/*.asm`, NASM) must assemble byte-exactly; keep `db` only for instructions NASM cannot encode the TASM way, with the mnemonic in a comment.
 7. Library (Turbo C runtime) code is identified by matching against the real `CL.LIB`/`C0L.OBJ`, not rewritten.
-8. After changes: `python3 tools/verify.py && python3 tools/splice.py && python3 tools/matchreport.py`.
+8. After changes: `rm -rf build && tools/relink.sh && python3 tools/matchreport.py`. The relink must stay byte-identical. It is the only check that sees call targets and data references, which verify.py masks.
+10. Never commit generated data (`build/gen`): game data enters git only as decompiled C/asm initialisers.
 9. Keep `DONALD.EXE` (retail) as the base; the alt `DONALD` build is tracked as differences in `config/alt/`.
