@@ -38,7 +38,13 @@ for src in (ROOT / "src").rglob("*.c"):
     for m in re.finditer(r"FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})", src.read_text()):
         sg, of = int(m.group(1), 16), int(m.group(2), 16); starts[sg * 16 + of] = (sg, of)
 ASM_SEGS = {0x0512, 0x056A}                     # hand-written asm modules (cs:-relative data, DS reloads)
-segbases = sorted({s * 16 for s, _ in starts.values()} | {end})
+# asm module spans (src/asm/*.asm headers) bound the neighbouring functions; a TLINK segment base is only the
+# paragraph below a module's first byte, so sizes are NOT capped at segment bases in general
+asm_spans = []
+for a in (ROOT / "src/asm").glob("*.asm"):
+    m = re.search(r"SEGMENT:\s*DONALD\s+(\w{4})\s+(\w{4})-(\w{4})", a.read_text())
+    if m: sg, a0, a1 = (int(x, 16) for x in m.groups()); asm_spans.append((sg * 16 + a0, sg * 16 + a1))
+segbases = sorted({a for a, _ in asm_spans} | {end})
 lib = [r for r in csv.DictReader(open(ROOT / "config/retail/symbols.csv")) if r["status"] == "lib"]
 sp = [(int(r["addr"][:4], 16) * 16 + int(r["addr"][5:], 16), int(r["size"])) for r in lib]
 ks = sorted(starts); rows = []
@@ -47,7 +53,7 @@ for i, p in enumerate(ks):
     nb = next(b for b in segbases if b > p)       # never run past the next segment base
     n = min(ks[i + 1] if i + 1 < len(ks) else end, nb) - p
     if any(a <= p < a + m for a, m in sp): kind = "lib"
-    elif p < 0x2DAB or s in ASM_SEGS or img[p + 3:p + 7] == b"\x57\x56\x1e\xb8": kind = "asm"
+    elif p < 0x2DAB or s in ASM_SEGS or any(a <= p < b for a, b in asm_spans) or img[p + 3:p + 7] == b"\x57\x56\x1e\xb8": kind = "asm"
     else:
         kind = "c"
         # C size excludes trailing data/padding: cut after the last RET/RETF in the span
