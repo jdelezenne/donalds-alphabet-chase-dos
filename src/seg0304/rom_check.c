@@ -1,4 +1,4 @@
-/* 0304:05C0 */
+/* FUNCTION: DONALD 0304:05C0 */
 int rom_check(void)
 {
     register int r = 0;

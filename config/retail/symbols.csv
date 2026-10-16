@@ -1,8 +1,10 @@
 name,addr,size,status,notes
+c0l_local,0000:0000,269,lib,C0L
 exit,0000:010D,101,lib,C0L
 restorezero,0000:0172,61,lib,C0L
 abort,0000:01AF,24,lib,C0L
 DGROUP@,0000:01C7,2,lib,C0L
+setargv_local,0000:2DAB,8,lib,CL.LIB:SETARGV
 setargv,0000:2DB3,254,lib,CL.LIB:SETARGV
 setenvp,0000:2EB1,68,lib,CL.LIB:SETENVP
 PADD@,0000:2EF5,45,lib,CL.LIB:PADD
@@ -14,21 +16,43 @@ LUDIV@,0000:2F8E,5,lib,CL.LIB:LDIV
 LMOD@,0000:2F93,5,lib,CL.LIB:LDIV
 LUMOD@,0000:2F98,149,lib,CL.LIB:LDIV
 LXLSH@,0000:302D,31,lib,CL.LIB:LLSH
-blit_dispatch,0304:000C,90,matched,TCC -ml -O -Z
-draw_items,0304:0187,154,matched,TCC -ml -O -Z
-rom_check,0304:05C0,43,matched,TCC -ml -O -Z
+blit_dispatch,0304:000C,90,matched,100.0% src/seg0304/blit_dispatch.c
+draw_items,0304:0187,154,matched,100.0% src/seg0304/draw_items.c
+rom_check,0304:05C0,43,matched,100.0% src/seg0304/rom_check.c
+level_sum,0304:0737,63,matched,100.0% src/seg0304/level_sum.c
+wait_key,0304:1B37,61,matched,100.0% src/seg0304/wait_key.c
+play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
+stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
+key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
+get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
+repeat_call,05D4:0002,27,matched,100.0% src/seg05d4/repeat.c
+music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
+redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
+harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
+install_harderr,06E3:0017,13,matched,100.0% src/seg06e3/harderr_handler.c
+harderr_local,06E3:0024,56,lib,CL.LIB:HARDERR
 harderr,06E3:005C,32,lib,CL.LIB:HARDERR
 hardresume,06E3:007C,27,lib,CL.LIB:HARDERR
 hardretn,06E3:0097,52,lib,CL.LIB:HARDERR
+fatal,06F0:000E,34,matched,100.0% src/seg06f0/m06f0.c
+quit,06F0:0030,19,matched,100.0% src/seg06f0/m06f0.c
+close_slot,06F0:0245,72,matched,100.0% src/seg06f0/m06f0.c
+file_exists,06F0:0620,48,matched,100.0% src/seg06f0/m06f0.c
+delete_ok,06F0:0650,25,matched,100.0% src/seg06f0/m06f0.c
+create_file,06F0:0669,52,matched,100.0% src/seg06f0/m06f0.c
+inset_rect,06F0:0DF9,34,matched,100.0% src/seg06f0/m06f0.c
 IOERROR,06F0:0E1B,59,lib,CL.LIB:IOERROR
+exit_local,07D5:0006,1,lib,CL.LIB:EXIT
 exit,07D5:0007,51,lib,CL.LIB:EXIT
 atexit,07D5:003A,47,lib,CL.LIB:ATEXIT
 malloc,07DB:0009,21,lib,CL.LIB:FMALLOC
 pull_free_block,07DB:001E,492,lib,CL.LIB:FMALLOC
 farmalloc,07DB:020A,271,lib,CL.LIB:FMALLOC
+fbrk_local,080C:0009,144,lib,CL.LIB:FBRK
 brk,080C:0099,71,lib,CL.LIB:FBRK
 sbrk,080C:00E0,123,lib,CL.LIB:FBRK
 setblock,0821:000B,32,lib,CL.LIB:SETBLOCK
+open_local,0823:000B,51,lib,CL.LIB:OPEN
 open,0823:003E,365,lib,CL.LIB:OPEN
 open,083D:000B,77,lib,CL.LIB:OPENA
 ioctl,0842:0008,45,lib,CL.LIB:IOCTL

@@ -1,4 +1,4 @@
-/* 0304:000C */
+/* FUNCTION: DONALD 0304:000C */
 #include "donald.h"
 
 void blit_dispatch(char far *src, register int x, register int y, int w, int h)

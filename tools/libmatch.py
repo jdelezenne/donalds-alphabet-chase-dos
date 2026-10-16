@@ -39,6 +39,7 @@ if a.csv:
         o.write("name,addr,size,status,notes\n")
         for lin, n, name, ps in hits:
             ps = ps or [(0, name.split(':')[-1])]
+            if ps[0][0] > 0: ps = [(0, name.split(':')[-1].lower() + '_local')] + ps
             for k, (off, p) in enumerate(ps):
                 end = ps[k + 1][0] if k + 1 < len(ps) else n
                 o.write(f"{p.lstrip('_') if p.startswith('_') else p},{segoff(lin+off)},{end-off},lib,{name}\n")

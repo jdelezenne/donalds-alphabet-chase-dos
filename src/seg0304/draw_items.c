@@ -1,4 +1,4 @@
-/* 0304:0187 */
+/* FUNCTION: DONALD 0304:0187 */
 #include "donald.h"
 
 void draw_items(int p)

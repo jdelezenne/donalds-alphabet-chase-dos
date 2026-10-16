@@ -15,4 +15,21 @@ extern int g_arr3A9E[8];     /* DGROUP:3A9E */
 
 void far draw_item(int p, int x, int y, int a, int b);          /* 0304:0221 */
 
+/* placeholder globals, named by DGROUP offset */
+extern char g_1460;
+extern long g_1E22[];
+extern int g_1ED8, g_1EDA, g_1EDC, g_1EDE;
+extern void (far *g_1F2E)(void);
+extern void (far *g_1F32)(void);
+extern int g_382D;
+extern int g_3AF6, g_3AFC;
+extern char far *g_3B50;
+extern int g_3B58[];
+extern char far *g_1F02;
+extern int g_1EE2, g_1EE4, g_1EE6;
+extern int g_388A;
+extern int g_1485[], g_146D[], g_3AAE[];
+
+void far quit(int code);
+
 #endif
