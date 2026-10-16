@@ -1,7 +1,7 @@
 /* Module at segment 06F0 (compiled without -O). Functions in address order. */
 #include "donald.h"
 
-struct name_entry { char far *name; char pad[8]; int value; char pad2[4]; };
+struct name_entry { char far *name; char pad[4]; char far *data; int value; char pad2[4]; };
 extern struct name_entry g_1772[];
 char far *fn_08E1_0003();
 
@@ -71,6 +71,37 @@ int lookup_value(char far *name)
         if (fn_087E_0009(g_1772[i].name, name) == 0)
             return g_1772[i].value;
     fatal(g_1F1A);
+}
+
+/* FUNCTION: DONALD 06F0:098D */
+void free_all(void)
+{
+    register int i;
+
+    for (i = 0; *g_1772[i].name; i++)
+        if (g_1772[i].data) {
+            free(g_1772[i].data);
+            g_1772[i].data = 0L;
+        }
+    for (i = 0; i < 10; i++)
+        if (g_3B58[i] != 0x7fff)
+            fatal(g_1F22);
+}
+
+/* FUNCTION: DONALD 06F0:0BFC */
+int is_loaded(char far *name)
+{
+    register int i = 0;
+
+    name = fn_08E1_0003(name);
+    for (; *g_1772[i].name; i++)
+        if (fn_087E_0009(g_1772[i].name, name) == 0) {
+            if (g_1772[i].data)
+                return 1;
+            else
+                return 0;
+        }
+    return 0;
 }
 
 /* FUNCTION: DONALD 06F0:0C83 */

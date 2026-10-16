@@ -21,6 +21,9 @@ draw_items,0304:0187,154,matched,100.0% src/seg0304/draw_items.c
 step,0304:0383,121,matched,100.0% src/seg0304/step.c
 rom_check,0304:05C0,43,matched,100.0% src/seg0304/rom_check.c
 level_sum,0304:0737,63,matched,100.0% src/seg0304/level_sum.c
+aim,0304:0776,152,matched,100.0% src/seg0304/aim.c
+reset_actors,0304:080E,163,matched,100.0% src/seg0304/reset_actors.c
+setup_level,0304:08B1,139,matched,100.0% src/seg0304/setup_level.c
 roll,0304:1A71,73,matched,100.0% src/seg0304/roll.c
 init_slots,0304:1ABA,125,matched,100.0% src/seg0304/init_slots.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/wait_key.c
@@ -54,6 +57,8 @@ file_exists,06F0:0620,48,matched,100.0% src/seg06f0/m06f0.c
 delete_ok,06F0:0650,25,matched,100.0% src/seg06f0/m06f0.c
 create_file,06F0:0669,52,matched,100.0% src/seg06f0/m06f0.c
 lookup_value,06F0:069D,130,matched,100.0% src/seg06f0/m06f0.c
+free_all,06F0:098D,150,matched,100.0% src/seg06f0/m06f0.c
+is_loaded,06F0:0BFC,135,matched,100.0% src/seg06f0/m06f0.c
 find_name,06F0:0C83,113,matched,100.0% src/seg06f0/m06f0.c
 inset_rect,06F0:0DF9,34,matched,100.0% src/seg06f0/m06f0.c
 IOERROR,06F0:0E1B,59,lib,CL.LIB:IOERROR
