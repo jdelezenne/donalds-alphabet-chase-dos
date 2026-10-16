@@ -8,14 +8,20 @@ def _idx(b, p):
     return (((v & 0x7F) << 8) | b[p + 1], p + 2) if v & 0x80 else (v, p + 1)
 
 def read(path):
-    b = open(path, "rb").read(); p = 0
+    return parse(open(path, "rb").read())[:4]
+
+def parse(b, p=0):
+    """Parse one module starting at b[p]; returns (segs, pubs, data, fix, end_pos, module_name)."""
+    modname = ""
     names, segs, pubs = [""], [None], []
     data = {}           # seg index -> bytearray
     fix = {}            # seg index -> set(offsets that are fixup bytes)
     last = None         # (seg, offset) of last LEDATA
     while p < len(b):
         t, n = b[p], struct.unpack_from("<H", b, p + 1)[0]; r = b[p + 3:p + 3 + n - 1]; p += 3 + n
-        if t == 0x96:  # LNAMES
+        if t == 0x80: modname = r[1:1 + r[0]].decode("latin1")
+        elif t in (0x8A, 0x8B): break
+        elif t == 0x96:  # LNAMES
             q = 0
             while q < len(r): l = r[q]; names.append(r[q + 1:q + 1 + l].decode("latin1")); q += 1 + l
         elif t in (0x98, 0x99):
@@ -47,8 +53,19 @@ def read(path):
                     s.update(range(last[1] + loc, last[1] + loc + width))
                 else:  # THREAD subrecord
                     d = r[q]; q += 1
-                    if (d >> 2) & 7 < 3 or not d & 0x40: _, q = _idx(r, q)
-    return segs, pubs, data, fix
+                    if not d & 0x40 or (d >> 2) & 7 < 3: _, q = _idx(r, q)
+    return segs, pubs, data, fix, p, modname
+
+def library(path):
+    """Yield (segs, pubs, data, fix, name) for each module of an OMF .LIB."""
+    b = open(path, "rb").read()
+    page = 16
+    if b[0] == 0xF0: page = struct.unpack_from("<H", b, 1)[0] + 3
+    p = page if b[0] == 0xF0 else 0
+    while p < len(b) and b[p] == 0x80:
+        segs, pubs, data, fix, end, name = parse(b, p)
+        yield segs, pubs, data, fix, name
+        p = (end + page - 1) // page * page
 
 if __name__ == "__main__":
     segs, pubs, data, fix = read(sys.argv[1])

@@ -30,6 +30,6 @@ for k, (si, off, nm) in enumerate(code):
         rc = 1
         a = list(md.disasm(bytes(mine), 0)); b = list(md.disasm(bytes(orig), 0))
         for x, y in list(zip(a, b))[(0 if os.environ.get("FULL") else max(0, next(i for i, z in enumerate(a) if z.address + z.size > bad[0]) - 3)):][:None if os.environ.get("FULL") else 14]:
-            m = " " if x.bytes == y.bytes else "*"
+            m = "*" if any(x.address <= q < x.address + x.size for q in bad) else " "
             print(f"  {m}{x.address:4X} {x.mnemonic} {x.op_str:<30} | {y.address:4X} {y.mnemonic} {y.op_str}")
 sys.exit(rc)

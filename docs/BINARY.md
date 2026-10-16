@@ -16,11 +16,11 @@ Both files are plain, **unpacked** MZ executables (no LZEXE/PKLITE/EXEPACK signa
 The two builds differ by 80 bytes / 4 relocations: a slightly different code build, same toolchain.
 
 ## Compiler
-**Borland Turbo C 2.0** (1988 banner; 2.01 shipped in 1989 with the same banner text, must be ruled out by matching `C0x.OBJ`).
+**Borland Turbo C 2.0** — confirmed against 2.01 by library matching (see MATCHING.md).
 Entry code is the Turbo C `C0.ASM` startup (`mov dx,DGROUP; mov cs:[DGROUP@],dx; mov ah,30h; int 21h; mov bp,[2]; mov bx,[2Ch]` ...).
 Runtime strings: `Divide error`, `Abnormal program termination`.
 
-## Memory model: large (likely) — to confirm
+## Memory model: large (confirmed by C0L.OBJ/CL.LIB match, see MATCHING.md)
 - **Far code**: ~47 distinct code segments in the relocation table (one per module, Borland style), 462 `9A` far-call bytes vs 204 `E8`, 249 `RETF` (`CB`).
 - **Far data**: no `Null pointer assignment` message (Turbo C only emits that check in tiny/small/medium), 440 `LES` bytes.
 - 58 `push ds; mov ax,seg; mov ds,ax` sequences: could be huge-model prologues or library code; **large vs huge is open** (match `C0L.OBJ` vs `C0H.OBJ` startup with `libmatch`).

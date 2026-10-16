@@ -14,7 +14,7 @@ Expected hashes are in [config/originals.sha256](config/originals.sha256).
 | alt build | `DONALD` (no extension) | 55,432 | `61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23` |
 
 ## Status
-Scaffolding only. 0 functions matched. See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md)
+Pipeline working: Turbo C 2.0 `-ml -O -Z`; 3 game functions byte-matched, 45 Turbo C startup/library modules identified. See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md)
 (executable analysis) and [docs/MATCHING.md](docs/MATCHING.md) (workflow and compiler notes).
 
 ## Layout
@@ -31,6 +31,7 @@ Scaffolding only. 0 functions matched. See [docs/STATUS.md](docs/STATUS.md), [do
 | `tools/dosrun.sh` | runs DOS commands headless in DOSBox-X (C: = compiler, D: = work dir) |
 | `tools/build.sh` | compiles `src/*.c` with `TCC` into `build/obj/` |
 | `tools/cmpobj.py` | per-function compare of an `.OBJ` against the original image, fixup bytes masked, side-by-side diff |
+| `tools/libmatch.py` | finds Turbo C startup/library modules in the image (relocation-masked) |
 | `tools/omf.py` | minimal OMF reader (segments, publics, LEDATA, fixups) |
 | `tools/mzinfo.py` | MZ header, packer/banner detection, relocation segment histogram |
 | `tools/funcs.py` | seeds function starts per code segment |
@@ -38,6 +39,6 @@ Scaffolding only. 0 functions matched. See [docs/STATUS.md](docs/STATUS.md), [do
 
 ## Reproducing
 1. `tools/setup.sh`
-2. `tools/install_tc.sh /path/to/your/TC20` 
+2. `tools/install_tc.sh /path/to/your/TC20-floppies.7z /opt/tc20`
 3. Copy your game files into `game/`, run `python3 tools/verify_originals.py`.
 4. `tools/build.sh && tools/.venv/bin/python tools/cmpobj.py build/obj/FOO.OBJ`
