@@ -7,6 +7,8 @@ void far reset_actors(void);
 void far init_slots(void);
 void far load_level_gfx(void);
 int far handle_key(void);
+int far run_script(int i);
+int far ending(void);
 
 /* FUNCTION: DONALD 0304:000C */
 
@@ -184,7 +186,7 @@ void draw_frame(int mode, register int i, register int x, int y)
     g_1AC0 = 25;
     switch (mode) {
     case 0:
-        draw_sprite(g_3AF8, g_3984[i], x, y, 0);
+        draw_sprite(g_3AF8, g_3984[i], x, y, 1);
         break;
     case 1:
         draw_sprite(p, g_3984[i], x, y, 1);
@@ -435,6 +437,113 @@ void load_level_gfx(void)
     g_38DE = 0;
 }
 
+/* FUNCTION: DONALD 0304:0C0D */
+void game(void)
+{
+    int now;
+    int last;
+    int dt;
+    register int i;
+    register int key;
+
+    for (i = key = 0; i < 70; i++)
+        g_3984[i] = (char far *)-1L;
+    set_palette(g_0186);
+    if (g_3B4E)
+        fn_0000_01FE(1);
+    fn_056A_019E();
+    show_picture(26);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    play_sound(24);
+    for (i = 0; i < 1000; i++) {
+        repeat_call(1);
+        if (key_ready()) {
+            get_key();
+            break;
+        }
+    }
+    play_sound(17);
+    show_picture(25);
+    for (i = 41; i < 56; i++)
+        g_3984[i] = fn_062D_0005(((i - 41) % 5) * 8, ((i - 41) / 5) * 64, 8, 64);
+    show_picture(24);
+    g_3984[56] = fn_062D_0005(0, 0, 8, 64);
+    show_picture(23);
+    g_3984[1] = fn_062D_0005(0, 0, 1, 1);
+    g_3984[2] = fn_062D_0005(3, 0, 1, 1);
+    g_3984[3] = fn_062D_0005(6, 0, 3, 24);
+    for (i = 57; i < 65; i++)
+        g_3984[i] = fn_062D_0005(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
+    for (i = 1; i < 28; i++)
+        g_3984[i + 3] = fn_062D_0005(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
+    key = 1;
+    if (!key)
+        key = 27;
+    if (key != 27)
+        key = 0;
+    while (key != 27) {
+        for (i = 0; i < 26; i++)
+            g_3AAE[i] = g_3940[i] = 0;
+        i = 0; g_391A = 0; g_38DE = 0; g_38DA = 0; g_38B2 = g_388A = g_3AE2 = 0;
+        load_level_gfx();
+        reset_actors();
+        last = now = fn_0512_0544();
+        for (i = 0; i < 8; i++)
+            draw_item(4, (g_386A[i] >> 3) - 1, g_387A[i] - 8, g_391C[i] + 2, (g_3A9E[i] + 2) << 3);
+        for (;;) {
+            g_38DE++;
+            draw_items(3);
+            for (i = 0; i < 8; i++) {
+                g_389E[i] = run_script(i);
+                if (g_389E[i] != -1)
+                    g_388C[i] = g_389E[i];
+            }
+            for (i = 0; i < 8; i++)
+                if (g_389E[i] != -1) {
+                    i = 0;
+                    break;
+                }
+            if (!i) {
+                check_collisions();
+                draw_items(2);
+                for (i = 0; i < 8; i++)
+                    if (g_389E[i] != -1 && g_389E[i] != 0) {
+                        if (g_3974[i] == 0)
+                            draw_frame(1, g_388C[i], g_386A[i], g_387A[i]);
+                        else
+                            draw_frame(2, g_388C[i], g_386A[i], g_387A[i]);
+                    }
+                draw_items(1);
+            }
+            do {
+                now = fn_0512_0544();
+                if (last < 0)
+                    last = now;
+                if (last > now)
+                    now += 0x123;
+            } while ((dt = now - last) <= 4);
+            last = fn_0512_0544();
+            if (!fn_0512_00EE()) {
+                key = 27;
+                break;
+            }
+            if (key_ready()) {
+                key = handle_key();
+                if (key == 27)
+                    break;
+            }
+            if (g_391A) {
+                key = ending();
+                break;
+            }
+        }
+    }
+    for (i = 1; i < 65; i++)
+        if (g_3984[i] != (char far *)-1L)
+            free(g_3984[i]);
+    free(g_393C);
+}
+
 /* FUNCTION: DONALD 0304:1061 */
 int handle_key(void)
 {
@@ -493,6 +602,296 @@ done:
     return key;
 }
 
+/* FUNCTION: DONALD 0304:11AA */
+int run_script(register int i)
+{
+    int r;
+    int cont;
+    int t;
+    register int j;
+
+    if (g_392C[i]) {
+        g_392C[i]--;
+        if (g_3B4E == 1 && g_392C[i])
+            g_392C[i]--;
+        return -1;
+    }
+    g_392C[i] = g_390A[i];
+    g_3974[i] = 0;
+    cont = 1;
+    r = -1;
+    while (r < 0 && cont != -1) {
+        r = *g_38BA[i]++;
+        if (r < 0)
+        switch (r) {
+        case -1:
+            if (g_386A[i] >> 3 == *g_38BA[i]) {
+                g_38BA[i] += 3;
+                break;
+            }
+            if (g_386A[i] >> 3 < *g_38BA[i])
+                g_386A[i] += 8;
+            else {
+                g_386A[i] -= 8;
+                g_3974[i] = 1;
+            }
+            g_388C[i]++;
+            if (g_388C[i] > g_38BA[i][2])
+                g_388C[i] = g_38BA[i][1];
+            if (g_388C[i] < g_38BA[i][1])
+                g_388C[i] = g_38BA[i][1];
+        back:
+            g_38BA[i]--;
+            r = g_388C[i];
+            break;
+        case -2:
+            r = cont = -1;
+            g_38BA[i] = g_1332;
+            break;
+        case -3:
+            g_386A[i] = *g_38BA[i]++ << 3;
+            g_387A[i] = *g_38BA[i]++ << 3;
+            break;
+        case -4:
+            g_390A[i] = g_392C[i] = *g_38BA[i]++;
+            break;
+        case -5:
+            if ((t = level_sum()) != 0) {
+                g_38BA[i] = g_13E2;
+                break;
+            }
+            if (!g_38DA) {
+                if (g_38DE > 5000) {
+                    g_38BA[i] = g_13E6;
+                    g_38DE = 0;
+                    break;
+                }
+                do
+                    j = roll(1, g_146D[g_388A], g_1479[g_388A]);
+                while (g_3AAE[j]);
+                g_38BA[j - g_1485[g_388A]] = g_1262[j];
+                g_145E = j;
+                g_38CE = g_1336;
+                g_0210 = 3;
+                g_0211 = 0;
+                g_020C = ((j - g_1485[g_388A]) << 2) + 1;
+                break;
+            } else {
+                if (g_145E == g_38E0)
+                    break;
+                g_145E = j = g_38E0;
+                g_38BA[j - g_1485[g_388A]] = g_1262[j];
+                break;
+            }
+        case -6:
+            if (g_386A[7] >> 3 == *g_38BA[i])
+                g_38BA[i]++;
+            else {
+        back3:
+                g_38BA[i]--;
+                r = cont = -1;
+            }
+            break;
+        case -7:
+            j = *g_38BA[i]++;
+            if (*g_38BA[i]++ < g_386A[j] >> 3)
+                goto back2;
+            else
+                g_38BA[i]++;
+            break;
+        case -8:
+            j = *g_38BA[i]++;
+            if (*g_38BA[i]++ != g_386A[j] >> 3)
+                goto back2;
+            else
+                goto inc;
+            break;
+        case -9:
+            g_3A9E[i]++;
+            break;
+        case -10:
+            g_3A9E[i]--;
+            break;
+        case -11:
+            j = *g_38BA[i]++;
+            j = roll(1, j, -1);
+            g_38BA[i] += j;
+            g_38BA[i] = g_1262[*g_38BA[i]];
+            break;
+        case -12:
+            g_3974[i] = 1;
+            break;
+        case -13:
+            if (fn_0000_1197() & 1)
+                g_38BA[i] += *g_38BA[i];
+            else
+                g_38BA[i]++;
+            break;
+        case -14:
+            if (fn_0000_1197() & 3)
+                g_38BA[i]++;
+            else
+        back2:
+                g_38BA[i] -= *g_38BA[i];
+            break;
+        case -15:
+            next_level();
+            break;
+        case -16:
+            if (g_387A[7] >> 3 != *g_38BA[i])
+                goto back3;
+            else
+                goto inc;
+            break;
+        case -17:
+            if ((g_386A[i] >> 3) + *g_38BA[i] != g_386A[7] >> 3)
+                goto back3;
+            else
+                g_38BA[i]++;
+            break;
+        case -18:
+            if (g_3940[g_1485[g_388A] + i] == 0)
+                g_38BA[i]++;
+            else {
+                g_38BA[i] += *g_38BA[i];
+                g_3AAE[g_1485[g_388A] + i] = 1;
+            }
+            break;
+        case -19:
+            g_38D6[3] = *g_38BA[i]++ + (g_386A[i] >> 3);
+            break;
+        case -20:
+            if (!g_3AE2) {
+                g_392C[i] = g_390A[i] = 4;
+                g_3AE2++;
+                aim(i);
+                g_0210 = g_0211 = 0;
+                g_38CE = g_1336;
+                g_020C = 0x25;
+                play_sound(11);
+            }
+            if (g_38B8) {
+                step(i);
+                g_38B8--;
+            }
+            if (!g_38B8) {
+                g_38DA = 0;
+                g_3AE2 = 0;
+                g_38BA[i]++;
+                play_sound(10);
+            } else
+                g_38BA[i]--;
+            r = g_388C[i];
+            break;
+        case -22:
+            init_slots();
+            break;
+        case -23:
+            g_38BA[0] = g_1262[g_1461[g_388A]];
+            break;
+        case -24:
+            if (*g_38BA[i]++ == g_388A)
+                g_38BA[i] += *g_38BA[i];
+            else
+                g_38BA[i]++;
+            break;
+        case -21:
+            g_38BA[i] += *g_38BA[i];
+            break;
+        case -25:
+            j = *g_38BA[i]++;
+            g_38BA[j] = g_1262[*g_38BA[i]++];
+            g_392C[j] = 0;
+            break;
+        case -26:
+            g_386A[i] += 8;
+            break;
+        case -28:
+            g_386A[i] -= 8;
+            break;
+        case -30:
+            g_386A[i] += 8;
+            g_387A[i] += 8;
+            break;
+        case -31:
+            g_386A[i] += 8;
+            g_387A[i] -= 8;
+            break;
+        case -32:
+            g_386A[i] -= 8;
+        case -27:
+            g_387A[i] += 8;
+            break;
+        case -33:
+            g_386A[i] -= 8;
+        case -29:
+            g_387A[i] -= 8;
+            break;
+        case -34:
+            g_386A[i] += 8;
+            r = g_388C[i];
+            break;
+        case -36:
+            g_386A[i] -= 8;
+            r = g_388C[i];
+            break;
+        case -38:
+            g_386A[i] += 8;
+            g_387A[i] += 8;
+            r = g_388C[i];
+            break;
+        case -39:
+            g_386A[i] += 8;
+            g_387A[i] -= 8;
+            r = g_388C[i];
+            break;
+        case -40:
+            g_386A[i] -= 8;
+        case -35:
+            g_387A[i] += 8;
+            r = g_388C[i];
+            break;
+        case -41:
+            g_386A[i] -= 8;
+        case -37:
+            g_387A[i] -= 8;
+            r = g_388C[i];
+            break;
+        case -42:
+            g_145E = -1;
+            g_0210 = g_0211 = 0;
+            g_38CE = g_1336;
+            g_020C = 0x25;
+            break;
+        case -43:
+            if (!g_38DA)
+        inc:
+                g_38BA[i]++;
+            else
+                setup_level(g_145E);
+            break;
+        case -44:
+            g_386A[i] = g_386A[7] + 16;
+            g_387A[i] = 0x60;
+            break;
+        case -45:
+            g_145E = -1;
+            break;
+        case -46:
+            j = *g_38BA[i]++;
+            play_sound(j);
+            break;
+        case -47:
+            g_38B2 = 1;
+            break;
+        case -48:
+            g_38B2 = 0;
+            break;
+        }
+    }
+    return r;
+}
+
 /* FUNCTION: DONALD 0304:1A71 */
 int roll(int n, int max, int base)
 {
@@ -542,4 +941,76 @@ int wait_key(int any)
         }
     }
     return key;
+}
+
+/* FUNCTION: DONALD 0304:1B74 */
+int ending(void)
+{
+    register int k = 0;
+
+    play_sound(17);
+    load_file(g_1772[18].name, g_393C);
+    load_file(g_1772[19].name, g_393C + 0x1b8a);
+    load_file(g_1772[20].name, g_393C + 0x3714);
+    load_file(g_1772[21].name, g_393C + 0x5910);
+    if (g_3B4E == 0)
+        fn_0000_0FF2(g_16D0[18]);
+    draw_pic(g_393C, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    play_sound(24);
+    draw_pic(g_393C + 0x1b8a, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    draw_pic(g_393C + 0x3714, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    draw_pic(g_393C + 0x5910, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    play_sound(17);
+    load_file(g_1772[22].name, g_393C);
+    if (g_3B4E == 0)
+        fn_0000_0FF2(g_16D0[22]);
+    set_palette(g_0196);
+    if (g_3B4E)
+        fn_0000_01FE(1);
+    draw_pic(g_393C, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    k = wait_key(1);
+    if (k != 27)
+        k = wait_key(1);
+    return k;
+}
+
+/* FUNCTION: DONALD 0304:1E5B */
+void about(void)
+{
+    fn_0000_08B9();
+    set_and_redraw(2);
+    draw_line((g_1ED8 - 1) << 3, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, 15);
+    draw_line((g_1ED8 - 1) << 3, ((g_1EDA + g_1EDE + 1) << 3) - 1, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    draw_line((g_1ED8 - 1) << 3, (g_1EDA - 1) << 3, (g_1ED8 - 1) << 3, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    draw_line(((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    print_wrapped(g_01A6);
+    get_key();
+    fn_0000_08B9();
 }

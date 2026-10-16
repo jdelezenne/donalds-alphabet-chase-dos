@@ -63,14 +63,32 @@ rows = sorted(byaddr.values(), key=lambda r: int(r["addr"][:4], 16) * 16 + int(r
 w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"]); w.writeheader(); w.writerows(rows)
 for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
     if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st}")
+# assembly modules: src/asm/*.asm (NASM, `; SEGMENT: DONALD SSSS AAAA-BBBB` header) must assemble to the exact bytes
+asm_ok = 0; asm_bad = []
+for a in sorted((ROOT / "src/asm").glob("*.asm")):
+    m = re.search(r"SEGMENT:\s*DONALD\s+([0-9A-Fa-f]{4})\s+([0-9A-Fa-f]{4})-([0-9A-Fa-f]{4})", a.read_text())
+    out = ROOT / "build/asm" / (a.stem + ".bin"); out.parent.mkdir(parents=True, exist_ok=True)
+    r = subprocess.run(["nasm", "-f", "bin", "-i", str(a.parent) + "/", "-o", str(out), str(a)], capture_output=True, text=True)
+    sg, s0, s1 = (int(x, 16) for x in m.groups()); want = img[sg * 16 + s0: sg * 16 + s1]
+    got = out.read_bytes() if r.returncode == 0 else b""
+    if got == want: asm_ok += len(want)
+    else:
+        asm_bad.append(a.name)
+        k = next((i for i in range(min(len(got), len(want))) if got[i] != want[i]), min(len(got), len(want)))
+        print(f"{a.name}: MISMATCH at {sg:04X}:{s0 + k:04X} (got {len(got)} bytes, want {len(want)}) {r.stderr.strip()}")
 fn = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
 ctot = sum(int(r["size"]) for r in fn if r["kind"] == "c")
 code_end = struct.unpack_from("<H", img, 1)[0] * 16       # DGROUP start = end of code
-mc = sum(int(r["size"] or 0) for r in rows if r["status"] == "matched")
+matched = {r["addr"] for r in rows if r["status"] == "matched"}
+mc = sum(int(r["size"]) for r in fn if r["kind"] == "c" and r["addr"] in matched)   # sizes from functions.csv (data-trimmed)
 lib = sum(int(r["size"]) for r in rows if r["status"] == "lib")
 nm = sum(1 for r in rows if r["status"] == "matched")
-print(f"checked {len(res)}, all matched {nm}; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
-      f"code {mc+lib}/{code_end} bytes = {100*(mc+lib)/code_end:.2f}% (incl. {lib} lib)")
+unc = [r["addr"] for r in fn if r["kind"] == "c" and r["addr"] not in matched]
+if unc: print("unmatched C:", " ".join(unc))
+summary = (f"checked {len(res)}, all matched {nm}; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
+           f"code {mc+lib+asm_ok}/{code_end} bytes = {100*(mc+lib+asm_ok)/code_end:.2f}% (incl. {lib} lib, {asm_ok} asm)")
+print(summary)
 (ROOT / "build").mkdir(exist_ok=True)
 (ROOT / "build/progress.txt").write_text(f"{100*mc/ctot:.2f}\n")
-sys.exit(0 if all(v[3] == "matched" for v in res.values()) else 1)
+(ROOT / "build/summary.txt").write_text(summary + "\n")
+sys.exit(0 if all(v[3] == "matched" for v in res.values()) and not asm_bad else 1)

@@ -51,3 +51,24 @@ is a full-layout TLINK rebuild compared with `cmp`.
 - Per-module flags live in `config/retail/cflags.txt` (glob relative to src/, last match wins).
 - One source file per original code segment (calls to earlier functions in the same TU become `push cs; call near`).
 - TC quirks: first local = lowest address; `a=b=0` stores b first; -O reorders if/else and tail-merges; branch polarity follows source (`if (x != 3) {...} else` vs `if (x == 3)`).
+
+## Batch-2 findings
+- **Gotos are real.** `run_script` (0304:11AA, a 48-opcode actor script VM) only matched once shared tails were written as `goto` to labels in the earlier case. Plain duplicate code made TC's cross-jump merge keep the *later* copy, the opposite of the original. For a jump whose target is a jump, write `if (a != b) goto back; else goto inc;`. TC canonicalises `if (x) A; else goto L;`, so swapping the condition alone does not change the branch polarity.
+- **Branch polarity follows source.** `if (g != 3) {...} else ...` vs `if (g == 3)` decides layout. Early `return` without `else` avoids an extra `jmp`.
+- **unsigned vs int and chained assignment.** `x = y = reg` stores through `ax`; separate statements store the register directly. `print_wrapped` needed the odd but byte-exact `idx = wlen = wlen;`, which permute.py found.
+- `draw_frame` was never a codegen puzzle: case 0 passes `1` (`b8 01 00`). Read the raw bytes before theorising.
+- `-G` is still unresolved: no function so far shows a size/speed choice that depends on it.
+
+## Assembly modules
+There is no TASM in the TC 2.0 archives, and TC's inline `asm` needs TASM. So, as in time-commando-dos (MASM sources checked byte-for-byte), the asm modules are NASM sources under `src/asm/`:
+- `seg0000.asm` (0000:01C9-2DAB, graphics/blit/decompression helpers between C0L and the runtime), `seg0512.asm` (0512:0000-0558, timer and music), and `seg056a.asm` (056A:0000-058B, keyboard ISR and scancode tables).
+- Each has a `; SEGMENT: DONALD SSSS AAAA-BBBB` header. `verify.py` assembles each one (`nasm -f bin`) and requires identical bytes. Relocated words appear as literal segment values marked `; reloc`.
+- `tasm.inc` provides `rr op, dst, src` for TASM's `reg, r/m` encodings (8B/33/03...). Six instructions remain as `db` (cs:-override and `rcl m8,1` forms) with the mnemonic in a comment.
+- They were bootstrapped by `tools/asm2nasm.py` (recursive descent from the known entry points, data as `db`) and are meant to be annotated further (names, comments, `%define`s for the tables).
+- Making them relocatable OMF (externs, `SEG` fixups) is needed for a real link.
+
+## Full relink: status
+`tools/splice.py` gives the full-layout build: it writes `build/DONALD.EXE` with every non-fixup byte of matched code taken from our objects/asm and the rest from your local original. It reproduces the original SHA-256 (27,223 code bytes come from our sources). A TLINK relink still needs:
+1. Definitions for all DGROUP data. Today the globals are `extern g_XXXX` placeholders.
+2. The asm modules as relocatable OMF.
+3. The module link order recovered from the segment map.

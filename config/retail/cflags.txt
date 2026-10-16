@@ -10,3 +10,5 @@ seg06c3/*: -ml
 seg06d3/*: -ml
 seg05d5/*: -ml
 seg062d/*: -ml
+seg06ad/*: -ml
+seg0671/*: -ml
