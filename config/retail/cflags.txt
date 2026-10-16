@@ -3,3 +3,4 @@
 seg06f0/*: -ml -Z
 seg05ed/*: -ml
 seg05e7/*: -ml
+seg0612/*: -ml
