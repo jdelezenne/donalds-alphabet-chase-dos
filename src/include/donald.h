@@ -75,7 +75,8 @@ extern int g_1485[], g_146D[], g_3AAE[];
 
 void far quit(int code);
 extern char g_0186[], g_0196[], g_01A6[];
-extern int g_3974[], g_3AE2;
+extern int g_3974[], g_3AE2, g_390A[], g_1479[], g_1461[];
+extern char far *g_13E2, far *g_13E6, far *g_1262[];
 extern int g_3B54, g_3B56, g_1F36;
 extern char far *g_1EF2, far *g_1EF6, far *g_1EFA, far *g_1EFE;
 void far print_word(char far *s, int nl);

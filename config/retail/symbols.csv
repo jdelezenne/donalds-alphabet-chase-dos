@@ -33,6 +33,7 @@ show_picture,0304:093C,274,matched,100.0% src/seg0304/m0304.c
 load_level_gfx,0304:0A4E,447,matched,100.0% src/seg0304/m0304.c
 game,0304:0C0D,1108,matched,100.0% src/seg0304/m0304.c
 handle_key,0304:1061,329,matched,100.0% src/seg0304/m0304.c
+run_script,0304:11AA,2247,matched,100.0% src/seg0304/m0304.c
 roll,0304:1A71,73,matched,100.0% src/seg0304/m0304.c
 init_slots,0304:1ABA,125,matched,100.0% src/seg0304/m0304.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/m0304.c
