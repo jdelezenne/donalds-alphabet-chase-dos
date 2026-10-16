@@ -27,7 +27,7 @@ stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
 key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
 get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
 repeat_call,05D4:0002,27,matched,100.0% src/seg05d4/repeat.c
-hline,05ED:0007,159,nonmatching,99.4% src/seg05ed/m05ed.c
+hline,05ED:0007,159,matched,100.0% src/seg05ed/m05ed.c
 draw_line,05ED:00A6,177,matched,100.0% src/seg05ed/m05ed.c
 plot,05ED:0157,26,matched,100.0% src/seg05ed/m05ed.c
 load_file,061A:0005,82,matched,100.0% src/seg061a/m061a.c
