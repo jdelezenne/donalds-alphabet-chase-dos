@@ -59,6 +59,8 @@ grab_vga,062D:01A6,326,matched,100.0% src/seg062d/m062d.c
 music_toggle,065B:000C,44,matched,100.0% src/seg065b/music.c
 set_window,065E:0008,272,matched,100.0% src/seg065e/m065e.c
 redraw_rect,066F:0008,37,matched,100.0% src/seg066f/redraw.c
+print_wrapped,0671:000D,949,matched,100.0% src/seg0671/m0671.c
+print_word,06AD:0002,365,matched,100.0% src/seg06ad/m06ad.c
 draw_sprite,06C3:000F,253,matched,100.0% src/seg06c3/m06c3.c
 draw_sprite_masked,06D3:000C,253,matched,100.0% src/seg06d3/m06d3.c
 harderr_handler,06E3:0009,14,matched,100.0% src/seg06e3/harderr_handler.c
@@ -70,6 +72,7 @@ hardretn,06E3:0097,52,lib,CL.LIB:HARDERR
 set_and_redraw,06EF:000B,19,matched,100.0% src/seg06ef/m06ef.c
 fatal,06F0:000E,34,matched,100.0% src/seg06f0/m06f0.c
 quit,06F0:0030,19,matched,100.0% src/seg06f0/m06f0.c
+open_slot,06F0:0043,514,matched,100.0% src/seg06f0/m06f0.c
 close_slot,06F0:0245,72,matched,100.0% src/seg06f0/m06f0.c
 read_file,06F0:028D,230,matched,100.0% src/seg06f0/m06f0.c
 write_file,06F0:0373,207,matched,100.0% src/seg06f0/m06f0.c

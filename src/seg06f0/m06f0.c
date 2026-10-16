@@ -22,6 +22,84 @@ void quit(int code)
     exit(code);
 }
 
+/* FUNCTION: DONALD 06F0:0043 */
+int open_slot(char far *name, int mode)
+{
+    int oflag;
+    int slot;
+    register int fd;
+    register int tries;
+
+    switch (mode) {
+    case 1:
+        if (!is_loaded(name) && !file_exists(name)) {
+            g_3B54 = lookup_value(name);
+            if (g_3B56)
+                music_toggle(g_3B54);
+        }
+        oflag = 0x8001;
+        break;
+    case 2:
+        oflag = 0x8002;
+        delete_ok(name);
+    case 3:
+        tries = g_1F36;
+        if (!file_exists(name)) {
+            while (!create_file(name) && tries--) {
+                g_3B50 = g_1EF2;
+                (*g_1F2E)();
+            }
+            if (!file_exists(name)) {
+                (*g_1F32)();
+                quit(1);
+            }
+        }
+        if (mode == 3)
+            oflag = 0x8004;
+        break;
+    default:
+        g_3B50 = g_1EF6;
+        (*g_1F2E)();
+        (*g_1F32)();
+        quit(1);
+        break;
+    }
+    if (!is_loaded(name)) {
+        tries = g_1F36;
+        fd = open(name, oflag);
+        while (fd == -1 && tries) {
+            fd = open(name, oflag);
+            if (fd == -1) {
+                tries--;
+                g_3B54 = lookup_value(name);
+                g_3B50 = g_1EFA;
+                (*g_1F2E)();
+            }
+        }
+        if (fd == -1) {
+            (*g_1F32)();
+            quit(1);
+        }
+    } else {
+        fd = find_name(name);
+        g_1772[fd].pos = 0;
+        fd = fd | 0x8000;
+    }
+    slot = 10;
+    for (tries = 0; tries < 10; tries++)
+        if (g_3B58[tries] == 0x7fff) {
+            slot = tries;
+            break;
+        }
+    if (slot == 10) {
+        g_3B50 = g_1EFE;
+        (*g_1F2E)();
+        (*g_1F32)();
+    }
+    g_3B58[slot] = fd;
+    return slot;
+}
+
 /* FUNCTION: DONALD 06F0:0245 */
 void close_slot(register int i)
 {
