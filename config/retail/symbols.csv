@@ -21,7 +21,7 @@ check_collisions,0304:0066,289,matched,100.0% src/seg0304/m0304.c
 draw_items,0304:0187,154,matched,100.0% src/seg0304/m0304.c
 draw_item,0304:0221,354,matched,100.0% src/seg0304/m0304.c
 step,0304:0383,121,matched,100.0% src/seg0304/m0304.c
-draw_frame,0304:03FC,252,nonmatching,52.4% src/seg0304/m0304.c
+draw_frame,0304:03FC,253,matched,100.0% src/seg0304/m0304.c
 next_level,0304:04F9,199,matched,100.0% src/seg0304/m0304.c
 rom_check,0304:05C0,43,matched,100.0% src/seg0304/m0304.c
 detect_video,0304:05EB,332,matched,100.0% src/seg0304/m0304.c

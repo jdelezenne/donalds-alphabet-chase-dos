@@ -186,7 +186,7 @@ void draw_frame(int mode, register int i, register int x, int y)
     g_1AC0 = 25;
     switch (mode) {
     case 0:
-        draw_sprite(g_3AF8, g_3984[i], x, y, 0);
+        draw_sprite(g_3AF8, g_3984[i], x, y, 1);
         break;
     case 1:
         draw_sprite(p, g_3984[i], x, y, 1);
