@@ -26,6 +26,7 @@ level_sum,0304:0737,63,matched,100.0% src/seg0304/level_sum.c
 aim,0304:0776,152,matched,100.0% src/seg0304/aim.c
 reset_actors,0304:080E,163,matched,100.0% src/seg0304/reset_actors.c
 setup_level,0304:08B1,139,matched,100.0% src/seg0304/setup_level.c
+show_picture,0304:093C,274,matched,100.0% src/seg0304/show_picture.c
 roll,0304:1A71,73,matched,100.0% src/seg0304/roll.c
 init_slots,0304:1ABA,125,matched,100.0% src/seg0304/init_slots.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/wait_key.c
@@ -38,6 +39,7 @@ key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
 get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
 blit_ega,05C5:0008,234,matched,100.0% src/seg05c5/m05c5.c
 repeat_call,05D4:0002,27,matched,100.0% src/seg05d4/repeat.c
+print_text,05D5:000D,285,matched,100.0% src/seg05d5/m05d5.c
 fill_rect,05E7:000A,93,matched,100.0% src/seg05e7/m05e7.c
 hline,05ED:0007,159,matched,100.0% src/seg05ed/m05ed.c
 draw_line,05ED:00A6,177,matched,100.0% src/seg05ed/m05ed.c

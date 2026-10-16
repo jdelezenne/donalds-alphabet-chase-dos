@@ -3,8 +3,6 @@
 
 long mem_read(int i, char far *buf, long len);
 
-struct name_entry { char far *name; long size; char far *data; int value; long pos; };
-extern struct name_entry g_1772[];
 char far *fn_08E1_0003();
 char far *fn_0000_115F();
 

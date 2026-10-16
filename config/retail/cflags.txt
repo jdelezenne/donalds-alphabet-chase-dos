@@ -8,3 +8,4 @@ seg061f/*: -ml
 seg05c5/*: -ml
 seg06c3/*: -ml
 seg06d3/*: -ml
+seg05d5/*: -ml
