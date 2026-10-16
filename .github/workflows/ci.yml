@@ -1,0 +1,10 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m py_compile tools/*.py && bash -n tools/*.sh
+      - name: no game binaries committed
+        run: "! git ls-files | grep -iE '\\.(exe|cmp|com|obj|lib|img|ima)$|^game/DONALD$'"
