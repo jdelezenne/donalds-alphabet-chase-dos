@@ -650,3 +650,75 @@ int wait_key(int any)
     }
     return key;
 }
+
+/* FUNCTION: DONALD 0304:1B74 */
+int ending(void)
+{
+    register int k = 0;
+
+    play_sound(17);
+    load_file(g_1772[18].name, g_393C);
+    load_file(g_1772[19].name, g_393C + 0x1b8a);
+    load_file(g_1772[20].name, g_393C + 0x3714);
+    load_file(g_1772[21].name, g_393C + 0x5910);
+    if (g_3B4E == 0)
+        fn_0000_0FF2(g_16D0[18]);
+    draw_pic(g_393C, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    play_sound(24);
+    draw_pic(g_393C + 0x1b8a, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    draw_pic(g_393C + 0x3714, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    draw_pic(g_393C + 0x5910, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    k = wait_key(0);
+    if (k == 27)
+        return k;
+    play_sound(17);
+    load_file(g_1772[22].name, g_393C);
+    if (g_3B4E == 0)
+        fn_0000_0FF2(g_16D0[22]);
+    set_palette(g_0196);
+    if (g_3B4E)
+        fn_0000_01FE(1);
+    draw_pic(g_393C, g_3AF2);
+    if (g_3B4E == 2)
+        fn_0000_0A6B(g_3AF2, 0xA800);
+    blit_dispatch(g_3AF2, 0, 0, 40, 200);
+    k = wait_key(1);
+    if (k != 27)
+        k = wait_key(1);
+    return k;
+}
+
+/* FUNCTION: DONALD 0304:1E5B */
+void about(void)
+{
+    fn_0000_08B9();
+    set_and_redraw(2);
+    draw_line((g_1ED8 - 1) << 3, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, 15);
+    draw_line((g_1ED8 - 1) << 3, ((g_1EDA + g_1EDE + 1) << 3) - 1, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    draw_line((g_1ED8 - 1) << 3, (g_1EDA - 1) << 3, (g_1ED8 - 1) << 3, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    draw_line(((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
+    print_wrapped(g_01A6);
+    get_key();
+    fn_0000_08B9();
+}

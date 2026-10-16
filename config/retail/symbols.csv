@@ -36,6 +36,8 @@ handle_key,0304:1061,329,matched,100.0% src/seg0304/m0304.c
 roll,0304:1A71,73,matched,100.0% src/seg0304/m0304.c
 init_slots,0304:1ABA,125,matched,100.0% src/seg0304/m0304.c
 wait_key,0304:1B37,61,matched,100.0% src/seg0304/m0304.c
+ending,0304:1B74,743,matched,100.0% src/seg0304/m0304.c
+about,0304:1E5B,302,matched,100.0% src/seg0304/m0304.c
 main,04FC:0009,214,matched,100.0% src/seg04fc/main.c
 init_game,04FC:00DF,99,matched,100.0% src/seg04fc/m04fc.c
 shutdown,04FC:0142,31,matched,100.0% src/seg04fc/m04fc.c
