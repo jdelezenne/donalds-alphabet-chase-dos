@@ -6,7 +6,7 @@ void set_palette(char far *pal)
     register int i;
     register int v;
 
-    wait_vretrace(g_382D);
+    wait_vretrace(g_retraceWait);
     if (g_videoMode == 1)
         set_palette_regs(pal);
     else if (g_videoMode == 2) {

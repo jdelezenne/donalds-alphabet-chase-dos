@@ -26,14 +26,14 @@ global _snd_play
 _snd_play equ L03CD
 global _snd_stop
 _snd_stop equ L03F1
-global _fn_0512_0407
-_fn_0512_0407 equ L0407
-global _fn_0512_043A
-_fn_0512_043A equ L043A
-global _fn_0512_045C
-_fn_0512_045C equ L045C
-global _fn_0512_0522
-_fn_0512_0522 equ L0522
+global _ctrlc_install
+_ctrlc_install equ ctrlc_install
+global _ctrlc_remove
+_ctrlc_remove equ ctrlc_remove
+global _kbbreak_install
+_kbbreak_install equ kbbreak_install
+global _kbbreak_remove
+_kbbreak_remove equ kbbreak_remove
 global _timer_ticks
 _timer_ticks equ L0544
 
@@ -229,7 +229,8 @@ L03F1:
     retf
 
 ; FUNCTION: DONALD 0512:0407
-L0407:
+; ctrlc_install: save int 23h and point it at an IRET stub (Ctrl-C ignored)
+ctrlc_install:
     push bp
     rr mov, bp, sp
     push di
@@ -256,7 +257,8 @@ L0407:
     db 0x8E,0xD8,0x58,0x1F,0xCF
 
 ; FUNCTION: DONALD 0512:043A
-L043A:
+; ctrlc_remove: restore the saved int 23h
+ctrlc_remove:
     push bp
     rr mov, bp, sp
     push di
@@ -277,7 +279,8 @@ L043A:
     retf
 
 ; FUNCTION: DONALD 0512:045C
-L045C:
+; kbbreak_install: save int 9 and chain a keyboard filter that swallows ScrollLock/SysRq/Ctrl-Break combos
+kbbreak_install:
     push bp
     rr mov, bp, sp
     push di
@@ -313,7 +316,8 @@ L045C:
     db 0xE6,0x61,0x86,0xE0,0xE6,0x61,0xB0,0x20,0xE6,0x20,0x58,0x1F,0xCF
 
 ; FUNCTION: DONALD 0512:0522
-L0522:
+; kbbreak_remove: restore the saved int 9
+kbbreak_remove:
     push bp
     rr mov, bp, sp
     push di

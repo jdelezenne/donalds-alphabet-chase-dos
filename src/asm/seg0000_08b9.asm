@@ -98,14 +98,14 @@ L08B9:
     mov es, ax
     mov di, 0
     mov cx, 0x2000
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L0908
     shl ch, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L0908
     mov ax, 0xa000
     mov es, ax
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L08F1
     shl ch, 1
     jmp short L0908
@@ -146,7 +146,7 @@ L0912:
     mov ds, ax
     push es
     mov ax, 0xb800
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     jle short L092B
     mov ax, 0xa000
 L092B:
@@ -163,11 +163,11 @@ L092B:
     shl dx, 1
     mov word [0x26], dx
     mov dx, 0x28
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L097D
     shl dx, 1
     shl bx, 1
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     jne short L0963
     shr ax, 1
     jmp short L097D
@@ -176,7 +176,7 @@ L0963:
     shl dx, 1
     shl cx, 1
     shl bx, 1
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     jne short L0977
     shr ax, 1
     shr ax, 1
@@ -192,12 +192,12 @@ L097D:
     rr add, ax, bx
     rr mov, di, ax
     mov word [0x2a], cx
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L09FC
     mov dx, word [0x26]
     mov ax, word [bp + 0xe]
     rr mov, ah, al
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     je short L09C0
     shl al, 1
     shl al, 1
@@ -205,7 +205,7 @@ L097D:
     shl al, 1
     rr or, al, ah
     rr mov, ah, al
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L09C0
     and ax, 0x3333
     shl al, 1
@@ -218,9 +218,9 @@ L09C0:
     rep stosw
     rr mov, di, si
     add di, word [0x28]
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     je short L09F7
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     jne short L09E9
     add di, 0x1f60
     jns short L09F7
@@ -717,10 +717,10 @@ L0D56:
     mov ax, word [bp + 0x10]
     mov byte [0x3e], al
     mov bx, word [bp + 0x12]
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     je short L0DBF
     mov dh, byte [0x3e]
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L0DAB
     mov ds, word [0x3a]
 L0D99:
@@ -777,7 +777,7 @@ L0DE7:
     loop L0DE7
     mov ch, 0x80
 L0DEE:
-    call L0E6F
+    call take_nibble
     mov si, 0x42
     rr add, si, dx
     or byte [si], ch
@@ -842,7 +842,8 @@ L0E5E:
     rr mov, ax, di
     sub ax, word [0x3c]
     jmp near L0DA5
-L0E6F:
+; take_nibble: dl = top 4 bits of bx, bx <<= 4
+take_nibble:
     rr xor, dx, dx
     shl bx, 1
     rcl dl, 1
@@ -1109,7 +1110,7 @@ L0FF2:
     push ds
     mov ax, GFX_DATA  ; reloc
     mov ds, ax
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     jne short L1066
     mov si, word [bp + 6]
     mov ax, word [bp + 8]
@@ -1790,7 +1791,7 @@ L14C7:
     mov ax, GFX_DATA  ; reloc
     mov ds, ax
     mov ax, word [bp + 6]
-    mov word [0x286], ax
+    mov word [GV_MODE], ax
     pop ds
     pop si
     pop di
@@ -1859,7 +1860,7 @@ L16FA:
     push ds
     mov ax, GFX_DATA  ; reloc
     mov ds, ax
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     jne short L170F
     jmp near L1975
 L170F:
@@ -2413,7 +2414,7 @@ L1D16:
     mov ax, GFX_DATA  ; reloc
     mov ds, ax
     mov word [cs:0x16f6], 0
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     jne short L1D32
     jmp near L1FD3
 L1D32:
@@ -2624,7 +2625,7 @@ L1F1A:
     mov ds, dx
     cmp word [cs:0x16f6], 0
     je short L1F39
-    call L1F96
+    call smc_merge_nibble
     rr xor, bh, bh
 L1F39:
     mov bl, byte [si]
@@ -2665,7 +2666,8 @@ L1F8D:
     dec word [0x298]
     jne short L1F1A
     jmp near L1EC8
-L1F96:
+; smc_merge_nibble / smc_merge_shifted: sprite_mask_cga helpers that merge one masked pixel byte into es:di
+smc_merge_nibble:
     mov bl, byte [si + 1]
     mov bl, byte [cs:bx + 0x1c16]
     rr mov, ah, bl
@@ -2908,7 +2910,7 @@ L21E1:
     mov cl, byte [0x2a0]
     cmp word [cs:0x16f6], 0
     je short L21FA
-    call L2271
+    call smc_merge_shifted
 L21FA:
     rr or, ch, ch
     je short L2232
@@ -2967,7 +2969,7 @@ L2264:
     dec word [0x298]
     je short L2252
     jmp near L21E1
-L2271:
+smc_merge_shifted:
     mov ds, dx
     mov al, byte [si + 1]
     mov ah, byte [bx + 1]
@@ -3003,9 +3005,9 @@ L2298:
     mov byte [0x14a5], al
     mov al, byte [bp + 8]
     mov byte [0x14a6], al
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L22E8
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     jae short L22E3
     mov bl, byte [0x14a5]
     rr mov, al, bl
@@ -3251,18 +3253,18 @@ L2470:
     mov ax, ds
     mov es, ax
     cld
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     jae short L24D7
     mov si, 0x4a5
     add si, 0x3ff
     mov di, 0x4a5
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L24B2
     add di, 0xffc
 L249D:
     mov bl, byte [si]
-    call L24DD
-    call L24DD
+    call expand_bits4
+    call expand_bits4
     sub di, 8
     dec si
     cmp si, 0x4a5
@@ -3296,7 +3298,8 @@ L24D7:
     pop di
     pop bp
     retf
-L24DD:
+; expand_bits4: expand the top 4 bits of bl into 4 nibble pixels (one word) at es:di
+expand_bits4:
     rr xor, ax, ax
     shl bl, 1
     jae short L24E5
@@ -3327,7 +3330,7 @@ L24FB:
     push ds
     mov ax, GFX_DATA  ; reloc
     mov ds, ax
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     jne short L2536
     mov si, word [bp + 6]
     mov ax, word [bp + 8]
@@ -3434,9 +3437,9 @@ L2584:
     mov word [0x14b1], ax
     mov ax, word [bp + 0xc]
     mov word [0x14b3], ax
-    cmp word [0x286], 3
+    cmp word [GV_MODE], 3
     je short L25B6
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     jne short L25DD
     jmp near L26A2
 L25B6:
@@ -3456,7 +3459,7 @@ L25D1:
     loop L25D1
     jmp near L269C
 L25DD:
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L262E
     mov dx, 0x3ce
     mov ax, 0x205
@@ -3657,25 +3660,25 @@ L2735:
 
 ; ---- far data (GFX_DATA, frame 0B7F, offsets 0026-14B5; the code addresses it by these offsets) ----
 segment GFX_DATA
-global _g_23B2
-global _g_23B4
-global _g_23B6
-global _g_23B8
-global _g_25FB
+global _gfx_clip_x1
+global _gfx_clip_x2
+global _gfx_clip_y1
+global _gfx_clip_y2
+global _g_randSeed
 global _clip_x1
 global _clip_x2
 global _clip_y1
 global _clip_y2
-global _g_382D
+global _g_retraceWait
 gfx_0026:
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-_g_23B2:   ; 0B7F:0032, used from C as DGROUP:23B2
+_gfx_clip_x1:   ; 0B7F:0032, used from C as DGROUP:23B2
     db 0x00,0x00
-_g_23B4:   ; 0B7F:0034, used from C as DGROUP:23B4
+_gfx_clip_x2:   ; 0B7F:0034, used from C as DGROUP:23B4
     db 0x28,0x00
-_g_23B6:   ; 0B7F:0036, used from C as DGROUP:23B6
+_gfx_clip_y1:   ; 0B7F:0036, used from C as DGROUP:23B6
     db 0x00,0x00
-_g_23B8:   ; 0B7F:0038, used from C as DGROUP:23B8
+_gfx_clip_y2:   ; 0B7F:0038, used from C as DGROUP:23B8
     db 0xC8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03
@@ -3713,7 +3716,7 @@ _g_23B8:   ; 0B7F:0038, used from C as DGROUP:23B8
     db 0x00,0x00,0x00,0x00,0x01,0x01,0x01,0x01,0x02,0x02,0x02,0x02,0x03,0x03,0x03,0x03
     db 0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03,0x00,0x01,0x02,0x03
     db 0x00,0x00,0x00
-_g_25FB:   ; 0B7F:027B, used from C as DGROUP:25FB
+_g_randSeed:   ; 0B7F:027B, used from C as DGROUP:25FB
     db 0x34,0x12,0x76,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 _clip_x1:   ; 0B7F:0288, used from C as DGROUP:2608
     db 0x00,0x00
@@ -4012,5 +4015,5 @@ _clip_y2:   ; 0B7F:028E, used from C as DGROUP:260E
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-_g_382D:   ; 0B7F:14AD, used from C as DGROUP:382D
+_g_retraceWait:   ; 0B7F:14AD, used from C as DGROUP:382D
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00

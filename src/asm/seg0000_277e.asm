@@ -9,8 +9,6 @@ segment _TEXT public align=1 class=CODE use16
 
 global _save_window
 _save_window equ L277E
-global _fn_0000_28B3
-_fn_0000_28B3 equ L28B3
 global _blit_generic
 _blit_generic equ L28B3
 ; FUNCTION: DONALD 0000:277E
@@ -35,11 +33,11 @@ L277E:
     mov ax, word [bp + 0x10]
     push es
     mov es, ax
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L27E7
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L2817
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     jne short L27BD
     jmp near L2863
 L27BD:
@@ -194,11 +192,11 @@ L28B3:
     mov ax, word [bp + 0x10]
     mov word [cs:0x28b1], ax
     push es
-    cmp word [0x286], 0
+    cmp word [GV_MODE], 0
     je short L2923
-    cmp word [0x286], 1
+    cmp word [GV_MODE], 1
     je short L2959
-    cmp word [0x286], 2
+    cmp word [GV_MODE], 2
     jne short L28F3
     jmp near L29AB
 L28F3:
