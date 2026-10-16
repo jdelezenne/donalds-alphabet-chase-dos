@@ -57,6 +57,22 @@ int create_file(char far *name)
     return 1;
 }
 
+struct name_entry { char far *name; char pad[14]; };
+extern struct name_entry g_1772[];
+char far *fn_08E1_0003();
+
+/* FUNCTION: DONALD 06F0:0C83 */
+int find_name(char far *name)
+{
+    register int i = 0;
+
+    name = fn_08E1_0003(name);
+    for (; *g_1772[i].name; i++)
+        if (fn_087E_0009(g_1772[i].name, name) == 0)
+            return i;
+    fatal(g_1F1E);
+}
+
 /* FUNCTION: DONALD 06F0:0DF9 */
 void inset_rect(register int n)
 {

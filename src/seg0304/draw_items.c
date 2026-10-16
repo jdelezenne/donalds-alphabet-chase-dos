@@ -11,12 +11,12 @@ void draw_items(int p)
         a = 1;
         b = 8;
         d = 2;
-        if (g_arr3A9E[i] != 3 && g_arr3A9E[i] != 8) {
+        if (g_3A9E[i] != 3 && g_3A9E[i] != 8) {
             a = d;
             b = 16;
             d = 4;
         }
-        if (g_arr389E[i] != -1)
-            draw_item(p, (g_arr386A[i] >> 3) - a, g_arr387A[i] - b, g_arr391C[i] + d, (g_arr3A9E[i] + d) << 3);
+        if (g_389E[i] != -1)
+            draw_item(p, (g_386A[i] >> 3) - a, g_387A[i] - b, g_391C[i] + d, (g_3A9E[i] + d) << 3);
     }
 }
