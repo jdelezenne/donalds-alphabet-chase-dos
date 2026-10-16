@@ -3,7 +3,7 @@
 
 long mem_read(int i, char far *buf, long len);
 
-char far *fn_08E1_0003();
+char far *strupr();
 char far *fn_0000_115F();
 char far *farmalloc();
 void far inset_rect(int n);
@@ -22,7 +22,7 @@ void fatal(char far *msg)
 /* FUNCTION: DONALD 06F0:0030 */
 void quit(int code)
 {
-    fn_04FC_0142();
+    shutdown();
     exit(code);
 }
 
@@ -245,9 +245,9 @@ int lookup_value(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0)
+        if (strcmp(g_1772[i].name, name) == 0)
             return g_1772[i].value;
     fatal(g_1F1A);
 }
@@ -343,7 +343,7 @@ void load_resources(void)
     while (*g_1772[i].name) {
         g_3B56 |= g_1772[i].value;
         if (g_3B6C) {
-            g_1772[i].name = fn_08E1_0003(g_1772[i].name);
+            g_1772[i].name = strupr(g_1772[i].name);
             need = g_1772[i].size / 1024L + 1;
             if (avail >= need)
                 buf = farmalloc(g_1772[i].size);
@@ -379,9 +379,9 @@ int is_loaded(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0) {
+        if (strcmp(g_1772[i].name, name) == 0) {
             if (g_1772[i].data)
                 return 1;
             else
@@ -395,9 +395,9 @@ int find_name(char far *name)
 {
     register int i = 0;
 
-    name = fn_08E1_0003(name);
+    name = strupr(name);
     for (; *g_1772[i].name; i++)
-        if (fn_087E_0009(g_1772[i].name, name) == 0)
+        if (strcmp(g_1772[i].name, name) == 0)
             return i;
     fatal(g_1F1E);
 }

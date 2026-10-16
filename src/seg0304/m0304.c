@@ -2,7 +2,7 @@
 #include "donald.h"
 
 unsigned char fn_0000_1197();
-char far *fn_062D_0005();
+char far *grab();
 void far reset_actors(void);
 void far init_slots(void);
 void far load_level_gfx(void);
@@ -192,10 +192,10 @@ void draw_frame(int mode, register int i, register int x, int y)
         draw_sprite(p, g_3984[i], x, y, 1);
         break;
     case 2:
-        fn_06D3_000C(p, g_3984[i], x, y, 1);
+        draw_sprite_masked(p, g_3984[i], x, y, 1);
         break;
     case 3:
-        fn_06D3_000C(g_3AF8, g_3984[i], x, y, 1);
+        draw_sprite_masked(g_3AF8, g_3984[i], x, y, 1);
         break;
     }
 }
@@ -423,10 +423,10 @@ void load_level_gfx(void)
         }
     show_picture(g_016E[g_388A]);
     for (i = 1; i < 28; i++)
-        g_3984[i + 3] = fn_062D_0005(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
+        g_3984[i + 3] = grab(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
     show_picture(g_017A[g_388A]);
     for (i = 57; i < 65; i++)
-        g_3984[i] = fn_062D_0005(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
+        g_3984[i] = grab(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
     show_picture(g_0162[g_388A]);
     if (g_3B4E)
         fn_0000_01FE(0);
@@ -465,17 +465,17 @@ void game(void)
     play_sound(17);
     show_picture(25);
     for (i = 41; i < 56; i++)
-        g_3984[i] = fn_062D_0005(((i - 41) % 5) * 8, ((i - 41) / 5) * 64, 8, 64);
+        g_3984[i] = grab(((i - 41) % 5) * 8, ((i - 41) / 5) * 64, 8, 64);
     show_picture(24);
-    g_3984[56] = fn_062D_0005(0, 0, 8, 64);
+    g_3984[56] = grab(0, 0, 8, 64);
     show_picture(23);
-    g_3984[1] = fn_062D_0005(0, 0, 1, 1);
-    g_3984[2] = fn_062D_0005(3, 0, 1, 1);
-    g_3984[3] = fn_062D_0005(6, 0, 3, 24);
+    g_3984[1] = grab(0, 0, 1, 1);
+    g_3984[2] = grab(3, 0, 1, 1);
+    g_3984[3] = grab(6, 0, 3, 24);
     for (i = 57; i < 65; i++)
-        g_3984[i] = fn_062D_0005(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
+        g_3984[i] = grab(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
     for (i = 1; i < 28; i++)
-        g_3984[i + 3] = fn_062D_0005(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
+        g_3984[i + 3] = grab(((i - 1) % 13) * 3, ((i - 1) / 13) * 24, 3, 24);
     key = 1;
     if (!key)
         key = 27;
