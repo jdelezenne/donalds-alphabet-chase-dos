@@ -83,7 +83,7 @@ addr,linear,size,kind,lang,evidence
 0304:1E5B,04E9B,302,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
 04FC:0009,04FC9,214,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
 04FC:00DF,0509F,99,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
-04FC:0142,05102,30,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
+04FC:0142,05102,31,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
 0512:00EE,0520E,20,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data"
 0512:0102,05222,594,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O"
 0512:0354,05474,68,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, direct int"

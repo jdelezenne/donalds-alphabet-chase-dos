@@ -5,8 +5,6 @@
 data_start  0094     # end of C0L _DATA
 chunk 0304  1C00     # 0304 data (182 far pointers into DGROUP, 0x1264-0x195A)
 chunk 0512  1EA2     # up to the literals of seg0612 ("Alloc too big!")
-chunk 06EF  1F40     # 17 far pointers 0x1EF4-0x1F34 (06F0 handlers, DGROUP strings)
-chunk 06F0  2194     # up to the CL.LIB _DATA (IOERROR first)
 gfx         238E 3860  # GFX_DATA, word aligned right after _CRTSEG (frame 0B7F, so it starts at 0B7F:000E): far data of the hand-written graphics modules
 bss         3868 3B6E  # game _BSS, before the CL.LIB _BSS (0x8E bytes: ATEXIT, HARDERR, TZSET)
 record_mod  5E       # TC splits LEDATA at offsets == 0x5E (mod 0x400): reproduces the relocation order

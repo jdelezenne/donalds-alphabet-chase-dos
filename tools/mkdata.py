@@ -40,11 +40,13 @@ for n, s in order:
     kind, nm = s.split(":")
     if kind == "lib": continue
     o = ROOT / ("build/obj" if kind == "obj" else "build/asm") / (nm + ".OBJ")
-    segs, _, data, _ = omf.read(o)
+    segs, _, data, fixes = omf.read(o)
     if kind == "obj": pos += pos & 1             # TC _DATA is word aligned, even when empty
     for i, sg in enumerate(segs):
         if sg and sg["name"] == "_DATA" and sg["len"]:
-            if bytes(data[i]) != img[DG + pos:DG + pos + sg["len"]]: sys.exit(f"{nm}: _DATA does not match the original at {pos:#x}")
+            fx = fixes.get(i, set())
+            bad = [k for k in range(sg["len"]) if k not in fx and data[i][k] != img[DG + pos + k]]
+            if bad: sys.exit(f"{nm}: _DATA differs from the original at DGROUP:{pos + bad[0]:04X} ({len(bad)} bytes)")
             pos += sg["len"]
 
 def rec(t, body):

@@ -1,5 +1,5 @@
 -ml -O -Z
-# line 1 = default TCC flags (UNVERIFIED guess, see docs/MATCHING.md). Per-file override: FOO.C: -ml ...
+# line 1 = default TCC flags, verified by the relink: -O and -Z are both required for the default files, and -G is NOT used (adding it breaks 49 of 73 functions). Per-file override: "<glob under src/>: flags"
 seg06f0/*: -ml
 seg05ed/*: -ml
 seg05e7/*: -ml

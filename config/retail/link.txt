@@ -36,6 +36,4 @@ M06D3    obj:m06d3
 M06E3    obj:harderr
 A2A15    asm:seg0000_2a15
 M06EF    obj:m06ef
-@data    06EF
 M06F0    obj:m06f0
-@data    06F0
