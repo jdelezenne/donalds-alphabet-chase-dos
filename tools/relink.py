@@ -3,10 +3,15 @@
 Inputs: build/obj/*.OBJ (tools/build.sh), build/asm/*.OBJ (tools/verify.py),
 C:\\LIB\\C0L.OBJ + C:\\LIB\\CL.LIB from $TC_ROOT, object order from config/retail/link.txt.
 Output: build/link/DONALD.EXE (+ DONALD.MAP); prints the first differences. Exit 0 only if byte-identical.
-Usage: relink.py [-q]"""
+Usage: relink.py [--alt]
+--alt: the alternate build game/DONALD (sha256 61d3bc8b...): objects from build/alt/obj override build/obj
+(DAC_TARGET=alt tools/build.sh), asm variants assembled with -DDONALD_ALT into build/alt/asm, output build/link-alt."""
 import hashlib, shutil, struct, subprocess, sys
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]; L = ROOT / "build/link"
+ROOT = Path(__file__).resolve().parents[1]
+ALT = "--alt" in sys.argv
+L = ROOT / ("build/link-alt" if ALT else "build/link")
+TARGET, ORIG = ("DONALD", "game/DONALD") if ALT else ("DONALD.EXE", "game/DONALD.EXE")
 if L.exists(): shutil.rmtree(L)
 L.mkdir(parents=True)
 objs = []
@@ -16,6 +21,8 @@ for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
     kind, name = s.split(":")
     if kind == "lib": objs.append("C:\\LIB\\" + name); continue
     src = ROOT / {"obj": "build/obj", "asm": "build/asm"}[kind] / (name + ".OBJ")
+    alt = ROOT / {"obj": "build/alt/obj", "asm": "build/alt/asm"}[kind] / (name + ".OBJ")
+    if ALT and alt.exists(): src = alt
     if not src.exists(): sys.exit(f"missing {src} (run tools/build.sh, tools/verify.py)")
     shutil.copy(src, L / (n + ".OBJ")); objs.append(n)
 rsp = "/m /s /l /c " + " +\r\n".join(objs) + "\r\nDONALD\r\nDONALD\r\nC:\\LIB\\CL\r\n"
@@ -25,9 +32,10 @@ msgs = [l for l in out.splitlines() if l.strip() and not l.startswith("Turbo Lin
 for m in msgs: print("tlink:", m)
 exe = L / "DONALD.EXE"
 if not exe.exists(): sys.exit("link failed")
-a, b = exe.read_bytes(), (ROOT / "game/DONALD.EXE").read_bytes()
-print(f"build/link/DONALD.EXE {len(a)} bytes sha256 {hashlib.sha256(a).hexdigest()[:16]}; original {len(b)} bytes")
-if a == b: print("IDENTICAL to original"); sys.exit(0)
+a, b = exe.read_bytes(), (ROOT / ORIG).read_bytes()
+if ALT: (L / "DONALD").write_bytes(a)
+print(f"{L.relative_to(ROOT)}/{TARGET} {len(a)} bytes sha256 {hashlib.sha256(a).hexdigest()[:16]}; original {len(b)} bytes")
+if a == b: print(f"IDENTICAL to {ORIG}"); sys.exit(0)
 ha, hb = struct.unpack_from("<14H", a), struct.unpack_from("<14H", b)
 print("header mine", ha); print("header orig", hb)
 hs = hb[4] * 16

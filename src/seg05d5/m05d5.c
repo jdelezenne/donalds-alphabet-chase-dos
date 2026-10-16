@@ -15,7 +15,7 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
     unsigned cur;
     int x0;
 
-    fn_0000_2298(fg, bg);
+    set_text_colours(fg, bg);
     p = s;
     off = y * 320;
     if (g_videoMode == 3)
@@ -40,13 +40,13 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
             }
             cur = col++;
             if (g_videoMode == 0)
-                fn_0000_237A(ch << 1, off, cur << 1);
+                draw_char_tandy(ch << 1, off, cur << 1);
             else if (g_videoMode == 1)
-                fn_0000_2319(ch << 2, off, cur << 2);
+                draw_char_cga(ch << 2, off, cur << 2);
             else if (g_videoMode == 2)
-                fn_0000_23C2(ch, off, cur);
+                draw_char_ega(ch, off, cur);
             else
-                fn_0000_241D(ch, off, cur << 3);
+                draw_char_buf(ch, off, cur << 3);
         }
     }
 }

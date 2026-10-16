@@ -33,11 +33,11 @@ char far *g_tunes[] = {tune_1AE0, tune_1AFB, tune_1B4E, tune_1B5B, tune_1B76, tu
 void play_sound(int i)
 {
     if (g_1460)
-        fn_0512_03CD(g_tunes[i]);
+        snd_play(g_tunes[i]);
 }
 
 /* FUNCTION: DONALD 0567:002A */
 void stop_sound(void)
 {
-    fn_0512_03F1();
+    snd_stop();
 }

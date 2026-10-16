@@ -16,14 +16,14 @@ void calibrate(void)
     ticks = (unsigned long far *)0x0000046CL;
     count = 0;
     g_382D = count;
-    fn_0000_0FF0();
+    disable_ints();
     t = *ticks;
-    fn_0000_0FEE();
+    enable_ints();
     while (*ticks == t)
         ;
-    fn_0000_0FF0();
+    disable_ints();
     t = *ticks + 4;
-    fn_0000_0FEE();
+    enable_ints();
     while (*ticks < t) {
         count++;
         for (d = 200; d; d--)
@@ -34,7 +34,7 @@ void calibrate(void)
         g_3AE6 = 0;
     b = a = 0;
     for (i = 0; i < 10000; i++)
-        if (fn_0000_253B())
+        if (in_vretrace())
             a++;
         else
             b++;

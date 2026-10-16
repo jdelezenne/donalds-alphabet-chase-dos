@@ -1,20 +1,22 @@
 ; Module 0000:0217: hand-written graphics assembly, _TEXT part 2/5 (split by relocation-table order).
 ; SEGMENT: DONALD 0000 0217-08B9
+; Purpose: EGA span/rectangle primitives.
 bits 16
 %include "tasm.inc"
 
 segment GFX_DATA public align=2 class=DATA use16   ; far data of the graphics modules (starts at 0B7F:000E)
 segment _TEXT public align=1 class=CODE use16
 
-global _fn_0000_0217
-_fn_0000_0217 equ L0217
+global _hspan
+_hspan equ L0217
 global _fn_0000_0342
 _fn_0000_0342 equ L0342
-global _fn_0000_03BA
-_fn_0000_03BA equ L03BA
-global _fn_0000_0677
-_fn_0000_0677 equ L0677
+global _copy_rect_ega
+_copy_rect_ega equ L03BA
+global _blit_ega_core
+_blit_ega_core equ L0677
 ; FUNCTION: DONALD 0000:0217
+; hspan: horizontal EGA span (x, y, n, colour)
 L0217:
     push bp
     rr mov, bp, sp
@@ -205,6 +207,7 @@ L03A8:
     retf
 
 ; FUNCTION: DONALD 0000:03BA
+; copy_rect_ega: EGA rectangle copy (src, dst, x, y, w, h)
 L03BA:
     push bp
     rr mov, bp, sp
@@ -498,6 +501,7 @@ L0676:
     ret
 
 ; FUNCTION: DONALD 0000:0677
+; blit_ega_core: EGA latch blit used by blit_ega
 L0677:
     push bp
     rr mov, bp, sp

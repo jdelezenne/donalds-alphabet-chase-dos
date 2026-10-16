@@ -23,18 +23,18 @@ char far *grab(int x, register int y, int w, register int h)
                 y *= 160;
                 w <<= 1;
                 stride = 160;
-                fn_0000_0D56(g_3AF2 + y + x, res + 4, w, h, stride - w * 2);
+                pack_rect(g_backBuf + y + x, res + 4, w, h, stride - w * 2);
                 if (g_videoMode == 0)
-                    fn_0000_0D56(g_3AF2 + y + x + 1, res + (size >> 1) + 4, w, h, stride - w * 2);
+                    pack_rect(g_backBuf + y + x + 1, res + (size >> 1) + 4, w, h, stride - w * 2);
             }
         } else {
             x <<= 2;
             y *= 160;
-            n2 = fn_0000_0D56(g_3AF2 + y + x, g_38B4, w, h, 160 - w * 4);
+            n2 = pack_rect(g_backBuf + y + x, g_packBuf, w, h, 160 - w * 4);
             res = xalloc((long)(n2 + 4));
             res[1] = h - 1;
             res[2] = w;
-            fn_0000_0A2E(g_38B4, res + 4, (long)n2);
+            far_copy(g_packBuf, res + 4, (long)n2);
         }
     } else
         res = grab_vga(x, y, w, h);
@@ -52,11 +52,11 @@ char far *grab_vga(int x, int y, int w, int h)
     long size;
 
     size = 4;
-    dst = g_38B4;
+    dst = g_packBuf;
     dst[1] = h - 1;
     dst[2] = w;
     dst += 4;
-    p = g_3AF2;
+    p = g_backBuf;
     p += y * 320 + x;
     row = p;
     while (h--) {
@@ -83,6 +83,6 @@ char far *grab_vga(int x, int y, int w, int h)
     }
     row = xalloc(size);
     if (row)
-        fn_0000_0A2E(g_38B4, row, size);
+        far_copy(g_packBuf, row, size);
     return row;
 }

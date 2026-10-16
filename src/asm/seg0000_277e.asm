@@ -1,18 +1,20 @@
 ; Module 0000:277E: hand-written graphics assembly, _TEXT part 4/5 (split by relocation-table order).
 ; SEGMENT: DONALD 0000 277E-2A15
+; Purpose: window save/restore blits.
 bits 16
 %include "tasm.inc"
 
 segment GFX_DATA public align=2 class=DATA use16   ; far data of the graphics modules (starts at 0B7F:000E)
 segment _TEXT public align=1 class=CODE use16
 
-global _fn_0000_277E
-_fn_0000_277E equ L277E
+global _save_window
+_save_window equ L277E
 global _fn_0000_28B3
 _fn_0000_28B3 equ L28B3
 global _blit_generic
 _blit_generic equ L28B3
 ; FUNCTION: DONALD 0000:277E
+; save_window: window background save/blit (x, y, w, h, buf)
 L277E:
     push bp
     rr mov, bp, sp
@@ -172,6 +174,7 @@ L28A6:
     db 0x00,0x00
 
 ; FUNCTION: DONALD 0000:28B3
+; blit_generic: sprite/picture blit for CGA/Tandy (x, y, w, rows, src)
 L28B3:
     push bp
     rr mov, bp, sp
