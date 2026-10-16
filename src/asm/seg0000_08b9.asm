@@ -1,5 +1,6 @@
 ; Module 0000:08B9: hand-written graphics assembly, _TEXT part 3/5 (split by relocation-table order).
 ; SEGMENT: DONALD 0000 08B9-277E
+; Purpose: graphics driver core: screen/buffer clears, .CMP RLE decoders, palette, DOS helpers, text glyphs, joystick-free retrace waits.
 bits 16
 %include "tasm.inc"
 
@@ -8,18 +9,18 @@ segment _TEXT public align=1 class=CODE use16
 
 global _clear_screen
 _clear_screen equ L08B9
-global _fn_0000_0912
-_fn_0000_0912 equ L0912
+global _redraw_rect_hw
+_redraw_rect_hw equ L0912
 global _far_copy
 _far_copy equ L0A2E
 global _present_buffer
 _present_buffer equ L0A6B
-global _fn_0000_0B2E
-_fn_0000_0B2E equ L0B2E
-global _fn_0000_0D1C
-_fn_0000_0D1C equ L0D1C
-global _fn_0000_0D56
-_fn_0000_0D56 equ L0D56
+global _sprite_put_ega
+_sprite_put_ega equ L0B2E
+global _cga_shift_rows
+_cga_shift_rows equ L0D1C
+global _pack_rect
+_pack_rect equ L0D56
 global _gfx_fill_rect
 _gfx_fill_rect equ L0E82
 global _dos_free_kb
@@ -34,8 +35,8 @@ global _disable_ints
 _disable_ints equ L0FF0
 global _set_palette16
 _set_palette16 equ L0FF2
-global _fn_0000_106B
-_fn_0000_106B equ L106B
+global _cga_convert
+_cga_convert equ L106B
 global _clear_buffer
 _clear_buffer equ L10D2
 global _normalize_ptr
@@ -44,8 +45,8 @@ global _dos_putc
 _dos_putc equ L1180
 global _rand8
 _rand8 equ L1197
-global _fn_0000_11DC
-_fn_0000_11DC equ L11DC
+global _sprite_mask_ega
+_sprite_mask_ega equ L11DC
 global _dos_set_drive
 _dos_set_drive equ L1461
 global _cga_select_palette
@@ -56,10 +57,10 @@ global _set_video_type
 _set_video_type equ L14C7
 global _set_bios_mode
 _set_bios_mode equ L14DD
-global _fn_0000_16FA
-_fn_0000_16FA equ L16FA
-global _fn_0000_1D16
-_fn_0000_1D16 equ L1D16
+global _sprite_put_cga
+_sprite_put_cga equ L16FA
+global _sprite_mask_cga
+_sprite_mask_cga equ L1D16
 global _set_text_colours
 _set_text_colours equ L2298
 global _draw_char_cga
@@ -83,6 +84,7 @@ _vline equ L2584
 global _set_dac_regs
 _set_dac_regs equ L271E
 ; FUNCTION: DONALD 0000:08B9
+; clear_screen: clears video memory B800/A000 per mode
 L08B9:
     push bp
     rr mov, bp, sp
@@ -133,6 +135,7 @@ L0908:
     retf
 
 ; FUNCTION: DONALD 0000:0912
+; redraw_rect_hw: repaints the current window rectangle
 L0912:
     push bp
     rr mov, bp, sp
@@ -265,6 +268,7 @@ L0A28:
     retf
 
 ; FUNCTION: DONALD 0000:0A2E
+; far_copy: rep movsw far copy (src, dst, len)
 L0A2E:
     push bp
     rr mov, bp, sp
@@ -305,6 +309,7 @@ L0A65:
     retf
 
 ; FUNCTION: DONALD 0000:0A6B
+; present_buffer: copies the off-screen buffer to video memory (EGA planes via 3C4/3CE)
 L0A6B:
     push bp
     rr mov, bp, sp
@@ -409,6 +414,7 @@ L0A9A:
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 ; FUNCTION: DONALD 0000:0B2E
+; sprite_put_ega: draw_sprite, EGA
 L0B2E:
     push bp
     rr mov, bp, sp
@@ -656,6 +662,7 @@ L0D17:
     jmp short L0CFA
 
 ; FUNCTION: DONALD 0000:0D1C
+; cga_shift_rows: moves the converted CGA rows into place (small-window mode)
 L0D1C:
     push bp
     rr mov, bp, sp
@@ -689,6 +696,7 @@ L0D3F:
     retf
 
 ; FUNCTION: DONALD 0000:0D56
+; pack_rect: packs a screen rectangle into a buffer, returns its size
 L0D56:
     push bp
     rr mov, bp, sp
@@ -847,6 +855,7 @@ L0E6F:
     ret
 
 ; FUNCTION: DONALD 0000:0E82
+; gfx_fill_rect: (x, y, w, h, colour)
 L0E82:
     push bp
     rr mov, bp, sp
@@ -911,6 +920,7 @@ L0EF8:
     retf
 
 ; FUNCTION: DONALD 0000:0EFE
+; dos_free_kb: int 21h AH=48h probe; returns free conventional memory in KB
 L0EFE:
     push bp
     rr mov, bp, sp
@@ -943,6 +953,7 @@ L0F27:
     retf
 
 ; FUNCTION: DONALD 0000:0F2C
+; cmp_unpack_planar: decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md
 L0F2C:
     push bp
     rr mov, bp, sp
@@ -1005,6 +1016,7 @@ L0F7D:
     retf
 
 ; FUNCTION: DONALD 0000:0F83
+; cmp_unpack_cga: decodes a .CMP picture (CGA layout), see docs/CMP.md
 L0F83:
     push bp
     rr mov, bp, sp
@@ -1076,16 +1088,19 @@ L0FE8:
     retf
 
 ; FUNCTION: DONALD 0000:0FEE
+; enable_ints: sti
 L0FEE:
     sti
     retf
 
 ; FUNCTION: DONALD 0000:0FF0
+; disable_ints: cli
 L0FF0:
     cli
     retf
 
 ; FUNCTION: DONALD 0000:0FF2
+; set_palette16: loads a 16-entry palette table
 L0FF2:
     push bp
     rr mov, bp, sp
@@ -1153,6 +1168,7 @@ L1066:
     retf
 
 ; FUNCTION: DONALD 0000:106B
+; cga_convert: 4-bit pixels -> CGA 2-bit via xlat table
 L106B:
     push bp
     rr mov, bp, sp
@@ -1212,6 +1228,7 @@ L10CC:
     retf
 
 ; FUNCTION: DONALD 0000:10D2
+; clear_buffer: fills an off-screen buffer
 L10D2:
     push bp
     rr mov, bp, sp
@@ -1290,6 +1307,7 @@ L1159:
     retf
 
 ; FUNCTION: DONALD 0000:115F
+; normalize_ptr: far pointer normalisation (offset < 16)
 L115F:
     push bp
     rr mov, bp, sp
@@ -1314,6 +1332,7 @@ L117B:
     retf
 
 ; FUNCTION: DONALD 0000:1180
+; dos_putc: int 21h AH=06h
 L1180:
     push bp
     rr mov, bp, sp
@@ -1332,6 +1351,7 @@ L1180:
     retf
 
 ; FUNCTION: DONALD 0000:1197
+; rand8: shift-register random byte (state at GFX_DATA:027B)
 L1197:
     push bp
     rr mov, bp, sp
@@ -1365,6 +1385,7 @@ L1197:
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 ; FUNCTION: DONALD 0000:11DC
+; sprite_mask_ega: draw_sprite_masked, EGA
 L11DC:
     push bp
     rr mov, bp, sp
@@ -1684,6 +1705,7 @@ L145C:
     jmp short L143E
 
 ; FUNCTION: DONALD 0000:1461
+; dos_set_drive: int 21h AH=0Eh
 L1461:
     push bp
     rr mov, bp, sp
@@ -1702,6 +1724,7 @@ L1461:
     retf
 
 ; FUNCTION: DONALD 0000:1478
+; cga_select_palette: int 10h AH=0Bh BH=1
 L1478:
     push bp
     rr mov, bp, sp
@@ -1721,6 +1744,7 @@ L1478:
     retf
 
 ; FUNCTION: DONALD 0000:1491
+; set_palette_reg: EGA attribute controller register (index, value)
 L1491:
     push bp
     rr mov, bp, sp
@@ -1756,6 +1780,7 @@ L1491:
     retf
 
 ; FUNCTION: DONALD 0000:14C7
+; set_video_type: stores g_videoMode in the graphics driver (GFX_DATA:0286)
 L14C7:
     push bp
     rr mov, bp, sp
@@ -1773,6 +1798,7 @@ L14C7:
     retf
 
 ; FUNCTION: DONALD 0000:14DD
+; set_bios_mode: int 10h AH=00h
 L14DD:
     push bp
     rr mov, bp, sp
@@ -1824,6 +1850,7 @@ L14DD:
     db 0x00,0x00,0x00,0x00,0x00,0x00
 
 ; FUNCTION: DONALD 0000:16FA
+; sprite_put_cga: draw_sprite, CGA/Tandy buffer
 L16FA:
     push bp
     rr mov, bp, sp
@@ -2376,6 +2403,7 @@ L1C13:
     db 0x0F,0x1F,0x2F,0x3F,0x4F,0x5F,0x6F,0x7F,0x8F,0x9F,0xAF,0xBF,0xCF,0xDF,0xEF,0xFF
 
 ; FUNCTION: DONALD 0000:1D16
+; sprite_mask_cga: draw_sprite_masked, CGA/Tandy buffer
 L1D16:
     push bp
     rr mov, bp, sp
@@ -2962,6 +2990,7 @@ L2271:
     ret
 
 ; FUNCTION: DONALD 0000:2298
+; set_text_colours: (fg, bg) for draw_char_*
 L2298:
     push bp
     rr mov, bp, sp
@@ -3021,6 +3050,7 @@ L22FD:
     jmp short L22E3
 
 ; FUNCTION: DONALD 0000:2319
+; draw_char_cga: glyph to CGA memory
 L2319:
     push bp
     rr mov, bp, sp
@@ -3070,6 +3100,7 @@ L234A:
     retf
 
 ; FUNCTION: DONALD 0000:237A
+; draw_char_tandy: glyph to Tandy memory
 L237A:
     push bp
     rr mov, bp, sp
@@ -3108,6 +3139,7 @@ L23A4:
     retf
 
 ; FUNCTION: DONALD 0000:23C2
+; draw_char_ega: glyph to EGA planes
 L23C2:
     push bp
     rr mov, bp, sp
@@ -3158,6 +3190,7 @@ L23FE:
     retf
 
 ; FUNCTION: DONALD 0000:241D
+; draw_char_buf: glyph to the off-screen buffer
 L241D:
     push bp
     rr mov, bp, sp
@@ -3205,6 +3238,7 @@ L2461:
     retf
 
 ; FUNCTION: DONALD 0000:2470
+; gfx_init: graphics driver init
 L2470:
     push bp
     rr mov, bp, sp
@@ -3284,6 +3318,7 @@ L24F9:
     ret
 
 ; FUNCTION: DONALD 0000:24FB
+; set_palette_regs: all 16 attribute registers
 L24FB:
     push bp
     rr mov, bp, sp
@@ -3324,6 +3359,7 @@ L2536:
     retf
 
 ; FUNCTION: DONALD 0000:253B
+; in_vretrace: 3DA bit 3
 L253B:
     push bp
     rr mov, bp, sp
@@ -3343,6 +3379,7 @@ L253B:
     retf
 
 ; FUNCTION: DONALD 0000:2553
+; wait_vretrace: waits for (the end of) vertical retrace
 L2553:
     push bp
     rr mov, bp, sp
@@ -3380,6 +3417,7 @@ L257F:
     retf
 
 ; FUNCTION: DONALD 0000:2584
+; vline: (x, y1, y2, colour)
 L2584:
     push bp
     rr mov, bp, sp
@@ -3565,6 +3603,7 @@ L2715:
     jmp near L269C
 
 ; FUNCTION: DONALD 0000:271E
+; set_dac_regs: int 10h AX=1010h
 L271E:
     push bp
     rr mov, bp, sp
@@ -3623,10 +3662,10 @@ global _g_23B4
 global _g_23B6
 global _g_23B8
 global _g_25FB
-global _g_2608
-global _g_260A
-global _g_260C
-global _g_260E
+global _clip_x1
+global _clip_x2
+global _clip_y1
+global _clip_y2
 global _g_382D
 gfx_0026:
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
@@ -3676,13 +3715,13 @@ _g_23B8:   ; 0B7F:0038, used from C as DGROUP:23B8
     db 0x00,0x00,0x00
 _g_25FB:   ; 0B7F:027B, used from C as DGROUP:25FB
     db 0x34,0x12,0x76,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-_g_2608:   ; 0B7F:0288, used from C as DGROUP:2608
+_clip_x1:   ; 0B7F:0288, used from C as DGROUP:2608
     db 0x00,0x00
-_g_260A:   ; 0B7F:028A, used from C as DGROUP:260A
+_clip_x2:   ; 0B7F:028A, used from C as DGROUP:260A
     db 0x28,0x00
-_g_260C:   ; 0B7F:028C, used from C as DGROUP:260C
+_clip_y1:   ; 0B7F:028C, used from C as DGROUP:260C
     db 0x00,0x00
-_g_260E:   ; 0B7F:028E, used from C as DGROUP:260E
+_clip_y2:   ; 0B7F:028E, used from C as DGROUP:260E
     db 0xC8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80
     db 0x90,0xA0,0xB0,0xC0,0xD0,0xE0,0xF0,0x01,0x11,0x21,0x31,0x41,0x51,0x61,0x71,0x81

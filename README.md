@@ -18,7 +18,8 @@ Every C function in the game (73 functions, 16,709 bytes) byte-matches with Turb
 The assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14,020 bytes) reassemble byte-exactly as relocatable NASM objects. Every function is classified C/asm/lib with evidence in `config/retail/functions.csv` (`tools/classify.py`). The 71 Turbo C library modules are identified against the real `CL.LIB`.
 That covers 99.97% of the 38,000 code bytes; the rest is 12 bytes of zero padding.
 **`tools/relink.sh` relinks DONALD.EXE with TLINK 2.0 byte-identically (header, relocation table, code, data; sha256 c72ed190…).** Every byte comes from `src/` (all initialised data, `GFX_DATA` and `_BSS` are C or asm definitions); the original EXE is only read for the comparison (see docs/MATCHING.md, Relink and Data in source).
-See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md) and [docs/MATCHING.md](docs/MATCHING.md).
+**The alternate build `DONALD` (sha256 61d3bc8b…) relinks byte-identically from the same sources** with `DONALD_ALT` defined: a shorter `main()` with no command-line options, `shutdown()` without `exit()`, and the two driver modules 8 bytes further into their paragraph (`CSO()` offsets).
+See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MATCHING.md](docs/MATCHING.md), [docs/CMP.md](docs/CMP.md) (picture format) and [docs/SCRIPTS.md](docs/SCRIPTS.md) (actor script opcodes).
 
 ## Layout
 - `src/segXXXX/` one C file per original code segment (= one Turbo C translation unit, functions in address order); `src/include/` headers; `src/asm/` NASM sources of the assembly modules (`tasm.inc` holds the TASM-style encodings).
@@ -39,7 +40,8 @@ See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md) and [docs
 | `tools/permute.py` | permuter: tries `@P{a\|b}` source alternatives times a flag list and writes the first 100% match |
 | `tools/dumpfn.py` | `--list` unmatched C functions by size; `SSSS:OOOO` disassembles one |
 | `tools/asm2nasm.py` | bootstraps a NASM source for an asm module from your local EXE (then hand-annotated) |
-| `tools/relink.sh` | **whole-EXE proof**: verify, TLINK, byte compare with the original (`relink.py`) |
+| `tools/relink.sh` | **whole-EXE proof** `[retail\|alt\|all]`: verify, TLINK, byte compare with `DONALD.EXE` and `DONALD` (`relink.py [--alt]`) |
+| `tools/cmp_extract.py` | decodes `.CMP` pictures to PNG (`build/cmp/`) |
 | `tools/classify.py` | per-function C/asm/lib verdict with evidence → `functions.csv` `lang`/`evidence` |
 | `tools/splice.py` | full-layout build `build/DONALD.EXE` from our bytes plus the local original, and compares it |
 | `tools/cmpobj.py` | per-function compare of an `.OBJ` against the original image, fixup bytes masked, side-by-side diff |
@@ -49,8 +51,14 @@ See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md) and [docs
 | `tools/funcs.py` | function starts, sizes (C sizes exclude trailing data) and kind lib/asm/c → `functions.csv` |
 | `tools/matchreport.py` | regenerates `docs/STATUS.md` from `symbols.csv` |
 
-## Reproducing
+## Building
+Requirements: Linux with DOSBox-X, `nasm` and Python 3 (`tools/setup.sh` installs them), and your own Turbo C 2.0.
 1. `tools/setup.sh`
-2. `tools/install_tc.sh /path/to/your/TC20-floppies.7z /opt/tc20`
-3. Copy your game files into `game/`, run `python3 tools/verify_originals.py`.
-4. `rm -rf build && tools/relink.sh` (needs `nasm`); prints `IDENTICAL to original`
+2. `tools/install_tc.sh /path/to/your/TC20-floppies.7z /opt/tc20` (or set `TC_ROOT`)
+3. Copy your game files into `game/`, then run `python3 tools/verify_originals.py`.
+4. `rm -rf build && tools/relink.sh`. It should print `IDENTICAL to game/DONALD.EXE` and `IDENTICAL to game/DONALD`.
+   The outputs are `build/link/DONALD.EXE` and `build/link-alt/DONALD`. `tools/relink.sh retail` or `alt` builds one target.
+5. Optional: `python3 tools/cmp_extract.py game/*.CMP` writes the pictures as PNG.
+
+While editing a C function, run `python3 tools/verify.py` (per-function match) and `python3 tools/fndiff.py SSSS:OOOO`.
+The relink is the final proof, because it also checks calls and data references.

@@ -28,12 +28,12 @@ void blit_ega(register int x, register int y, int sx, int sy, int w, int h, char
         sy = 0;
     }
     if (g_videoMode != 2)
-        fn_0000_0677(x, y, sx, sy, w, h, p1, p2);
+        blit_ega_core(x, y, sx, sy, w, h, p1, p2);
     else {
-        if (p1 == g_3AF2)
+        if (p1 == g_backBuf)
             p1 = (char far *)0xA2000000L;
-        if (p2 == g_3AF2)
+        if (p2 == g_backBuf)
             p2 = (char far *)0xA2000000L;
-        fn_0000_0677(x, y, sx, sy, w, h, p1, p2);
+        blit_ega_core(x, y, sx, sy, w, h, p1, p2);
     }
 }

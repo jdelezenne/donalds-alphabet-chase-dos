@@ -1,5 +1,6 @@
 ; Module 0000:01C9: hand-written graphics assembly, _TEXT part 1/5 (split by relocation-table order).
 ; SEGMENT: DONALD 0000 01C9-0217
+; Purpose: video BIOS probes (EGA present, text mode, EGA palette select).
 bits 16
 %include "tasm.inc"
 
@@ -13,6 +14,7 @@ _set_text_mode equ L01E8
 global _ega_select_palette
 _ega_select_palette equ L01FE
 ; FUNCTION: DONALD 0000:01C9
+; ega_present: int 10h AH=12h BL=10h: EGA BIOS present
 L01C9:
     push bp
     rr mov, bp, sp
@@ -36,6 +38,7 @@ L01E3:
     retf
 
 ; FUNCTION: DONALD 0000:01E8
+; set_text_mode: int 10h mode 3
 L01E8:
     push bp
     rr mov, bp, sp
@@ -54,6 +57,7 @@ L01E8:
     retf
 
 ; FUNCTION: DONALD 0000:01FE
+; ega_select_palette: int 10h AH=10h, palette 0/1
 L01FE:
     push bp
     rr mov, bp, sp

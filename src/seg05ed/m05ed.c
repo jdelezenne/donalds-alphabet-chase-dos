@@ -19,7 +19,7 @@ void hline(register int y, register int x, int x2, int c)
         if (g_videoMode != 3)
             n >>= g_1E98[g_videoMode];
         if (n)
-            fn_0000_0217(x, y, n, c);
+            hspan(x, y, n, c);
         x = g_1E88[g_videoMode + 4] & x2;
     }
     while (x <= x2)

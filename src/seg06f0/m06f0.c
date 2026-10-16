@@ -15,8 +15,8 @@ void error_msg(void);
 int g_1ECE = 0;
 int g_1ED0[3] = {0, 0, 0};
 int g_1ED6 = 0;                         /* current window */
-int g_1ED8 = 0, g_1EDA = 0;             /* error box x, y (text cells) */
-int g_1EDC = 40, g_1EDE = 25;           /* error box w, h */
+int win_x = 0, win_y = 0;             /* error box x, y (text cells) */
+int win_w = 40, win_h = 25;           /* error box w, h */
 int g_1EE0 = 15, g_1EE2 = 0;            /* text fg, bg */
 int g_1EE4 = 0, g_1EE6 = 0, g_1EE8 = 0;
 int g_1EEA[4] = {-72, -80, -75, -77};
@@ -307,7 +307,7 @@ void show_error(void)
     set_window(g_1F3E);
     alloc = 0;
     if (g_1F3A == 0) {
-        sz = g_1EDC * g_1EDE;
+        sz = win_w * win_h;
         alloc = 5;
         if (g_videoMode == 3)
             alloc = 6;
@@ -315,12 +315,12 @@ void show_error(void)
         g_1F3A = farmalloc(sz);
         alloc = 1;
     }
-    fn_0000_277E(g_1ED8, g_1EDA, g_1EDC, g_1EDE, g_1F3A);
+    save_window(win_x, win_y, win_w, win_h, g_1F3A);
     redraw_rect();
-    draw_line(g_1ED8 << 3, g_1EDA << 3, ((g_1ED8 + g_1EDC) << 3) - 1, g_1EDA << 3, 15);
-    draw_line(g_1ED8 << 3, ((g_1EDA + g_1EDE) << 3) - 1, ((g_1ED8 + g_1EDC) << 3) - 1, ((g_1EDA + g_1EDE) << 3) - 1, 15);
-    draw_line(g_1ED8 << 3, g_1EDA << 3, g_1ED8 << 3, ((g_1EDA + g_1EDE) << 3) - 1, 15);
-    draw_line(((g_1ED8 + g_1EDC) << 3) - 1, g_1EDA << 3, ((g_1ED8 + g_1EDC) << 3) - 1, ((g_1EDA + g_1EDE) << 3) - 1, 15);
+    draw_line(win_x << 3, win_y << 3, ((win_x + win_w) << 3) - 1, win_y << 3, 15);
+    draw_line(win_x << 3, ((win_y + win_h) << 3) - 1, ((win_x + win_w) << 3) - 1, ((win_y + win_h) << 3) - 1, 15);
+    draw_line(win_x << 3, win_y << 3, win_x << 3, ((win_y + win_h) << 3) - 1, 15);
+    draw_line(((win_x + win_w) << 3) - 1, win_y << 3, ((win_x + win_w) << 3) - 1, ((win_y + win_h) << 3) - 1, 15);
     inset_rect(-1);
     if (g_3B50 == g_1EFA) {
         g_3B50[12] = ch + g_3B54;
@@ -336,7 +336,7 @@ void show_error(void)
     g_1EE2 = bg;
     get_key();
     inset_rect(1);
-    blit_generic(g_1ED8, g_1EDA, g_1EDC, g_1EDE, g_1F3A);
+    blit_generic(win_x, win_y, win_w, win_h, g_1F3A);
     set_window(oldwin);
     if (alloc) {
         farfree(g_1F3A);
@@ -458,8 +458,8 @@ long mem_read(register int i, char far *buf, long len)
 /* FUNCTION: DONALD 06F0:0DF9 */
 void inset_rect(register int n)
 {
-    g_1ED8 -= n;
-    g_1EDA -= n;
-    g_1EDC += n * 2;
-    g_1EDE += n * 2;
+    win_x -= n;
+    win_y -= n;
+    win_w += n * 2;
+    win_h += n * 2;
 }

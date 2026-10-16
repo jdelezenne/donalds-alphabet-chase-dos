@@ -13,8 +13,8 @@ void draw_pic(char far *p, char far *dst)
         n = 80;
         if (g_1ECE)
             n = 4;
-        fn_0000_106B(dst, dst, n, 16000);
+        cga_convert(dst, dst, n, 16000);
         if (g_1ECE)
-            fn_0000_0D1C(dst);
+            cga_shift_rows(dst);
     }
 }

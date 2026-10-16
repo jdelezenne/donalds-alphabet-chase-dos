@@ -1,16 +1,18 @@
 ; Module 0000:2A15: hand-written graphics assembly, _TEXT part 5/5 (split by relocation-table order).
 ; SEGMENT: DONALD 0000 2A15-2DAB
+; Purpose: clipped sprite blits (EGA).
 bits 16
 %include "tasm.inc"
 
 segment GFX_DATA public align=2 class=DATA use16   ; far data of the graphics modules (starts at 0B7F:000E)
 segment _TEXT public align=1 class=CODE use16
 
-global _fn_0000_2A15
-_fn_0000_2A15 equ L2A15
-global _fn_0000_2BE0
-_fn_0000_2BE0 equ L2BE0
+global _sprite_put_m3
+_sprite_put_m3 equ L2A15
+global _sprite_mask_m3
+_sprite_mask_m3 equ L2BE0
 ; FUNCTION: DONALD 0000:2A15
+; sprite_put_m3: draw_sprite, g_videoMode 3
 L2A15:
     push bp
     rr mov, bp, sp
@@ -231,6 +233,7 @@ L2BD4:
     db 0x00,0x00,0x00,0x00,0x00,0x00
 
 ; FUNCTION: DONALD 0000:2BE0
+; sprite_mask_m3: draw_sprite_masked, g_videoMode 3
 L2BE0:
     push bp
     rr mov, bp, sp

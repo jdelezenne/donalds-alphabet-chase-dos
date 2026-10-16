@@ -134,3 +134,14 @@ C0L.OBJ and CL.LIB from the toolchain); the original EXE is read only for the fi
 ## Full-layout splice
 `tools/splice.py` still writes `build/DONALD.EXE` from our bytes plus the local original (for byte-level checks
 while editing). The relink above supersedes it as the proof.
+
+## Alternate build (batch 5)
+`game/DONALD` (55,432 bytes, sha256 61d3bc8b...) is the same program built from the same sources with
+`DONALD_ALT` defined (`tools/relink.sh alt`):
+- `main()` does not parse the command line. It calls `snd_set_option(-1)` without an argument and `snd_set_option(60)`
+  with one, then always calls `detect_video()`. Because `atol` is no longer referenced, CL.LIB's ATOL module drops out.
+- `shutdown()` returns to `main()` instead of calling `exit(g_videoMode)`.
+- These changes make M04FC 74 bytes shorter. The hand-written drivers seg0512/seg056a then start 8 bytes further into
+  their paragraph (0512 at offset 9, 056A at offset 8), and their TASM-style hard-coded `cs:` offsets move with them.
+  They are written as `CSO(n)` (= `n`, or `n + 8` under `DONALD_ALT`).
+Only units that mention `DONALD_ALT` are rebuilt for the alt target (`build/alt/obj`, `build/alt/asm`). Everything else is shared.

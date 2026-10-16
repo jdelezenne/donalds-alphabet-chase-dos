@@ -26,7 +26,7 @@ void print_wrapped(char far *s)
         }
         if (ch == '\r') {
             word[wlen] = 0;
-            if (wlen + col <= g_1EDC) {
+            if (wlen + col <= win_w) {
                 strcat(line, word);
                 print_word(line, 1);
             } else {
@@ -36,7 +36,7 @@ void print_wrapped(char far *s)
             col = wlen = 0;
         } else if (ch == 2) {
             word[wlen] = 0;
-            if (wlen + col <= g_1EDC) {
+            if (wlen + col <= win_w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -49,7 +49,7 @@ void print_wrapped(char far *s)
             idx++;
         } else if (ch == 6) {
             word[wlen] = 0;
-            if (wlen + col <= g_1EDC) {
+            if (wlen + col <= win_w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -62,7 +62,7 @@ void print_wrapped(char far *s)
             idx++;
         } else if (ch == 9) {
             word[wlen] = 0;
-            if (wlen + col <= g_1EDC) {
+            if (wlen + col <= win_w) {
                 strcat(line, word);
                 print_word(line, 0);
             } else {
@@ -72,7 +72,7 @@ void print_wrapped(char far *s)
             wlen = 0;
             g_1EE4 = col = s[idx];
             idx++;
-            if (g_1EE4 >= g_1EDC) {
+            if (g_1EE4 >= win_w) {
                 col = 0;
                 g_1EE4 = col;
             }
@@ -91,8 +91,8 @@ void print_wrapped(char far *s)
                 wlen = 0;
             }
         } else if (ch == ' ') {
-            if (wlen + col <= g_1EDC) {
-                if (wlen + col != g_1EDC && wlen + col != 0) {
+            if (wlen + col <= win_w) {
+                if (wlen + col != win_w && wlen + col != 0) {
                     word[wlen] = ' ';
                     wlen++;
                 }
@@ -110,7 +110,7 @@ void print_wrapped(char far *s)
             }
             col += wlen;
             wlen = 0;
-        } else if (g_1EDC - 1 <= wlen) {
+        } else if (win_w - 1 <= wlen) {
             if (line[0])
                 print_word(line, 1);
             word[wlen] = ch;
@@ -126,7 +126,7 @@ void print_wrapped(char far *s)
     }
     if (wlen || line[0]) {
         word[wlen] = 0;
-        if (wlen + col <= g_1EDC) {
+        if (wlen + col <= win_w) {
             strcat(line, word);
             print_word(line, 0);
         } else {

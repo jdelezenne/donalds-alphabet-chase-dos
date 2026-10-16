@@ -1,5 +1,6 @@
 ; Module 0512: hand-written sound/music driver assembly.
 ; SEGMENT: DONALD 0512 0001-0558
+; Purpose: sound driver: int 8 (PIT) hook, tune byte-stream player, tick counter.
 bits 16
 %include "tasm.inc"
 
@@ -53,6 +54,7 @@ _timer_ticks equ L0544
     db 0x2E,0x01,0x1D,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 
 ; FUNCTION: DONALD 0512:00EE
+; snd_get_option: music option word (set by snd_set_option)
 L00EE:
     push bp
     rr mov, bp, sp
@@ -69,6 +71,7 @@ L00EE:
     retf
 
 ; FUNCTION: DONALD 0512:0102
+; snd_set_option: music option word: -1 default, else argv[1] / 60
 L0102:
     push bp
     rr mov, bp, sp
@@ -124,6 +127,7 @@ L0102:
     db 0xFC,0xE6,0x61,0xC3,0xE6,0x42,0x8A,0xC4,0xE6,0x42,0xC3
 
 ; FUNCTION: DONALD 0512:0354
+; snd_init: hooks int 8, PIT channel 0 at 1000h
 L0354:
     push bp
     rr mov, bp, sp
@@ -156,6 +160,7 @@ L0354:
     retf
 
 ; FUNCTION: DONALD 0512:0398
+; snd_shutdown: restores int 8 and the PIT, speaker off
 L0398:
     push bp
     rr mov, bp, sp
@@ -186,6 +191,7 @@ L0398:
     retf
 
 ; FUNCTION: DONALD 0512:03CD
+; snd_play: starts a tune (far pointer to a byte stream)
 L03CD:
     push bp
     rr mov, bp, sp
@@ -206,6 +212,7 @@ L03CD:
     retf
 
 ; FUNCTION: DONALD 0512:03F1
+; snd_stop: sets the stop flag
 L03F1:
     push bp
     rr mov, bp, sp
@@ -327,6 +334,7 @@ L0522:
     retf
 
 ; FUNCTION: DONALD 0512:0544
+; timer_ticks: tick counter maintained by the int 8 handler
 L0544:
     push bp
     rr mov, bp, sp

@@ -2,9 +2,9 @@
 
 /* Uninitialised data (_BSS): DGROUP 3AF0-3B4D (ownership inferred, see docs/MATCHING.md). */
 int g_3AF0;
-char far *g_3AF2;
+char far *g_backBuf;
 int g_3AF6;
-char far *g_3AF8;
+char far *g_videoMem;
 int g_3AFC;
 char g_3AFE[80];
 

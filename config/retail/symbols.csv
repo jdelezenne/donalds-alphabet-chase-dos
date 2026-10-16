@@ -7,9 +7,16 @@ DGROUP@,0000:01C7,2,lib,C0L
 ega_present,0000:01C9,31,asm,int 10h AH=12h BL=10h: EGA BIOS present
 set_text_mode,0000:01E8,22,asm,int 10h mode 3
 ega_select_palette,0000:01FE,25,asm,"int 10h AH=10h, palette 0/1"
+hspan,0000:0217,299,asm,"horizontal EGA span (x, y, n, colour)"
+copy_rect_ega,0000:03BA,701,asm,"EGA rectangle copy (src, dst, x, y, w, h)"
+blit_ega_core,0000:0677,578,asm,EGA latch blit used by blit_ega
 clear_screen,0000:08B9,89,asm,clears video memory B800/A000 per mode
+redraw_rect_hw,0000:0912,284,asm,repaints the current window rectangle
 far_copy,0000:0A2E,61,asm,"rep movsw far copy (src, dst, len)"
 present_buffer,0000:0A6B,195,asm,copies the off-screen buffer to video memory (EGA planes via 3C4/3CE)
+sprite_put_ega,0000:0B2E,494,asm,"draw_sprite, EGA"
+cga_shift_rows,0000:0D1C,58,asm,moves the converted CGA rows into place (small-window mode)
+pack_rect,0000:0D56,300,asm,"packs a screen rectangle into a buffer, returns its size"
 gfx_fill_rect,0000:0E82,124,asm,"(x, y, w, h, colour)"
 dos_free_kb,0000:0EFE,46,asm,int 21h AH=48h probe; returns free conventional memory in KB
 cmp_unpack_planar,0000:0F2C,87,asm,"decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md"
@@ -17,15 +24,19 @@ cmp_unpack_cga,0000:0F83,107,asm,"decodes a .CMP picture (CGA layout), see docs/
 enable_ints,0000:0FEE,2,asm,sti
 disable_ints,0000:0FF0,2,asm,cli
 set_palette16,0000:0FF2,121,asm,loads a 16-entry palette table
+cga_convert,0000:106B,103,asm,4-bit pixels -> CGA 2-bit via xlat table
 clear_buffer,0000:10D2,141,asm,fills an off-screen buffer
 normalize_ptr,0000:115F,33,asm,far pointer normalisation (offset < 16)
 dos_putc,0000:1180,23,asm,int 21h AH=06h
 rand8,0000:1197,69,asm,shift-register random byte (state at GFX_DATA:027B)
+sprite_mask_ega,0000:11DC,645,asm,"draw_sprite_masked, EGA"
 dos_set_drive,0000:1461,23,asm,int 21h AH=0Eh
 cga_select_palette,0000:1478,25,asm,int 10h AH=0Bh BH=1
 set_palette_reg,0000:1491,54,asm,"EGA attribute controller register (index, value)"
 set_video_type,0000:14C7,22,asm,stores g_videoMode in the graphics driver (GFX_DATA:0286)
 set_bios_mode,0000:14DD,541,asm,int 10h AH=00h
+sprite_put_cga,0000:16FA,1564,asm,"draw_sprite, CGA/Tandy buffer"
+sprite_mask_cga,0000:1D16,1410,asm,"draw_sprite_masked, CGA/Tandy buffer"
 set_text_colours,0000:2298,129,asm,"(fg, bg) for draw_char_*"
 draw_char_cga,0000:2319,97,asm,glyph to CGA memory
 draw_char_tandy,0000:237A,72,asm,glyph to Tandy memory
@@ -37,6 +48,9 @@ in_vretrace,0000:253B,24,asm,3DA bit 3
 wait_vretrace,0000:2553,49,asm,waits for (the end of) vertical retrace
 vline,0000:2584,410,asm,"(x, y1, y2, colour)"
 set_dac_regs,0000:271E,96,asm,int 10h AX=1010h
+save_window,0000:277E,309,asm,"window background save/blit (x, y, w, h, buf)"
+sprite_put_m3,0000:2A15,459,asm,"draw_sprite, g_videoMode 3"
+sprite_mask_m3,0000:2BE0,467,asm,"draw_sprite_masked, g_videoMode 3"
 setargv_local,0000:2DAB,8,lib,CL.LIB:SETARGV
 setargv,0000:2DB3,254,lib,CL.LIB:SETARGV
 setenvp,0000:2EB1,68,lib,CL.LIB:SETENVP

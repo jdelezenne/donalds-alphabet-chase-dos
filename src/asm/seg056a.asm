@@ -1,5 +1,6 @@
 ; Module 056A: hand-written keyboard/timer interrupt assembly.
 ; SEGMENT: DONALD 056A 0000-058B
+; Purpose: keyboard driver: int 9 / int 23h hooks, 64-entry scan-code queue, ASCII translation tables.
 bits 16
 %include "tasm.inc"
 
@@ -54,12 +55,14 @@ _kbd_remove equ L0562
     db 0x3E,0x40,0x5A,0x80
 
 ; FUNCTION: DONALD 056A:0194
+; kbd_hit: key queue head != tail
 L0194:
     mov ax, word [cs:CSO(0xf0)]
     xor ax, word [cs:CSO(0xf2)]
     retf
 
 ; FUNCTION: DONALD 056A:019E
+; kbd_flush: key queue tail = head
 L019E:
     push ax
     mov ax, word [cs:CSO(0xf0)]
@@ -68,6 +71,7 @@ L019E:
     retf
 
 ; FUNCTION: DONALD 056A:01A9
+; kbd_getcode: waits for and pops a scan code word
 L01A9:
     push di
 L01AA:
@@ -84,6 +88,7 @@ L01AA:
     retf
 
 ; FUNCTION: DONALD 056A:01CB
+; kbd_getchar: kbd_getcode translated to ASCII
 L01CB:
     push bx
     push cx
@@ -137,6 +142,7 @@ L021A:
     db 0x42,0x4E,0x4D,0x3C,0x3E,0x3F,0x00,0x00,0x00,0x00,0x00,0x20
 
 ; FUNCTION: DONALD 056A:029A
+; kbd_install: hooks int 9 and int 23h
 L029A:
     push ax
     push bx
@@ -247,6 +253,7 @@ L0306:
     db 0x20,0xE6,0x20,0x5E,0x07,0x5A,0x1F,0x5F,0x59,0x5B,0x58,0xCF,0x00,0x00,0x00,0xCF
 
 ; FUNCTION: DONALD 056A:0562
+; kbd_remove: restores int 9 and int 23h
 L0562:
     push ax
     push ds

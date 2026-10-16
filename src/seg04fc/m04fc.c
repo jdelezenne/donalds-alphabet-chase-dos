@@ -6,7 +6,7 @@ void init_game(void);
 void shutdown(void);
 
 /* Module data: DGROUP 1AAA-1ADF (text windows for set_window; BIOS video mode per g_videoMode). */
-struct sprite_rect g_1AAA[] = {{0, 0, 40, 25, 15, 0, 0, 0}, {0, 8, 30, 10, 15, 0, 0, 0}, {5, 10, 30, 4, 15, 0, 0, 0}};
+struct window g_windows[] = {{0, 0, 40, 25, 15, 0, 0, 0}, {0, 8, 30, 10, 15, 0, 0, 0}, {5, 10, 30, 4, 15, 0, 0, 0}};
 int g_biosVideoMode[] = {4, 9, 13};
 
 /* FUNCTION: DONALD 04FC:0009 */
@@ -40,9 +40,9 @@ main(int argc, char far **argv)
         detect_video();
 #endif
     set_bios_mode(g_biosVideoMode[g_videoMode]);
-    g_3AF8 = (char far *)0xB8000000L;
+    g_videoMem = (char far *)0xB8000000L;
     if (g_videoMode == 2)
-        g_3AF8 = (char far *)0xA0000000L;
+        g_videoMem = (char far *)0xA0000000L;
     g_1F38 = 0x39;
     if (g_videoMode == 1)
         g_1F38 += 0x10;
@@ -61,9 +61,9 @@ void init_game(void)
     install_harderr();
     gfx_init();
     calibrate();
-    g_3AF2 = xalloc(0x8000L);
-    g_393C = g_38B4 = xalloc(0x8000L);
-    g_1F3A = g_3AF2;
+    g_backBuf = xalloc(0x8000L);
+    g_workBuf = g_packBuf = xalloc(0x8000L);
+    g_1F3A = g_backBuf;
     load_resources();
 }
 
