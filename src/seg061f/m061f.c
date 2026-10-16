@@ -1,5 +1,9 @@
 #include "donald.h"
 
+/* Uninitialised data (_BSS): DGROUP 3AE6-3AEF (ownership inferred, see docs/MATCHING.md). */
+int g_3AE6;
+char g_3AE8[8];
+
 /* FUNCTION: DONALD 061F:0007 */
 void calibrate(void)
 {

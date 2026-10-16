@@ -83,7 +83,7 @@ Sources are NASM `-f obj` (relocatable OMF), so they link with TLINK:
   Six instructions remain as `db`, with the mnemonic in a comment.
 
 ## Relink (batch 3): byte-identical
-`tools/relink.sh` runs verify.py, then mkdata.py, then relink.py (TLINK `/m /s /l /c` C0L + objects + CL.LIB). The result is
+`tools/relink.sh` runs verify.py, then relink.py (TLINK `/m /s /l /c` C0L + objects + CL.LIB). The result is
 `build/link/DONALD.EXE`, **identical to DONALD.EXE (sha256 c72ed190...)**: header, all 702 relocations in order, code and data.
 How the pieces were recovered:
 - **Link order from the relocation table.** TLINK writes relocations object by object in link order. Within an
@@ -95,17 +95,41 @@ How the pieces were recovered:
 - **Data.** The C modules' `_DATA` is word aligned, even when empty. 06F0's data (DGROUP 1ECE-2193: error-box variables,
   the far-pointer table of disk error messages, the `show_error`/`error_msg` hooks, then TC's literal pool) is now
   real C initialisers in `m06f0.c`. TC emitted those relocations before the code ones, exactly as in the original.
-  seg0612's two string literals were already C. The rest is generated at build time from your EXE by `tools/mkdata.py`
-  (layout in `config/retail/datalayout.txt`; no game bytes in git): DGROUP 0094-1EA1 (0304's strings, palette tables,
-  actor scripts, the `.CMP` name table...), `GFX_DATA`, and the game `_BSS` extent.
-  Each `g_XXXX` (and each `data.csv` name) becomes a public at its offset. Far pointers become DGROUP or code-segment fixups, emitted
-  in TC order (descending per LEDATA record, records cut at offsets congruent to 0x5E mod 0x400).
+  seg0612's two string literals were already C. Since batch 4 every other data byte is in source too (next section).
 - **Bugs the fixup-masked matcher could not see**, all found by the whole-EXE compare: `write_file` called `read`
   instead of `write`; `free_all` called `free` instead of `farfree`; `main` calls `atol`, not `atoi`.
   These calls differ only in fixup bytes, so **the relink is now the real proof for calls and data references**.
-- Next: move the remaining generated data into its owning sources. 0304 owns 0094-~1AA9: relocations 127-308, then its literal
-  pool of `.CMP` names. 1AAA-1EA1 belongs to modules between 04FC and 0612 (0512/0567 own the far pointers at 1E24-1E84).
-  `GFX_DATA` belongs to the asm modules. Then the BSS globals become definitions too.
+
+## Data in source (batch 4): no bytes from the EXE
+`tools/mkdata.py` and `datalayout.txt` are gone. The relink is IDENTICAL using only objects built from `src/` (plus
+C0L.OBJ and CL.LIB from the toolchain); the original EXE is read only for the final comparison.
+- **TC object layout.** TCC buffers the whole module and writes all `_DATA` LEDATA first, then the code, cutting
+  records every 1024 bytes from the start of the module's `_DATA` (backing off so a 4-byte fixup is never split).
+  Far-pointer fixups are written in descending order per record. So a module's data relocations always precede its
+  code relocations, and the record cuts depend on where the module's data starts.
+- **0304 is three units.** DGROUP 0094-1AA9 has relocations 127-308 *after* seg0304's code relocations (7-126), in
+  runs 1264-145C / 16D2-184C / 185E-195A. That is impossible for one TC module, but exact for three:
+  `m0304.c` owns 0094-0209 (detect_video's messages, palette maps, the disk prompt; no pointers), `src/data/scripts.c`
+  owns 020A-145D (actor scripts for `run_script` plus the five script-pointer tables; records cut at 060A, 0A0A, 0E0A,
+  120A, so all 127 pointers share one record), and `src/data/tables.c` owns 145E-1AA9 (sprite tables, `g_cmpFiles`,
+  and TC's literal pool of `.CMP` names at 196A; cuts at 185C, so runs of 40 and 15). Both are data-only C files
+  linked right after M0304. Their file names are ours.
+- **1AAA-1EA1**: `m04fc.c` (`g_1AAA` text windows, `g_biosVideoMode`), `sound.c` (the 25 tunes and `g_tunes`, whose
+  25 relocations sit between seg0512's and sound.c's code ones, as TC data-before-code predicts), `m05d5.c` (1E86),
+  `m05ed.c` (1E88-1EA1). Symbols that pointed inside these objects are now member expressions
+  (`g_1ABA` = `g_1AAA[1].a`, `g_1E32` = `g_tunes[4]`).
+- **`GFX_DATA`** (frame 0B7F, 0E-14DF) is `db` in the asm modules that address it: seg0000_0217 0E-25,
+  seg0000_08b9 26-14B5, seg0000_2a15 14B6-14DF (split by which module touches which offsets; the 14B6 cut is anywhere
+  in 14B6-14BC). Offsets used from C are publics (`_g_23B2`, ...).
+- **`_BSS`** is real tentative definitions with sizes: m0304 3868-3AE3, m05d5 3AE4, m061f 3AE6-3AEF, music.c 3AF0-3B4D,
+  m06f0 3B4E-3B6D (each owner references a variable in its range; the split keeps the link order monotonic). Gaps nobody
+  references are `char g_XXXX[n]`. Overlapping placeholders were really array elements: `g_3874` = `g_386A[5]`,
+  `g_3884` = `g_387A[5]`, `g_392A` = `g_391C[7]`, `g_3AAC` = `g_3A9E[7]`.
+- **TC's BSS order is its hash-table order.** TC allocates tentative definitions at the end of the module by walking
+  its symbol hash table: buckets in hash order, and within a bucket in order of first declaration. It is not the
+  definition order. Names that share their first and last character and their length land in one bucket. So
+  `donald.h` maps every BSS name to a link name `g_XXXX_` (`g_videoMode` -> `g_3B4E_`) and declares them all first, in
+  address order. The original names hashed into this order. Ours are placeholders that reproduce it.
 
 ## Full-layout splice
 `tools/splice.py` still writes `build/DONALD.EXE` from our bytes plus the local original (for byte-level checks

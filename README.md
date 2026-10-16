@@ -17,12 +17,13 @@ Expected hashes are in [config/originals.sha256](config/originals.sha256).
 Every C function in the game (73 functions, 16,709 bytes) byte-matches with Turbo C 2.0 (`-ml`, plus `-O -Z` on some modules; see `config/retail/cflags.txt`).
 The assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14,020 bytes) reassemble byte-exactly as relocatable NASM objects. Every function is classified C/asm/lib with evidence in `config/retail/functions.csv` (`tools/classify.py`). The 71 Turbo C library modules are identified against the real `CL.LIB`.
 That covers 99.97% of the 38,000 code bytes; the rest is 12 bytes of zero padding.
-**`tools/relink.sh` relinks DONALD.EXE with TLINK 2.0 byte-identically (header, relocation table, code, data; sha256 c72ed190…).** The data not yet decompiled is generated at build time from your own EXE (see docs/MATCHING.md, Relink).
+**`tools/relink.sh` relinks DONALD.EXE with TLINK 2.0 byte-identically (header, relocation table, code, data; sha256 c72ed190…).** Every byte comes from `src/` (all initialised data, `GFX_DATA` and `_BSS` are C or asm definitions); the original EXE is only read for the comparison (see docs/MATCHING.md, Relink and Data in source).
 See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md) and [docs/MATCHING.md](docs/MATCHING.md).
 
 ## Layout
 - `src/segXXXX/` one C file per original code segment (= one Turbo C translation unit, functions in address order); `src/include/` headers; `src/asm/` NASM sources of the assembly modules (`tasm.inc` holds the TASM-style encodings).
-- `config/retail/` `symbols.csv` (name, seg:off, size, status), `functions.csv` (starts, kind, `lang` + `evidence`), `cflags.txt`, `link.txt` (TLINK object order), `datalayout.txt` + `data.csv` (DGROUP layout, named globals).
+- `src/data/` data-only C units (`scripts.c`, `tables.c`: DGROUP 020A-1AA9, linked after seg0304).
+- `config/retail/` `symbols.csv` (name, seg:off, size, status), `functions.csv` (starts, kind, `lang` + `evidence`), `cflags.txt`, `link.txt` (TLINK object order), `data.csv` (named globals).
 - `config/alt/` same for the alternate `DONALD` build.
 - `tools/` workflow scripts (below). `build/` and `game/` are git-ignored.
 
@@ -38,7 +39,7 @@ See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md) and [docs
 | `tools/permute.py` | permuter: tries `@P{a\|b}` source alternatives times a flag list and writes the first 100% match |
 | `tools/dumpfn.py` | `--list` unmatched C functions by size; `SSSS:OOOO` disassembles one |
 | `tools/asm2nasm.py` | bootstraps a NASM source for an asm module from your local EXE (then hand-annotated) |
-| `tools/relink.sh` | **whole-EXE proof**: verify, generate data objects, TLINK, byte compare with the original (`relink.py`, `mkdata.py`) |
+| `tools/relink.sh` | **whole-EXE proof**: verify, TLINK, byte compare with the original (`relink.py`) |
 | `tools/classify.py` | per-function C/asm/lib verdict with evidence → `functions.csv` `lang`/`evidence` |
 | `tools/splice.py` | full-layout build `build/DONALD.EXE` from our bytes plus the local original, and compares it |
 | `tools/cmpobj.py` | per-function compare of an `.OBJ` against the original image, fixup bytes masked, side-by-side diff |

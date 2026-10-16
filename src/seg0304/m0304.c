@@ -10,6 +10,63 @@ int far handle_key(void);
 int far run_script(int i);
 int far ending(void);
 
+/* Module data: DGROUP 0094-0209 (detect_video's messages, palette maps, disk prompt). */
+char g_0094[] = "\n\r\nA CGA ";
+char g_009E[] = "\n\r\nAn EGA ";
+char g_00A9[] = "\n\r\nA TANDY ";
+char g_00B5[] = "graphic card has been detected.  If you wish to\n\roverride this choice, you will have 20 seconds to do so.\n\r\n\rInput graphics mode, 1:CGA 2:EGA/VGA 3:TANDY";
+char g_014F = 10;
+char g_0150 = 13;
+char d_0151[1] = {0};
+char g_0152[16] = {0, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+int g_0162[] = {15, 13, 12, 14, 17, 16};
+int g_016E[] = {5, 3, 1, 7, 2, 0};
+int g_017A[] = {6, 11, 4, 9, 8, 10};
+char g_0186[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+char g_0196[16] = {1, 5, 3, 2, 10, 14, 12, 6, 4, 11, 9, 1, 0, 8, 7, 15};
+char g_01A6[100] = "Please make sure that Donald's Alphabet Chase disk is in the disk drive, then press the space bar.";
+
+/* Uninitialised data (_BSS): DGROUP 3868-3AE3 (ownership inferred, see docs/MATCHING.md). */
+int g_3868;
+int g_386A[8];
+int g_387A[8];
+int g_388A;
+int g_388C[5];
+int g_3896;
+char g_3898[4];
+int g_389C;
+int g_389E[8];
+int g_38AE;
+int g_38B0;
+int g_38B2;
+char far *g_38B4;
+int g_38B8;
+char far *g_38BA[5];
+char far *g_38CE;
+char far *g_38D2;
+char far *g_38D6;
+int g_38DA;
+int g_38DC;
+int g_38DE;
+int g_38E0;
+char g_38E2[40];
+int g_390A[5];
+int g_3914;
+char g_3916[4];
+int g_391A;
+int g_391C[8];
+int g_392C[5];
+int g_3936;
+char g_3938[4];
+char far *g_393C;
+int g_3940[26];
+int g_3974[8];
+char far *g_3984[70];
+char g_3A9C[2];
+int g_3A9E[8];
+int g_3AAE[26];
+int g_3AE2;
+
 /* FUNCTION: DONALD 0304:000C */
 
 void blit_dispatch(char far *src, register int x, register int y, int w, int h)
@@ -180,10 +237,10 @@ void draw_frame(int mode, register int i, register int x, int y)
     p = g_3AF2;
     if (g_videoMode == 2)
         p = (char far *)0xA8000000L;
-    g_1ABA = 0;
-    g_1ABE = 40;
-    g_1ABC = 0;
-    g_1AC0 = 25;
+    g_1AAA[1].a = 0;
+    g_1AAA[1].c = 40;
+    g_1AAA[1].b = 0;
+    g_1AAA[1].d = 25;
     switch (mode) {
     case 0:
         draw_sprite(g_3AF8, g_3984[i], x, y, 1);
@@ -348,11 +405,11 @@ void reset_actors(void)
         g_392C[i] = g_390A[i] = 10;
         g_388C[i] = -1;
     }
-    g_392A = g_3AAC = 8;
+    g_391C[7] = g_3A9E[7] = 8;
     g_38D6 = g_13EA;
     g_38CE = g_1336;
-    g_3874 = 0x128;
-    g_3884 = g_3896 = 0;
+    g_386A[5] = 0x128;
+    g_387A[5] = g_3896 = 0;
     g_3936 = g_3914 = 20;
     init_slots();
 }
@@ -380,7 +437,7 @@ void show_picture(register int n)
 {
     char c;
 
-    load_file(g_1772[n].name, g_393C);
+    load_file(g_cmpFiles[n].name, g_393C);
     if (g_173C[n]) {
         c = 0;
         if (g_videoMode == 0) {
@@ -592,7 +649,7 @@ int handle_key(void)
     }
     if (key != '1')
         goto done;
-    fn_0512_03CD(g_1E32);
+    fn_0512_03CD(g_tunes[4]);
     g_1460 ^= 1;
     if (!g_1460)
         stop_sound();
@@ -949,10 +1006,10 @@ int ending(void)
     register int k = 0;
 
     play_sound(17);
-    load_file(g_1772[18].name, g_393C);
-    load_file(g_1772[19].name, g_393C + 0x1b8a);
-    load_file(g_1772[20].name, g_393C + 0x3714);
-    load_file(g_1772[21].name, g_393C + 0x5910);
+    load_file(g_cmpFiles[18].name, g_393C);
+    load_file(g_cmpFiles[19].name, g_393C + 0x1b8a);
+    load_file(g_cmpFiles[20].name, g_393C + 0x3714);
+    load_file(g_cmpFiles[21].name, g_393C + 0x5910);
     if (g_videoMode == 0)
         fn_0000_0FF2(g_16D0[18]);
     draw_pic(g_393C, g_3AF2);
@@ -985,7 +1042,7 @@ int ending(void)
     if (k == 27)
         return k;
     play_sound(17);
-    load_file(g_1772[22].name, g_393C);
+    load_file(g_cmpFiles[22].name, g_393C);
     if (g_videoMode == 0)
         fn_0000_0FF2(g_16D0[22]);
     set_palette(g_0196);
@@ -1014,3 +1071,5 @@ void about(void)
     get_key();
     fn_0000_08B9();
 }
+
+
