@@ -12,6 +12,18 @@ int g_biosVideoMode[] = {4, 9, 13};
 /* FUNCTION: DONALD 04FC:0009 */
 main(int argc, char far **argv)
 {
+#ifdef DONALD_ALT
+    /* alternate build (game/DONALD): no command-line parameters, video always auto-detected */
+    if (argc < 2)
+        fn_0512_0102(-1);
+    else
+        fn_0512_0102(60);
+    g_1F3E = 1;
+    g_1F2E = about;
+    g_3B6C = 1;
+    fn_056A_029A();
+    detect_video();
+#else
     g_videoMode = -1;
     if (argc < 2)
         fn_0512_0102(-1);
@@ -26,6 +38,7 @@ main(int argc, char far **argv)
     fn_056A_029A();
     if (g_videoMode == -1)
         detect_video();
+#endif
     fn_0000_14DD(g_biosVideoMode[g_videoMode]);
     g_3AF8 = (char far *)0xB8000000L;
     if (g_videoMode == 2)
@@ -60,5 +73,7 @@ void shutdown(void)
     fn_0000_14DD(2);
     fn_0512_0398();
     fn_056A_0562();
+#ifndef DONALD_ALT
     exit(g_videoMode);
+#endif
 }
