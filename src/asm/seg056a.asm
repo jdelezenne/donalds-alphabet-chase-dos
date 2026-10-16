@@ -13,18 +13,18 @@ bits 16
 
 segment KBD_TEXT public align=1 class=CODE use16
 
-global _fn_056A_0194
-_fn_056A_0194 equ L0194
-global _fn_056A_019E
-_fn_056A_019E equ L019E
-global _fn_056A_01A9
-_fn_056A_01A9 equ L01A9
-global _fn_056A_01CB
-_fn_056A_01CB equ L01CB
-global _fn_056A_029A
-_fn_056A_029A equ L029A
-global _fn_056A_0562
-_fn_056A_0562 equ L0562
+global _kbd_hit
+_kbd_hit equ L0194
+global _kbd_flush
+_kbd_flush equ L019E
+global _kbd_getcode
+_kbd_getcode equ L01A9
+global _kbd_getchar
+_kbd_getchar equ L01CB
+global _kbd_install
+_kbd_install equ L029A
+global _kbd_remove
+_kbd_remove equ L0562
 
     db 0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x20,0x02,0x20,0x03,0x0C,0x06,0x0D,0x07
     db 0x6A,0x06,0x69,0x06,0x30,0x02,0x30,0x03,0x7D,0x00,0x7D,0x01,0x5A,0x02,0x5A,0x03

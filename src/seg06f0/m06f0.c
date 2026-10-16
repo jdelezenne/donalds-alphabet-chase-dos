@@ -4,7 +4,7 @@
 long mem_read(int i, char far *buf, long len);
 
 char far *strupr();
-char far *fn_0000_115F();
+char far *normalize_ptr();
 char far *farmalloc();
 void far inset_rect(int n);
 void show_error(void);
@@ -377,7 +377,7 @@ void load_resources(void)
 
     for (i = 0; i < 10; i++)
         g_3B58[i] = 0x7fff;
-    avail = fn_0000_0EFE() - g_1F38;
+    avail = dos_free_kb() - g_1F38;
     i = 0;
     g_3B56 = i;
     while (*g_cmpFiles[i].name) {
@@ -449,8 +449,8 @@ long mem_read(register int i, char far *buf, long len)
 
     if (g_cmpFiles[i].pos + len > g_cmpFiles[i].size)
         len = g_cmpFiles[i].size - g_cmpFiles[i].pos;
-    src = fn_0000_115F(g_cmpFiles[i].data + g_cmpFiles[i].pos);
-    fn_0000_0A2E(src, buf, len);
+    src = normalize_ptr(g_cmpFiles[i].data + g_cmpFiles[i].pos);
+    far_copy(src, buf, len);
     g_cmpFiles[i].pos += len;
     return len;
 }

@@ -13,7 +13,7 @@ void hline(register int y, register int x, int x2, int c)
 
     mask = g_1E88[g_videoMode];
     while ((x & mask) && x <= x2)
-        fn_0000_2584(x++, y, y, c);
+        vline(x++, y, y, c);
     if (x < x2) {
         n = x2 - x;
         if (g_videoMode != 3)
@@ -23,7 +23,7 @@ void hline(register int y, register int x, int x2, int c)
         x = g_1E88[g_videoMode + 4] & x2;
     }
     while (x <= x2)
-        fn_0000_2584(x++, y, y, c);
+        vline(x++, y, y, c);
 }
 
 /* FUNCTION: DONALD 05ED:00A6 */
@@ -42,7 +42,7 @@ void draw_line(register int x1, register int y1, int x2, int y2, int c)
     if (y1 > 199) y1 = 199;
     if (y2 > 199) y2 = 199;
     if (x1 == x2)
-        fn_0000_2584(x1, y1, y2, c);
+        vline(x1, y1, y2, c);
     else if (y1 == y2)
         hline(y1, x1, x2, c);
 }

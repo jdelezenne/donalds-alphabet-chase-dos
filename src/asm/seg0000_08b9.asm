@@ -6,82 +6,82 @@ bits 16
 segment GFX_DATA public align=2 class=DATA use16   ; far data of the graphics modules (starts at 0B7F:000E)
 segment _TEXT public align=1 class=CODE use16
 
-global _fn_0000_08B9
-_fn_0000_08B9 equ L08B9
+global _clear_screen
+_clear_screen equ L08B9
 global _fn_0000_0912
 _fn_0000_0912 equ L0912
-global _fn_0000_0A2E
-_fn_0000_0A2E equ L0A2E
-global _fn_0000_0A6B
-_fn_0000_0A6B equ L0A6B
+global _far_copy
+_far_copy equ L0A2E
+global _present_buffer
+_present_buffer equ L0A6B
 global _fn_0000_0B2E
 _fn_0000_0B2E equ L0B2E
 global _fn_0000_0D1C
 _fn_0000_0D1C equ L0D1C
 global _fn_0000_0D56
 _fn_0000_0D56 equ L0D56
-global _fn_0000_0E82
-_fn_0000_0E82 equ L0E82
-global _fn_0000_0EFE
-_fn_0000_0EFE equ L0EFE
-global _fn_0000_0F2C
-_fn_0000_0F2C equ L0F2C
-global _fn_0000_0F83
-_fn_0000_0F83 equ L0F83
-global _fn_0000_0FEE
-_fn_0000_0FEE equ L0FEE
-global _fn_0000_0FF0
-_fn_0000_0FF0 equ L0FF0
-global _fn_0000_0FF2
-_fn_0000_0FF2 equ L0FF2
+global _gfx_fill_rect
+_gfx_fill_rect equ L0E82
+global _dos_free_kb
+_dos_free_kb equ L0EFE
+global _cmp_unpack_planar
+_cmp_unpack_planar equ L0F2C
+global _cmp_unpack_cga
+_cmp_unpack_cga equ L0F83
+global _enable_ints
+_enable_ints equ L0FEE
+global _disable_ints
+_disable_ints equ L0FF0
+global _set_palette16
+_set_palette16 equ L0FF2
 global _fn_0000_106B
 _fn_0000_106B equ L106B
-global _fn_0000_10D2
-_fn_0000_10D2 equ L10D2
-global _fn_0000_115F
-_fn_0000_115F equ L115F
-global _fn_0000_1180
-_fn_0000_1180 equ L1180
-global _fn_0000_1197
-_fn_0000_1197 equ L1197
+global _clear_buffer
+_clear_buffer equ L10D2
+global _normalize_ptr
+_normalize_ptr equ L115F
+global _dos_putc
+_dos_putc equ L1180
+global _rand8
+_rand8 equ L1197
 global _fn_0000_11DC
 _fn_0000_11DC equ L11DC
-global _fn_0000_1461
-_fn_0000_1461 equ L1461
-global _fn_0000_1478
-_fn_0000_1478 equ L1478
-global _fn_0000_1491
-_fn_0000_1491 equ L1491
-global _fn_0000_14C7
-_fn_0000_14C7 equ L14C7
-global _fn_0000_14DD
-_fn_0000_14DD equ L14DD
+global _dos_set_drive
+_dos_set_drive equ L1461
+global _cga_select_palette
+_cga_select_palette equ L1478
+global _set_palette_reg
+_set_palette_reg equ L1491
+global _set_video_type
+_set_video_type equ L14C7
+global _set_bios_mode
+_set_bios_mode equ L14DD
 global _fn_0000_16FA
 _fn_0000_16FA equ L16FA
 global _fn_0000_1D16
 _fn_0000_1D16 equ L1D16
-global _fn_0000_2298
-_fn_0000_2298 equ L2298
-global _fn_0000_2319
-_fn_0000_2319 equ L2319
-global _fn_0000_237A
-_fn_0000_237A equ L237A
-global _fn_0000_23C2
-_fn_0000_23C2 equ L23C2
-global _fn_0000_241D
-_fn_0000_241D equ L241D
-global _fn_0000_2470
-_fn_0000_2470 equ L2470
-global _fn_0000_24FB
-_fn_0000_24FB equ L24FB
-global _fn_0000_253B
-_fn_0000_253B equ L253B
-global _fn_0000_2553
-_fn_0000_2553 equ L2553
-global _fn_0000_2584
-_fn_0000_2584 equ L2584
-global _fn_0000_271E
-_fn_0000_271E equ L271E
+global _set_text_colours
+_set_text_colours equ L2298
+global _draw_char_cga
+_draw_char_cga equ L2319
+global _draw_char_tandy
+_draw_char_tandy equ L237A
+global _draw_char_ega
+_draw_char_ega equ L23C2
+global _draw_char_buf
+_draw_char_buf equ L241D
+global _gfx_init
+_gfx_init equ L2470
+global _set_palette_regs
+_set_palette_regs equ L24FB
+global _in_vretrace
+_in_vretrace equ L253B
+global _wait_vretrace
+_wait_vretrace equ L2553
+global _vline
+_vline equ L2584
+global _set_dac_regs
+_set_dac_regs equ L271E
 ; FUNCTION: DONALD 0000:08B9
 L08B9:
     push bp

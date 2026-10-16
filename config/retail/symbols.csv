@@ -4,6 +4,39 @@ exit,0000:010D,101,lib,C0L
 restorezero,0000:0172,61,lib,C0L
 abort,0000:01AF,24,lib,C0L
 DGROUP@,0000:01C7,2,lib,C0L
+ega_present,0000:01C9,31,asm,int 10h AH=12h BL=10h: EGA BIOS present
+set_text_mode,0000:01E8,22,asm,int 10h mode 3
+ega_select_palette,0000:01FE,25,asm,"int 10h AH=10h, palette 0/1"
+clear_screen,0000:08B9,89,asm,clears video memory B800/A000 per mode
+far_copy,0000:0A2E,61,asm,"rep movsw far copy (src, dst, len)"
+present_buffer,0000:0A6B,195,asm,copies the off-screen buffer to video memory (EGA planes via 3C4/3CE)
+gfx_fill_rect,0000:0E82,124,asm,"(x, y, w, h, colour)"
+dos_free_kb,0000:0EFE,46,asm,int 21h AH=48h probe; returns free conventional memory in KB
+cmp_unpack_planar,0000:0F2C,87,asm,"decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md"
+cmp_unpack_cga,0000:0F83,107,asm,"decodes a .CMP picture (CGA layout), see docs/CMP.md"
+enable_ints,0000:0FEE,2,asm,sti
+disable_ints,0000:0FF0,2,asm,cli
+set_palette16,0000:0FF2,121,asm,loads a 16-entry palette table
+clear_buffer,0000:10D2,141,asm,fills an off-screen buffer
+normalize_ptr,0000:115F,33,asm,far pointer normalisation (offset < 16)
+dos_putc,0000:1180,23,asm,int 21h AH=06h
+rand8,0000:1197,69,asm,shift-register random byte (state at GFX_DATA:027B)
+dos_set_drive,0000:1461,23,asm,int 21h AH=0Eh
+cga_select_palette,0000:1478,25,asm,int 10h AH=0Bh BH=1
+set_palette_reg,0000:1491,54,asm,"EGA attribute controller register (index, value)"
+set_video_type,0000:14C7,22,asm,stores g_videoMode in the graphics driver (GFX_DATA:0286)
+set_bios_mode,0000:14DD,541,asm,int 10h AH=00h
+set_text_colours,0000:2298,129,asm,"(fg, bg) for draw_char_*"
+draw_char_cga,0000:2319,97,asm,glyph to CGA memory
+draw_char_tandy,0000:237A,72,asm,glyph to Tandy memory
+draw_char_ega,0000:23C2,91,asm,glyph to EGA planes
+draw_char_buf,0000:241D,83,asm,glyph to the off-screen buffer
+gfx_init,0000:2470,139,asm,graphics driver init
+set_palette_regs,0000:24FB,64,asm,all 16 attribute registers
+in_vretrace,0000:253B,24,asm,3DA bit 3
+wait_vretrace,0000:2553,49,asm,waits for (the end of) vertical retrace
+vline,0000:2584,410,asm,"(x, y1, y2, colour)"
+set_dac_regs,0000:271E,96,asm,int 10h AX=1010h
 setargv_local,0000:2DAB,8,lib,CL.LIB:SETARGV
 setargv,0000:2DB3,254,lib,CL.LIB:SETARGV
 setenvp,0000:2EB1,68,lib,CL.LIB:SETENVP
@@ -42,8 +75,21 @@ about,0304:1E5B,302,matched,100.0% src/seg0304/m0304.c
 main,04FC:0009,214,matched,100.0% src/seg04fc/m04fc.c
 init_game,04FC:00DF,99,matched,100.0% src/seg04fc/m04fc.c
 shutdown,04FC:0142,31,matched,100.0% src/seg04fc/m04fc.c
+snd_get_option,0512:00EE,20,asm,music option word (set by snd_set_option)
+snd_set_option,0512:0102,594,asm,"music option word: -1 default, else argv[1] / 60"
+snd_init,0512:0354,68,asm,"hooks int 8, PIT channel 0 at 1000h"
+snd_shutdown,0512:0398,53,asm,"restores int 8 and the PIT, speaker off"
+snd_play,0512:03CD,36,asm,starts a tune (far pointer to a byte stream)
+snd_stop,0512:03F1,22,asm,sets the stop flag
+timer_ticks,0512:0544,20,asm,tick counter maintained by the int 8 handler
 play_sound,0567:0008,34,matched,100.0% src/seg0567/sound.c
 stop_sound,0567:002A,6,matched,100.0% src/seg0567/sound.c
+kbd_hit,056A:0194,10,asm,key queue head != tail
+kbd_flush,056A:019E,11,asm,key queue tail = head
+kbd_getcode,056A:01A9,34,asm,waits for and pops a scan code word
+kbd_getchar,056A:01CB,207,asm,kbd_getcode translated to ASCII
+kbd_install,056A:029A,712,asm,hooks int 9 and int 23h
+kbd_remove,056A:0562,41,asm,restores int 9 and int 23h
 key_ready,05C2:000B,17,matched,100.0% src/seg05c2/input.c
 get_key,05C2:001C,28,matched,100.0% src/seg05c2/input.c
 blit_ega,05C5:0008,234,matched,100.0% src/seg05c5/m05c5.c

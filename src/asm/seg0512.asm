@@ -13,18 +13,18 @@ bits 16
 
 segment SND_TEXT public align=1 class=CODE use16   ; starts at 0512:0001, right after shutdown()'s retf
 
-global _fn_0512_00EE
-_fn_0512_00EE equ L00EE
-global _fn_0512_0102
-_fn_0512_0102 equ L0102
-global _fn_0512_0354
-_fn_0512_0354 equ L0354
-global _fn_0512_0398
-_fn_0512_0398 equ L0398
-global _fn_0512_03CD
-_fn_0512_03CD equ L03CD
-global _fn_0512_03F1
-_fn_0512_03F1 equ L03F1
+global _snd_get_option
+_snd_get_option equ L00EE
+global _snd_set_option
+_snd_set_option equ L0102
+global _snd_init
+_snd_init equ L0354
+global _snd_shutdown
+_snd_shutdown equ L0398
+global _snd_play
+_snd_play equ L03CD
+global _snd_stop
+_snd_stop equ L03F1
 global _fn_0512_0407
 _fn_0512_0407 equ L0407
 global _fn_0512_043A
@@ -33,8 +33,8 @@ global _fn_0512_045C
 _fn_0512_045C equ L045C
 global _fn_0512_0522
 _fn_0512_0522 equ L0522
-global _fn_0512_0544
-_fn_0512_0544 equ L0544
+global _timer_ticks
+_timer_ticks equ L0544
 
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
     db 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00

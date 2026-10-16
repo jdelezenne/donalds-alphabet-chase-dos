@@ -34,7 +34,7 @@ char far *grab(int x, register int y, int w, register int h)
             res = xalloc((long)(n2 + 4));
             res[1] = h - 1;
             res[2] = w;
-            fn_0000_0A2E(g_38B4, res + 4, (long)n2);
+            far_copy(g_38B4, res + 4, (long)n2);
         }
     } else
         res = grab_vga(x, y, w, h);
@@ -83,6 +83,6 @@ char far *grab_vga(int x, int y, int w, int h)
     }
     row = xalloc(size);
     if (row)
-        fn_0000_0A2E(g_38B4, row, size);
+        far_copy(g_38B4, row, size);
     return row;
 }

@@ -6,16 +6,16 @@ void set_palette(char far *pal)
     register int i;
     register int v;
 
-    fn_0000_2553(g_382D);
+    wait_vretrace(g_382D);
     if (g_videoMode == 1)
-        fn_0000_24FB(pal);
+        set_palette_regs(pal);
     else if (g_videoMode == 2) {
         for (i = 0; i < 16; i++) {
             v = pal[i];
             if (v > 7)
                 v += 8;
-            fn_0000_1491(i, v);
+            set_palette_reg(i, v);
         }
     } else if (g_videoMode == 3)
-        fn_0000_271E(pal);
+        set_dac_regs(pal);
 }

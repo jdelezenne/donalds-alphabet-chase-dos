@@ -1,7 +1,7 @@
 /* Module at segment 0304 (one translation unit; functions in address order). */
 #include "donald.h"
 
-unsigned char fn_0000_1197();
+unsigned char rand8();
 char far *grab();
 void far reset_actors(void);
 void far init_slots(void);
@@ -302,28 +302,28 @@ void detect_video(void)
     register int i;
     long t0, t1;
 
-    fn_0000_01E8();
+    set_text_mode();
     for (i = 0; i < 8; i++) {
-        fn_0000_1180(g_014F);
-        fn_0000_1180(g_0150);
+        dos_putc(g_014F);
+        dos_putc(g_0150);
     }
     i = 0;
     if (rom_check()) {
         g_videoMode = 1;
         while (g_00A9[i])
-            fn_0000_1180(g_00A9[i++]);
-    } else if (fn_0000_01C9()) {
+            dos_putc(g_00A9[i++]);
+    } else if (ega_present()) {
         g_videoMode = 2;
         while (g_009E[i])
-            fn_0000_1180(g_009E[i++]);
+            dos_putc(g_009E[i++]);
     } else {
         g_videoMode = 0;
         while (g_0094[i])
-            fn_0000_1180(g_0094[i++]);
+            dos_putc(g_0094[i++]);
     }
     i = 0;
     while (g_00B5[i])
-        fn_0000_1180(g_00B5[i++]);
+        dos_putc(g_00B5[i++]);
     i = 0;
     time(&t0);
     do {
@@ -345,7 +345,7 @@ void detect_video(void)
             break;
         }
     }
-    fn_0000_14C7(g_videoMode);
+    set_video_type(g_videoMode);
 }
 
 /* FUNCTION: DONALD 0304:0737 */
@@ -441,25 +441,25 @@ void show_picture(register int n)
     if (g_173C[n]) {
         c = 0;
         if (g_videoMode == 0) {
-            fn_0000_0FF2(g_16D0[n]);
+            set_palette16(g_16D0[n]);
             c = g_videoMode = 1;
-            fn_0000_14C7(g_videoMode);
+            set_video_type(g_videoMode);
         }
         draw_pic(g_393C, g_3AF2);
         if (c) {
             g_videoMode = 0;
-            fn_0000_14C7(0);
-            fn_0000_10D2(g_3AF2, 0);
+            set_video_type(0);
+            clear_buffer(g_3AF2, 0);
         }
     } else {
         if (g_videoMode == 0)
-            fn_0000_0FF2(g_16D0[n]);
+            set_palette16(g_16D0[n]);
         draw_pic(g_393C, g_3AF2);
         if (g_videoMode == 2)
-            fn_0000_0A6B(g_3AF2, 0xA800);
+            present_buffer(g_3AF2, 0xA800);
     }
     if (g_videoMode == 0)
-        fn_0000_1478(1);
+        cga_select_palette(1);
 }
 
 /* FUNCTION: DONALD 0304:0A4E */
@@ -486,7 +486,7 @@ void load_level_gfx(void)
         g_3984[i] = grab(((i - 57) % 5) * 8, ((i - 57) / 5) * 64, 8, 64);
     show_picture(g_0162[g_388A]);
     if (g_videoMode)
-        fn_0000_01FE(0);
+        ega_select_palette(0);
     set_palette(g_0152);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     draw_item(0, 0, 0, 40, 200);
@@ -507,8 +507,8 @@ void game(void)
         g_3984[i] = (char far *)-1L;
     set_palette(g_0186);
     if (g_videoMode)
-        fn_0000_01FE(1);
-    fn_056A_019E();
+        ega_select_palette(1);
+    kbd_flush();
     show_picture(26);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     play_sound(24);
@@ -544,7 +544,7 @@ void game(void)
         i = 0; g_391A = 0; g_38DE = 0; g_38DA = 0; g_38B2 = g_388A = g_3AE2 = 0;
         load_level_gfx();
         reset_actors();
-        last = now = fn_0512_0544();
+        last = now = timer_ticks();
         for (i = 0; i < 8; i++)
             draw_item(4, (g_386A[i] >> 3) - 1, g_387A[i] - 8, g_391C[i] + 2, (g_3A9E[i] + 2) << 3);
         for (;;) {
@@ -573,14 +573,14 @@ void game(void)
                 draw_items(1);
             }
             do {
-                now = fn_0512_0544();
+                now = timer_ticks();
                 if (last < 0)
                     last = now;
                 if (last > now)
                     now += 0x123;
             } while ((dt = now - last) <= 4);
-            last = fn_0512_0544();
-            if (!fn_0512_00EE()) {
+            last = timer_ticks();
+            if (!snd_get_option()) {
                 key = 27;
                 break;
             }
@@ -608,12 +608,12 @@ int handle_key(void)
     register int r;
 
     if (!g_38B2) {
-        fn_056A_019E();
+        kbd_flush();
         goto done;
     }
     if (key_ready()) {
         key = get_key();
-        fn_056A_019E();
+        kbd_flush();
         if (key >= 'a' && key <= 'z')
             key = key - 32;
         if ((key < 'A' || key > 'Z') && key != 27 && key != '1')
@@ -649,7 +649,7 @@ int handle_key(void)
     }
     if (key != '1')
         goto done;
-    fn_0512_03CD(g_tunes[4]);
+    snd_play(g_tunes[4]);
     g_1460 ^= 1;
     if (!g_1460)
         stop_sound();
@@ -779,13 +779,13 @@ int run_script(register int i)
             g_3974[i] = 1;
             break;
         case -13:
-            if (fn_0000_1197() & 1)
+            if (rand8() & 1)
                 g_38BA[i] += *g_38BA[i];
             else
                 g_38BA[i]++;
             break;
         case -14:
-            if (fn_0000_1197() & 3)
+            if (rand8() & 3)
                 g_38BA[i]++;
             else
         back2:
@@ -960,7 +960,7 @@ int roll(int n, int max, int base)
         max = 1;
     for (i = 0; i < n; i++) {
         do
-            d = fn_0000_1197() & 0x0f;
+            d = rand8() & 0x0f;
         while (d == 0 || d > max);
         sum += d;
     }
@@ -1011,29 +1011,29 @@ int ending(void)
     load_file(g_cmpFiles[20].name, g_393C + 0x3714);
     load_file(g_cmpFiles[21].name, g_393C + 0x5910);
     if (g_videoMode == 0)
-        fn_0000_0FF2(g_16D0[18]);
+        set_palette16(g_16D0[18]);
     draw_pic(g_393C, g_3AF2);
     if (g_videoMode == 2)
-        fn_0000_0A6B(g_3AF2, 0xA800);
+        present_buffer(g_3AF2, 0xA800);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     play_sound(24);
     draw_pic(g_393C + 0x1b8a, g_3AF2);
     if (g_videoMode == 2)
-        fn_0000_0A6B(g_3AF2, 0xA800);
+        present_buffer(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
         return k;
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     draw_pic(g_393C + 0x3714, g_3AF2);
     if (g_videoMode == 2)
-        fn_0000_0A6B(g_3AF2, 0xA800);
+        present_buffer(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
         return k;
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     draw_pic(g_393C + 0x5910, g_3AF2);
     if (g_videoMode == 2)
-        fn_0000_0A6B(g_3AF2, 0xA800);
+        present_buffer(g_3AF2, 0xA800);
     k = wait_key(0);
     if (k == 27)
         return k;
@@ -1044,13 +1044,13 @@ int ending(void)
     play_sound(17);
     load_file(g_cmpFiles[22].name, g_393C);
     if (g_videoMode == 0)
-        fn_0000_0FF2(g_16D0[22]);
+        set_palette16(g_16D0[22]);
     set_palette(g_0196);
     if (g_videoMode)
-        fn_0000_01FE(1);
+        ega_select_palette(1);
     draw_pic(g_393C, g_3AF2);
     if (g_videoMode == 2)
-        fn_0000_0A6B(g_3AF2, 0xA800);
+        present_buffer(g_3AF2, 0xA800);
     blit_dispatch(g_3AF2, 0, 0, 40, 200);
     k = wait_key(1);
     if (k != 27)
@@ -1061,7 +1061,7 @@ int ending(void)
 /* FUNCTION: DONALD 0304:1E5B */
 void about(void)
 {
-    fn_0000_08B9();
+    clear_screen();
     set_and_redraw(2);
     draw_line((g_1ED8 - 1) << 3, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, 15);
     draw_line((g_1ED8 - 1) << 3, ((g_1EDA + g_1EDE + 1) << 3) - 1, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
@@ -1069,7 +1069,7 @@ void about(void)
     draw_line(((g_1ED8 + g_1EDC + 1) << 3) - 1, (g_1EDA - 1) << 3, ((g_1ED8 + g_1EDC + 1) << 3) - 1, ((g_1EDA + g_1EDE + 1) << 3) - 1, 15);
     print_wrapped(g_01A6);
     get_key();
-    fn_0000_08B9();
+    clear_screen();
 }
 
 

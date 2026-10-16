@@ -6,9 +6,9 @@ void draw_pic(char far *p, char far *dst)
     register int n;
 
     if (*p++ == 1)
-        fn_0000_0F2C(p, dst);
+        cmp_unpack_planar(p, dst);
     else
-        fn_0000_0F83(p, dst);
+        cmp_unpack_cga(p, dst);
     if (g_videoMode == 0) {
         n = 80;
         if (g_1ECE)

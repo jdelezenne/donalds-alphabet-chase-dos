@@ -12,8 +12,8 @@ char g_3AFE[80];
 void music_toggle(int x)
 {
     if (!g_3AFC) {
-        fn_0000_1461(0);
+        dos_set_drive(0);
         if (g_3AF6 && x > 0)
-            fn_0000_1461(1);
+            dos_set_drive(1);
     }
 }
