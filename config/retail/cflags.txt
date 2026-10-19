@@ -1,14 +1,14 @@
 -ml -O -Z
 # line 1 = default TCC flags, verified by the relink: -O and -Z are both required for the default files, and -G is NOT used (adding it breaks 49 of 73 functions). Per-file override: "<glob under src/>: flags"
-seg06f0/*: -ml
-seg05ed/*: -ml
-seg05e7/*: -ml
-seg0612/*: -ml
-seg061f/*: -ml
-seg05c5/*: -ml
-seg06c3/*: -ml
-seg06d3/*: -ml
-seg05d5/*: -ml
-seg062d/*: -ml
-seg06ad/*: -ml
-seg0671/*: -ml
+engine/files.c: -ml
+engine/lines.c: -ml
+engine/fillrect.c: -ml
+engine/xalloc.c: -ml
+engine/calibrat.c: -ml
+engine/egablit.c: -ml
+engine/sprite.c: -ml
+engine/mirror.c: -ml
+engine/text.c: -ml
+engine/capture.c: -ml
+engine/wordtext.c: -ml
+engine/wraptext.c: -ml

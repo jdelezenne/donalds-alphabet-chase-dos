@@ -1,14 +1,15 @@
 # Matching workflow
 
 ## Loop
-1. Pick a function from `config/retail/functions.csv` (start with small leaf functions in the game segments, not segment 0000 = startup/CRT).
-2. Write `src/<name>.c`, add `name,SSSS:OOOO,size,todo,` to `config/retail/symbols.csv`.
-3. `tools/build.sh src/<name>.c` then `tools/.venv/bin/python tools/cmpobj.py build/obj/<NAME>.OBJ`.
-4. Iterate until `MATCH`; set `status=matched`, run `tools/matchreport.py`, commit.
+1. Pick a function from `config/retail/functions.csv` and edit its existing cataloged translation unit, preserving address order. If adding or moving a unit, update `modules.csv`, `link.txt`, flag overrides and affected catalogs together.
+2. Compile that semantic path, for example `tools/build.sh src/game.c`. The object is `build/obj/game.OBJ`; the catalog keeps its stable DOS compiler stem `M0304`.
+3. With the original `game/DONALD.EXE` available, use `python3 tools/cmpobj.py build/obj/game.OBJ` or `fndiff.py` to investigate differences. These are diagnostic comparisons, not permission to set a matched status manually.
+4. From a clean build, run `python3 tools/verify.py` to update function statuses, then `tools/relink.sh all --check-hashes` to verify both complete outputs. Use `--verify` as well when both original files are available. Run `python3 tools/matchreport.py` after verification.
+5. Without original files, use `rm -rf build && tools/relink.sh all --check-hashes`. Report whole-file hash results separately from retained per-function statuses, then review and commit on a branch.
 
 `cmpobj.py` masks every byte covered by an OMF fixup (far call targets, segment bases, DGROUP offsets), so a
 function can match before the whole program links in original order. The final milestone (as in maniac-mansion-dos)
-is a full-layout TLINK rebuild compared with `cmp`.
+is a full-layout TLINK rebuild checked against the original hashes, or compared directly with the originals when available.
 
 ## Toolchain (settled)
 **Turbo C 2.0, large model, `TCC -c -ml -O -Z`.** Install with `tools/install_tc.sh <your TC 2.0 floppy archive> /opt/tc20`.
@@ -23,7 +24,7 @@ is a full-layout TLINK rebuild compared with `cmp`.
 
 - `U001` closed: **2.0**. `FBRK` (`__brk/__sbrk`) and `FFREE` (`free/farfree`) match only the 2.0 `CL.LIB`; every 2.01 hit is also a 2.0 hit. The startup object is identical in both versions so it cannot discriminate.
 - `U002` closed: **large**. `C0L.OBJ` matches at 0000:0000 (457 bytes) and 44 `CL.LIB` modules match; `C0H`/`CH.LIB` give only 7 generic hits (the `push ds; mov ds` sequences are the hand-written asm module in segment 0000, which loads its own data segment `0B7Fh`).
-- `U003` flags: `-Z` (register-load suppression) is required (`blit_dispatch` reuses `AX=0` for the second far pointer); `-O` (jump optimisation) is required (`rom_check` has no `jmp $+2` before the epilogue). Default register variables (`-r`) on: `SI` then `DI` in declaration order. `-G` is **not** used (closed in batch 3: adding it breaks 49 of 73 functions; dropping `-O` from the default line breaks 16 functions, dropping `-Z` breaks 9). No stack check (`-N` off).
+- `U003` flags: `-Z` (register-load suppression) is required (`present_rect` reuses `AX=0` for the second far pointer); `-O` (jump optimisation) is required (`detect_tandy_signature` has no `jmp $+2` before the epilogue). Default register variables (`-r`) on: `SI` then `DI` in declaration order. `-G` is **not** used (closed in batch 3: adding it breaks 49 of 73 functions; dropping `-O` from the default line breaks 16 functions, dropping `-Z` breaks 9). No stack check (`-N` off).
 - `U004` closed in batch 3: TLINK 2.0 (TC 2.0), order in `config/retail/link.txt` (see Relink below). Original note: Layout seen so far: segment 0000 = `C0L` + hand-written asm (0x01C9–0x2DAA, video/BIOS helpers, `push di/si/ds; mov ds,0B7Fh`) + `CL` helper modules (`SETARGV` … `LLSH`); 0304.. = C game modules (each `X_TEXT` segment); 06E3.. = remaining `CL.LIB` in library order (`HARDERR`, `IOERROR`, `EXIT` … `BDOS`).
 - `U005` assessed in batch 3: the alt `DONALD` (55,432 bytes, 698 relocations) is the same link with a shorter `main()` (no `argv[2]` video-mode override / `g_videoMode = -1` / `detect_video()` path, -0x48 bytes) and two small asm edits (0512:0199, 056A:03F6); everything else differs only by the resulting segment shift. It matches the same 45 library modules (`config/alt/crt_matches.csv`).
 
@@ -35,9 +36,9 @@ is a full-layout TLINK rebuild compared with `cmp`.
 ## Matched (proof of pipeline)
 | Function | Address | Size |
 |---|---|---|
-| blit_dispatch | 0304:000C | 90 |
-| draw_items | 0304:0187 | 154 |
-| rom_check | 0304:05C0 | 43 |
+| present_rect | 0304:000C | 90 |
+| copy_dirty_actor_rects | 0304:0187 | 154 |
+| detect_tandy_signature | 0304:05C0 | 43 |
 
 ## Library identification
 `tools/libmatch.py /opt/tc20/LIB -m l --csv ...` does a relocation-masked search of every code segment of `C0L.OBJ`, `CL.LIB`, `MATHL.LIB`, `EMU.LIB`, `FP87.LIB`, `GRAPHICS.LIB`. Results are merged into `config/retail/symbols.csv` with `status=lib`; `functions.csv` has `kind` = `lib` / `asm?` / `c`.
@@ -53,10 +54,10 @@ is a full-layout TLINK rebuild compared with `cmp`.
 - TC quirks: first local = lowest address; `a=b=0` stores b first; -O reorders if/else and tail-merges; branch polarity follows source (`if (x != 3) {...} else` vs `if (x == 3)`).
 
 ## Batch-2 findings
-- **Gotos are real.** `run_script` (0304:11AA, a 48-opcode actor script VM) only matched once shared tails were written as `goto` to labels in the earlier case. Plain duplicate code made TC's cross-jump merge keep the *later* copy, the opposite of the original. For a jump whose target is a jump, write `if (a != b) goto back; else goto inc;`. TC canonicalises `if (x) A; else goto L;`, so swapping the condition alone does not change the branch polarity.
+- **Gotos are real.** `step_actor_script` (0304:11AA, a 48-opcode actor script VM) only matched once shared tails were written as `goto` to labels in the earlier case. Plain duplicate code made TC's cross-jump merge keep the *later* copy, the opposite of the original. For a jump whose target is a jump, write `if (a != b) goto back; else goto inc;`. TC canonicalises `if (x) A; else goto L;`, so swapping the condition alone does not change the branch polarity.
 - **Branch polarity follows source.** `if (g != 3) {...} else ...` vs `if (g == 3)` decides layout. Early `return` without `else` avoids an extra `jmp`.
 - **unsigned vs int and chained assignment.** `x = y = reg` stores through `ax`; separate statements store the register directly. `print_wrapped` needed the odd but byte-exact `idx = wlen = wlen;`, which permute.py found.
-- `draw_frame` was never a codegen puzzle: case 0 passes `1` (`b8 01 00`). Read the raw bytes before theorising.
+- `draw_actor_frame` was never a codegen puzzle: case 0 passes `1` (`b8 01 00`). Read the raw bytes before theorising.
 - `-G`: resolved in batch 3, not used.
 
 ## Language classification (batch 3)
@@ -73,11 +74,11 @@ per function in `config/retail/functions.csv` (`lang`, `evidence`):
 
 ## Assembly modules
 Sources are NASM `-f obj` (relocatable OMF), so they link with TLINK:
-- `seg0000_01c9/0217/08b9/277e/2a15.asm`: 5 graphics modules in `_TEXT`. The relocation table shows they are 5
+- `graphics_bios/0217/08b9/277e/2a15.asm`: 5 graphics modules in `_TEXT`. The relocation table shows they are 5
   separate objects interleaved with the C modules in link order. They share the far data segment `GFX_DATA`
   (class DATA, word aligned, frame 0B7F because it starts at 0B7F:000E right after `_CRTSEG`).
-- `seg0512.asm`: `SND_TEXT`, timer and music; starts at 0512:0001, right after `shutdown()`'s `retf`.
-- `seg056a.asm`: `KBD_TEXT`, the keyboard ISR, plus its 8-byte `KBD_DATA` (frame 0CCD).
+- `sound.asm`: `SND_TEXT`, timer and music; starts at 0512:0001, right after `shutdown()`'s `retf`.
+- `keyboard.asm`: `KBD_TEXT`, the keyboard ISR, plus its 8-byte `KBD_DATA` (frame 0CCD).
 - Segment values are symbolic (`mov ax, GFX_DATA`, `dw KBD_DATA`, `call (seg L01A9):L01A9`). `verify.py` compares each
   module's code segment with fixup bytes masked. `tasm.inc` provides `rr op, dst, src` for TASM's `reg, r/m` encodings.
   Six instructions remain as `db`, with the mnemonic in a comment.
@@ -89,12 +90,12 @@ How the pieces were recovered:
 - **Link order from the relocation table.** TLINK writes relocations object by object in link order. Within an
   object they follow its FIXUPP records: TC writes them in descending order per LEDATA record, TASM in ascending order. So the order in which
   each module's relocations first appear gives `config/retail/link.txt`.
-- **Segment names matter.** TCC names the code segment after the file. `seg06e3/harderr.c` produces `HARDERR_TEXT`, which
+- **Segment names matter.** TCC names the code segment after the file. `src/engine/harderr.c` produces `HARDERR_TEXT`, which
   CL.LIB's `HARDERR` module joins: that is why the library's `harderr()` sits at 06E3:0024 inside the game code.
-  `build.sh` now compiles 8.3-safe files under their own name. `main()` and `m04fc.c` were one file (one segment).
+  `build.sh` stages each C unit under its stable 8.3 `compiler_stem` from `config/retail/modules.csv`. These are reconstruction build names, not claimed recovered historical filenames. `main()` and its initialization/shutdown helpers remain one translation unit (04FC).
 - **Data.** The C modules' `_DATA` is word aligned, even when empty. 06F0's data (DGROUP 1ECE-2193: error-box variables,
   the far-pointer table of disk error messages, the `show_error`/`error_msg` hooks, then TC's literal pool) is now
-  real C initialisers in `m06f0.c`. TC emitted those relocations before the code ones, exactly as in the original.
+  real C initialisers in `src/engine/files.c`. TC emitted those relocations before the code ones, exactly as in the original.
   seg0612's two string literals were already C. Since batch 4 every other data byte is in source too (next section).
 - **Bugs the fixup-masked matcher could not see**, all found by the whole-EXE compare: `Write_File` called `read`
   instead of `write`; `free_resident` called `free` instead of `farfree`; `main` calls `atol`, not `atoi`.
@@ -109,26 +110,26 @@ C0L.OBJ and CL.LIB from the toolchain); the original EXE is read only for the fi
   code relocations, and the record cuts depend on where the module's data starts.
 - **0304 is three units.** DGROUP 0094-1AA9 has relocations 127-308 *after* seg0304's code relocations (7-126), in
   runs 1264-145C / 16D2-184C / 185E-195A. That is impossible for one TC module, but exact for three:
-  `m0304.c` owns 0094-0209 (detect_video's messages, palette maps, the disk prompt; no pointers), `src/data/scripts.c`
-  owns 020A-145D (actor scripts for `run_script` plus the five script-pointer tables; records cut at 060A, 0A0A, 0E0A,
+  `src/game.c` owns 0094-0209 (detect_video's messages, palette maps, the disk prompt; no pointers), `src/data/scripts.c`
+  owns 020A-145D (actor scripts for `step_actor_script` plus the five script-pointer tables; records cut at 060A, 0A0A, 0E0A,
   120A, so all 127 pointers share one record), and `src/data/tables.c` owns 145E-1AA9 (sprite tables, `g_cmpFiles`,
   and TC's literal pool of `.CMP` names at 196A; cuts at 185C, so runs of 40 and 15). Both are data-only C files
   linked right after M0304. Their file names are ours.
-- **1AAA-1EA1**: `m04fc.c` (`g_1AAA` text windows, `g_biosVideoMode`), `sound.c` (the 25 tunes and `g_tunes`, whose
-  25 relocations sit between seg0512's and sound.c's code ones, as TC data-before-code predicts), `m05d5.c` (1E86),
-  `m05ed.c` (1E88-1EA1). Symbols that pointed inside these objects are now member expressions
+- **1AAA-1EA1**: `src/main.c` (`g_1AAA` text windows, `g_biosVideoMode`), `src/audio/music.c` (the 25 tunes and `g_tunes`, whose
+  25 relocations sit between the sound driver's and music.c's code ones, as TC data-before-code predicts), `src/engine/text.c` (1E86),
+  `src/engine/lines.c` (1E88-1EA1). Symbols that pointed inside these objects are now member expressions
   (`g_1ABA` = `g_1AAA[1].a`, `g_1E32` = `g_tunes[4]`).
-- **`GFX_DATA`** (frame 0B7F, 0E-14DF) is `db` in the asm modules that address it: seg0000_0217 0E-25,
-  seg0000_08b9 26-14B5, seg0000_2a15 14B6-14DF (split by which module touches which offsets; the 14B6 cut is anywhere
+- **`GFX_DATA`** (frame 0B7F, 0E-14DF) is `db` in the asm modules that address it: graphics_rect 0E-25,
+  graphics_core 26-14B5, graphics_mode3 14B6-14DF (split by which module touches which offsets; the 14B6 cut is anywhere
   in 14B6-14BC). Offsets used from C are publics (`_gfx_clip_x1`, ...).
-- **`_BSS`** is real tentative definitions with sizes: m0304 3868-3AE3, m05d5 3AE4, m061f 3AE6-3AEF, music.c 3AF0-3B4D,
-  m06f0 3B4E-3B6D (each owner references a variable in its range; the split keeps the link order monotonic). Gaps nobody
+- **`_BSS`** is real tentative definitions with sizes: `game.c` 3868-3AE3, `engine/text.c` 3AE4,
+  `engine/calibrat.c` 3AE6-3AEF, `engine/drive.c` 3AF0-3B4D, `engine/files.c` 3B4E-3B6D (each owner references a variable in its range; the split keeps the link order monotonic). Gaps nobody
   references are `char g_XXXX[n]`. Overlapping placeholders were really array elements: `g_3874` = `g_386A[5]`,
   `g_3884` = `g_387A[5]`, `g_392A` = `g_391C[7]`, `g_3AAC` = `g_3A9E[7]`.
 - **TC's BSS order is its hash-table order.** TC allocates tentative definitions at the end of the module by walking
   its symbol hash table: buckets in hash order, and within a bucket in order of first declaration. It is not the
   definition order. Names that share their first and last character and their length land in one bucket. So
-  `donald.h` maps every BSS name to a link name `g_XXXX_` (`g_videoMode` -> `g_3B4E_`) and declares them all first, in
+  `bss.h` (included first by `donald.h`) maps every BSS name to a link name `g_XXXX_` (`g_videoMode` -> `g_3B4E_`) and declares them all first, in
   address order. The original names hashed into this order. Ours are placeholders that reproduce it.
 
 ## Full-layout splice
@@ -141,7 +142,7 @@ while editing). The relink above supersedes it as the proof.
 - `main()` does not parse the command line. It calls `snd_set_option(-1)` without an argument and `snd_set_option(60)`
   with one, then always calls `detect_video()`. Because `atol` is no longer referenced, CL.LIB's ATOL module drops out.
 - `shutdown()` returns to `main()` instead of calling `exit(g_videoMode)`.
-- These changes make M04FC 74 bytes shorter. The hand-written drivers seg0512/seg056a then start 8 bytes further into
+- These changes make M04FC 74 bytes shorter. The hand-written drivers sound/keyboard then start 8 bytes further into
   their paragraph (0512 at offset 9, 056A at offset 8), and their TASM-style hard-coded `cs:` offsets move with them.
   They are written as label differences plus the correct module paragraph bias (`SND_OFFSET` / `KBD_CSO`), producing the original literals without extra offset fixups.
 Originally only units mentioning `DONALD_ALT` were rebuilt. The standalone build now compiles and assembles every unit separately for each variant (`build/alt/obj`, `build/alt/asm`), avoiding fallback to stale retail objects.
@@ -163,7 +164,7 @@ messages and file names, and those name the message globals (`msg_*`, `msg_err_*
 - CGA/Tandy colour maps (`g_palettes[]`) are `pal_<first picture that uses it>`. Tunes are `tune_NN` by `g_tunes` index.
 - `struct window` is now `{x, y, w, h, fg, bg, col, row}`: set_window swaps the last four with
   `g_win.fg/g_win.bg/g_win.col/g_win.row`.
-- New asm names: `copy_rect` (0000:0342) with its helpers `copy_rect_core`/`copy_rect_ega_latch`, and in seg0512
+- New asm names: `copy_rect` (0000:0342) with its helpers `copy_rect_core`/`copy_rect_ega_latch`, and in sound
   `ctrlc_install/remove` (int 23h) and `kbbreak_install/remove` (int 9). Internal helpers now have complete catalog entries: `take_nibble`,
   `merge_mirrored_tandy_edge`, `merge_mirrored_cga_edge`, `expand_bits4`. The latter names replace the
   earlier `smc_merge_*` labels. `GFX.video_mode` names GFX_DATA:0286. Shared-body ranges and inline data

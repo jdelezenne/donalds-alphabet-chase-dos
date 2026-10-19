@@ -2,11 +2,15 @@
 
 
 /* Module data: DGROUP 1AAA-1ADF (text windows for set_window; BIOS video mode per g_videoMode). */
-struct window g_windows[] = {{0, 0, 40, 25, 15, 0, 0, 0}, {0, 8, 30, 10, 15, 0, 0, 0}, {5, 10, 30, 4, 15, 0, 0, 0}};
+struct window g_windows[] = {
+    {0, 0, 40, 25, 15, 0, 0, 0},
+    {0, 8, 30, 10, 15, 0, 0, 0},
+    {5, 10, 30, 4, 15, 0, 0, 0}
+};
 int g_biosVideoMode[] = {4, 9, 13};
 
 /* FUNCTION: DONALD 04FC:0009 */
-main(int argc, char far **argv)
+int main(int argc, char far **argv)
 {
 #ifdef DONALD_ALT
     /* alternate build (game/DONALD): no command-line parameters, video always auto-detected */
@@ -15,7 +19,7 @@ main(int argc, char far **argv)
     else
         snd_set_option(60);
     g_errWindow = 1;
-    g_errShowHook = about;
+    g_errShowHook = prompt_insert_game_disk;
     g_preload = 1;
     kbd_install();
     detect_video();
@@ -29,7 +33,7 @@ main(int argc, char far **argv)
             set_video_type(g_videoMode = (int)atol(argv[2]));
     }
     g_errWindow = 1;
-    g_errShowHook = about;
+    g_errShowHook = prompt_insert_game_disk;
     g_preload = 1;
     kbd_install();
     if (g_videoMode == -1)
@@ -43,7 +47,7 @@ main(int argc, char far **argv)
     if (g_videoMode == VM_TANDY)
         g_memReserve += 0x10;
     init_game();
-    game();
+    run_game();
     free_resident();
     shutdown();
 }

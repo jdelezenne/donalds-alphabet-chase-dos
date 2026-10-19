@@ -34,7 +34,7 @@ ALIAS = re.compile(r"^\s*(" + IDENT + r")\s+equ\s+(" + IDENT + r")\s*$", re.I)
 EQU = re.compile(r"^\s*" + IDENT + r"\s+equ\b", re.I)
 DATA = re.compile(r"^(?:times\s+.+?\s+)?(db|dw|dd|dq|dt|do|dy|dz|resb|resw|resd|resq|rest|reso|resy|resz|incbin)\b", re.I)
 LINE = re.compile(r"^%line\s+(\d+)\+(\d+)\s+(.+)$")
-GFX_BASES = {"seg0000_0217": 0x000e, "seg0000_08b9": 0x0026, "seg0000_2a15": 0x14b6}
+GFX_BASES = {"graphics_rect": 0x000e, "graphics_core": 0x0026, "graphics_mode3": 0x14b6}
 
 
 def uncomment(line):
