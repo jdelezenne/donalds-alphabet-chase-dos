@@ -232,10 +232,10 @@ void draw_frame(int mode, register int i, register int x, int y)
         draw_sprite(p, g_sprites[i], x, y, 1);
         break;
     case 2:
-        draw_sprite_masked(p, g_sprites[i], x, y, 1);
+        draw_sprite_mirrored(p, g_sprites[i], x, y, 1);
         break;
     case 3:
-        draw_sprite_masked(g_videoMem, g_sprites[i], x, y, 1);
+        draw_sprite_mirrored(g_videoMem, g_sprites[i], x, y, 1);
         break;
     }
 }
@@ -432,7 +432,7 @@ void show_picture(register int n)
         if (c) {
             g_videoMode = VM_CGA;
             set_video_type(0);
-            clear_buffer(g_backBuf, 0);
+            convert_cga_pixels_and_masks(g_backBuf, 0);
         }
     } else {
         if (g_videoMode == VM_CGA)

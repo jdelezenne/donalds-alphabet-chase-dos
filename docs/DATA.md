@@ -9,7 +9,7 @@ both relinks stay IDENTICAL and verify.py reports 73/73. Turbo C 2.0 large model
   contiguous.
 
 Declarations: `src/include/donald.h` (types, constants, structs, data) and `src/include/proto.h` (prototypes of all
-72 C functions and all asm publics). Asm offsets: `src/asm/tasm.inc`.
+73 C functions and all asm publics). Asm layouts and offsets: `src/asm/tasm.inc` and `src/asm/gfx_data.inc`. Every assembly-owned storage object is catalogued in `config/retail/asm_data.csv`; see [ASM_DATA.md](ASM_DATA.md) for boundary evidence and original aliasing quirks.
 
 ## Recovered
 

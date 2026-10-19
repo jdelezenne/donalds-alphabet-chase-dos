@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-"""Build config/retail/functions.csv: function starts = far-call targets (9A with relocation) + near calls
+"""Discover function candidates: far-call targets (9A with relocation) + near calls
 preceded by PUSH CS + `push bp; mov bp,sp` prologues. size = distance to next start (or DGROUP).
 kind: lib (libmatch spans in symbols.csv), asm (segment 0000 after C0L, segments 0512/056A, or self-loading
 DS prologue), c (size trimmed to the last RET, so trailing data is not counted). Annotated starts are included;
-sizes never cross the next segment base.
-Usage: funcs.py [--write]"""
+sizes never cross the next segment base. This heuristic is NOT an authoritative assembly boundary finder:
+embedded data, interrupt handlers and overlapping near helpers require the reviewed asm_functions.csv.
+Existing reviewed C/library records and all their metadata are preserved when writing; new heuristic
+candidates are reported but never promoted into the reviewed catalog. Assembly entries come exclusively
+from that catalog, rather than the heuristic's next-entry spans.
+Usage: funcs.py [--write] [--exe path/to/reference.exe]"""
 import csv, struct, sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-d = (ROOT / "game/DONALD.EXE").read_bytes()
+reference = Path(sys.argv[sys.argv.index("--exe") + 1]) if "--exe" in sys.argv else ROOT / "game/DONALD.EXE"
+d = reference.read_bytes()
 f = struct.unpack_from("<14H", d); hdr = f[4] * 16; img = d[hdr:]
 rel = struct.unpack_from(f"<{2*f[3]}H", d, f[12]); relocs = {rel[i + 1] * 16 + rel[i] for i in range(0, len(rel), 2)}
 dgroup = struct.unpack_from("<H", img, 1)[0]; end = dgroup * 16
@@ -59,10 +64,22 @@ for i, p in enumerate(ks):
         # C size excludes trailing data/padding: cut after the last RET/RETF in the span
         body = img[p:p + n]; r = max(body.rfind(b"\xcb"), body.rfind(b"\xc3"))
         if r >= 0: n = r + 1
-    rows.append(dict(addr=f"{s:04X}:{o:04X}", linear=f"{p:05X}", size=n, kind=kind))
+    rows.append(dict(addr=f"{s:04X}:{o:04X}", linear=f"{p:05X}", size=n, kind=kind,
+                     lang=kind, evidence="Heuristic candidate; needs source/boundary review"))
+# Do not erase recovered types/evidence or re-absorb data/helper bodies into a public function.
+reviewed = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
+byaddr = {r["addr"]: r for r in reviewed if r["kind"] != "asm"}
+candidates = [r for r in rows if r["kind"] != "asm" and r["addr"] not in byaddr]
+for r in csv.DictReader(open(ROOT / "config/retail/asm_functions.csv")):
+    p = int(r["addr"][:4], 16) * 16 + int(r["addr"][5:], 16)
+    byaddr[r["addr"]] = dict(addr=r["addr"], linear=f"{p:05X}", size=r["size"], kind="asm", lang="asm",
+                             evidence=f"{r['role']}: {r['evidence']}")
+rows = sorted(byaddr.values(), key=lambda r: int(r["linear"], 16))
 if "--write" in sys.argv:
-    w = csv.DictWriter(open(ROOT / "config/retail/functions.csv", "w"), fieldnames=["addr", "linear", "size", "kind"]); w.writeheader(); w.writerows(rows)
+    w = csv.DictWriter(open(ROOT / "config/retail/functions.csv", "w"), fieldnames=["addr", "linear", "size", "kind", "lang", "evidence"], lineterminator="\n"); w.writeheader(); w.writerows(rows)
 import collections
 c = collections.Counter(r["kind"] for r in rows); b = collections.Counter()
-for r in rows: b[r["kind"]] += r["size"]
-print(dict(c), dict(b))
+for r in rows: b[r["kind"]] += int(r["size"])
+print("records:", dict(c), "listed body bytes (overlapping helpers are not additive coverage):", dict(b))
+if candidates:
+    print(f"Unreviewed non-ASM candidates: {len(candidates)} (not written):", " ".join(r["addr"] for r in candidates))

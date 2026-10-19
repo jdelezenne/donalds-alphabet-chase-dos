@@ -11,7 +11,7 @@ This mode does not compile, assemble, compare bytes, or update recorded match re
 This is a fixup-masked comparison, not a replacement for a whole-executable relink comparison."""
 import csv, re, subprocess, sys, struct
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent)); import omf
+sys.path.insert(0, str(Path(__file__).parent)); import omf, asm_inventory
 ROOT = Path(__file__).resolve().parents[1]
 if "-h" in sys.argv or "--help" in sys.argv: print(__doc__); sys.exit(0)
 args = [a for a in sys.argv[1:] if not a.startswith("-")]
@@ -67,12 +67,15 @@ if {a.stem for a in asm_sources} != linked_asm:
 for asm_src in asm_sources:
     if not re.search(r"SEGMENT:\s*DONALD\s+[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}", asm_src.read_text()):
         errors.append(f"{asm_src}: missing SEGMENT annotation")
+inventory = asm_inventory.Inventory(ROOT)
+errors.extend(inventory.check_sources())
 if not expected or not srcs or not linked_asm: errors.append("empty source or function manifest")
 if errors: sys.exit("source coverage check failed:\n" + "\n".join(errors))
 if "--sources-only" in sys.argv:
     data_units = sum(not want for want in selected.values())
     print(f"{'Full' if full else 'Subset'} source coverage OK: {len(seen_addr)} annotated C functions, "
-          f"{len(srcs)} C units ({data_units} data-only), {len(asm_sources)} linked assembly modules. "
+          f"{len(srcs)} C units ({data_units} data-only), {len(asm_sources)} linked assembly modules, "
+          f"{len(inventory.functions)} ASM function entries and {len(inventory.data)} named ASM data objects. "
           "No build or byte comparison performed.")
     sys.exit(0)
 if "-n" not in sys.argv and "--no-build" not in sys.argv:
@@ -136,7 +139,7 @@ for n, (a, size, pct, st, src) in res.items():
     r.update(name=n, addr=a, size=str(size), status=st, notes=f"{pct:.1f}% {src.relative_to(ROOT)}{extra}")
     byaddr[a] = r
 rows = sorted(byaddr.values(), key=lambda r: int(r["addr"][:4], 16) * 16 + int(r["addr"][5:], 16))
-w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"]); w.writeheader(); w.writerows(rows)
+w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"], lineterminator="\n"); w.writeheader(); w.writerows(rows)
 for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
     if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st} {details.get(n, '')}".rstrip())
 # assembly modules: src/asm/*.asm (NASM -f obj, `; SEGMENT: DONALD SSSS AAAA-BBBB` header). The module's first CODE
@@ -162,6 +165,7 @@ for a in asm_sources:
         asm_bad.append(a.name)
         k = next((i for i in range(min(len(got), len(want))) if got[i] != want[i]), min(len(got), len(want)))
         print(f"{a.name}: MISMATCH at {sg:04X}:{s0 + k:04X} (got {len(got)} bytes, want {len(want)}) {r.stderr.strip()}")
+errors.extend(inventory.check_objects(ROOT / "build/asm"))
 ctot = sum(expected[a] for a in seen_addr)
 code_end = struct.unpack_from("<H", img, 1)[0] * 16       # DGROUP start = end of code
 matched = {v[0] for v in res.values() if v[3] == "matched"}

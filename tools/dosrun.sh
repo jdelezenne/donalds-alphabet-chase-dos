@@ -31,8 +31,11 @@ trap 'rm -f "$BAT"' EXIT
 } | sed 's/$/\r/' > "$BAT"
 rm -f "$WORK/_OUT.TXT" "$WORK/_DONE.TXT" "$WORK/_FAIL.TXT"
 rc=0
-SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout "${DOS_TIMEOUT:-300}" "$DOSBOX" -silent -nogui -nomenu -fastlaunch \
-  -set "cpu cycles=max" -set "dos ver=3.3" -set "dosbox memsize=16" \
+# Adaptive cycles=max can throttle almost to a halt with SDL's headless driver.
+# A fixed budget keeps compiler runs deterministic and quick on headless hosts.
+# Retain the normal CPU core for portability; only its cycle budget is changed.
+SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout --kill-after=5 "${DOS_TIMEOUT:-300}" "$DOSBOX" -silent -nogui -nomenu -fastlaunch \
+  -set "cpu core=normal" -set "cpu cycles=${DOS_CYCLES:-fixed 100000}" -set "dos ver=3.3" -set "dosbox memsize=16" \
   -c "mount c \"$TC\"" -c "mount d \"$WORK\"" -c "d:" -c "call _RUN.BAT" -c "exit" >"$WORK/_EMU.LOG" 2>&1 || rc=$?
 if [ -f "$WORK/_OUT.TXT" ]; then tr -d '\r' < "$WORK/_OUT.TXT"; fi
 if [ "$rc" -ne 0 ]; then

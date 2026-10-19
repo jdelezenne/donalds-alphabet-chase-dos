@@ -42,8 +42,7 @@
 %endif
 %endmacro
 
-; GFX_DATA variables shared by the graphics modules (offsets in frame 0B7F)
-%define GV_MODE 0x286   ; video type 0 CGA, 1 Tandy, 2 EGA (written by set_video_type)
+; Graphics layout lives in gfx_data.inc; only graphics modules include it.
 
 ; Structures the asm reads (offsets only: NASM struc emits no bytes). C side: donald.h.
 struc SPRITE                ; header written by grab()/grab_vga(), read byte by byte by sprite_put_*/sprite_mask_*
