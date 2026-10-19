@@ -31,7 +31,7 @@ int jump_minor;
 int g_keysEnabled;
 char far *g_packBuf;
 int jump_steps;
-char far *slot_pc[8];
+script_t far *slot_pc[8];
 int g_letterPicked;
 int jump_err;
 int g_idleTicks;
@@ -51,8 +51,7 @@ int g_letterScore[26];
 int g_jumping;
 
 /* FUNCTION: DONALD 0304:000C */
-
-void blit_dispatch(char far *src, register int x, register int y, int w, int h)
+void present_rect(char far *src, register int x, register int y, int w, int h)
 {
     if (g_videoMode != VM_EGA)
         blit_generic(x, y, w, h >> 3, src);
@@ -61,7 +60,7 @@ void blit_dispatch(char far *src, register int x, register int y, int w, int h)
 }
 
 /* FUNCTION: DONALD 0304:0066 */
-void check_collisions(void)
+void propagate_dirty_overlap(void)
 {
     register int i;
     register int j;
@@ -93,8 +92,7 @@ void check_collisions(void)
 }
 
 /* FUNCTION: DONALD 0304:0187 */
-
-void draw_items(int mode)
+void copy_dirty_actor_rects(int mode)
 {
     register int i;
     register int grow;
@@ -110,12 +108,12 @@ void draw_items(int mode)
             grow = 4;
         }
         if (slot_shown[i] != -1)
-            draw_item(mode, (slot_x[i] >> 3) - padX, slot_y[i] - padY, slot_w[i] + grow, (slot_h[i] + grow) << 3);
+            copy_page_rect(mode, (slot_x[i] >> 3) - padX, slot_y[i] - padY, slot_w[i] + grow, (slot_h[i] + grow) << 3);
     }
 }
 
 /* FUNCTION: DONALD 0304:0221 */
-void draw_item(int mode, register int x, register int y, int w, int h)
+void copy_page_rect(int mode, register int x, register int y, int w, int h)
 {
     char far *src;
     char far *dst;
@@ -133,54 +131,54 @@ void draw_item(int mode, register int x, register int y, int w, int h)
     if (h <= 0)
         return;
     switch (mode) {
-    case 0:
+    case PAGE_SCREEN_TO_BACK:
         src = (char far *)0xA0000000L;
         dst = (char far *)0xA8000000L;
         break;
-    case 1:
+    case PAGE_BACK_TO_SCREEN:
         src = (char far *)0xA8000000L;
         dst = (char far *)0xA0000000L;
         break;
-    case 2:
+    case PAGE_BACK_TO_WORK:
         src = (char far *)0xA8000000L;
         dst = (char far *)0xA4000000L;
         break;
-    case 3:
+    case PAGE_WORK_TO_BACK:
         src = (char far *)0xA4000000L;
         dst = (char far *)0xA8000000L;
         break;
-    case 4:
+    case PAGE_SCREEN_TO_WORK:
         src = (char far *)0xA0000000L;
         dst = (char far *)0xA4000000L;
         break;
-    case 5:
+    case PAGE_WORK_TO_SCREEN:
         src = (char far *)0xA4000000L;
         dst = (char far *)0xA0000000L;
         break;
     }
     if (g_videoMode != VM_EGA) {
         switch (mode) {
-        case 0:
+        case PAGE_SCREEN_TO_BACK:
             src = g_videoMem;
             dst = g_backBuf;
             break;
-        case 1:
+        case PAGE_BACK_TO_SCREEN:
             src = g_backBuf;
             dst = g_videoMem;
             break;
-        case 2:
+        case PAGE_BACK_TO_WORK:
             src = g_backBuf;
             dst = g_workBuf;
             break;
-        case 3:
+        case PAGE_WORK_TO_BACK:
             src = g_workBuf;
             dst = g_backBuf;
             break;
-        case 4:
+        case PAGE_SCREEN_TO_WORK:
             src = g_videoMem;
             dst = g_workBuf;
             break;
-        case 5:
+        case PAGE_WORK_TO_SCREEN:
             src = g_workBuf;
             dst = g_videoMem;
             break;
@@ -190,7 +188,7 @@ void draw_item(int mode, register int x, register int y, int w, int h)
 }
 
 /* FUNCTION: DONALD 0304:0383 */
-void step(register int i)
+void step_jump_path(register int i)
 {
     if (jump_x_major) {
         if (jump_right)
@@ -213,7 +211,7 @@ void step(register int i)
 }
 
 /* FUNCTION: DONALD 0304:03FC */
-void draw_frame(int mode, register int i, register int x, int y)
+void draw_actor_frame(int mode, register int i, register int x, int y)
 {
     char far *p;
 
@@ -225,16 +223,16 @@ void draw_frame(int mode, register int i, register int x, int y)
     g_windows[1].y = 0;
     g_windows[1].h = 25;
     switch (mode) {
-    case 0:
+    case DRAW_SCREEN:
         draw_sprite(g_videoMem, g_sprites[i], x, y, 1);
         break;
-    case 1:
+    case DRAW_BACK:
         draw_sprite(p, g_sprites[i], x, y, 1);
         break;
-    case 2:
+    case DRAW_BACK_MIRRORED:
         draw_sprite_mirrored(p, g_sprites[i], x, y, 1);
         break;
-    case 3:
+    case DRAW_SCREEN_MIRRORED:
         draw_sprite_mirrored(g_videoMem, g_sprites[i], x, y, 1);
         break;
     }
@@ -268,7 +266,7 @@ void next_level(void)
 }
 
 /* FUNCTION: DONALD 0304:05C0 */
-int rom_check(void)
+int detect_tandy_signature(void)
 {
     register int r = 0;
     char c = 0;
@@ -291,7 +289,7 @@ void detect_video(void)
         dos_putc(str_cr);
     }
     i = 0;
-    if (rom_check()) {
+    if (detect_tandy_signature()) {
         g_videoMode = VM_TANDY;
         while (msg_tandy[i])
             dos_putc(msg_tandy[i++]);
@@ -332,7 +330,7 @@ void detect_video(void)
 }
 
 /* FUNCTION: DONALD 0304:0737 */
-int level_sum(void)
+int completed_group_score(void)
 {
     register int sum = 0;
     register int i;
@@ -345,7 +343,7 @@ int level_sum(void)
 }
 
 /* FUNCTION: DONALD 0304:0776 */
-void aim(int i)
+void initialize_jump_path(int i)
 {
     register int d;
     register int target;
@@ -388,17 +386,17 @@ void reset_actors(void)
         slot_timer[i] = slot_delay[i] = 10;
         slot_frame[i] = -1;
     }
-    slot_w[7] = slot_h[7] = 8;
-    slot_pc[7] = g_scriptTable[SCR_DONALD];
-    slot_pc[5] = g_scriptTable[SCR_BUBBLE];
-    slot_x[5] = 0x128;
-    slot_y[5] = slot_frame[5] = 0;
-    slot_timer[5] = slot_delay[5] = 20;
+    slot_w[SLOT_DONALD] = slot_h[SLOT_DONALD] = 8;
+    slot_pc[SLOT_DONALD] = g_scriptTable[SCR_DONALD];
+    slot_pc[SLOT_BUBBLE] = g_scriptTable[SCR_BUBBLE];
+    slot_x[SLOT_BUBBLE] = 0x128;
+    slot_y[SLOT_BUBBLE] = slot_frame[SLOT_BUBBLE] = 0;
+    slot_timer[SLOT_BUBBLE] = slot_delay[SLOT_BUBBLE] = 20;
     init_slots();
 }
 
 /* FUNCTION: DONALD 0304:08B1 */
-void setup_level(int lv)
+void prepare_letter_selection(int lv)
 {
     char i;
 
@@ -408,10 +406,10 @@ void setup_level(int lv)
         slot_pc[i] = g_scriptTable[SCR_PICK_LETTER];
         slot_h[i] = 3;
     }
-    slot_h[5] = 3;
-    slot_h[6] = 3;
+    slot_h[SLOT_BUBBLE] = 3;
+    slot_h[SLOT_HELPER] = 3;
     pick_frame1 = pick_frame2 = letter_frame[lv];
-    slot_pc[6] = g_scriptTable[SCR_PICK_HELPER];
+    slot_pc[SLOT_HELPER] = g_scriptTable[SCR_PICK_HELPER];
     init_slots();
 }
 
@@ -471,14 +469,14 @@ void load_level_gfx(void)
     if (g_videoMode)
         ega_select_palette(0);
     set_palette(pal_level);
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
-    draw_item(0, 0, 0, 40, 200);
-    draw_item(4, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
+    copy_page_rect(PAGE_SCREEN_TO_BACK, 0, 0, 40, 200);
+    copy_page_rect(PAGE_SCREEN_TO_WORK, 0, 0, 40, 200);
     g_idleTicks = 0;
 }
 
 /* FUNCTION: DONALD 0304:0C0D */
-void game(void)
+void run_game(void)
 {
     int now;
     int last;
@@ -493,10 +491,10 @@ void game(void)
         ega_select_palette(1);
     kbd_flush();
     show_picture(26);
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     play_sound(24);
     for (i = 0; i < 1000; i++) {
-        repeat_call(1);
+        wait_frame_intervals(1);
         if (key_ready()) {
             get_key();
             break;
@@ -529,12 +527,12 @@ void game(void)
         reset_actors();
         last = now = timer_ticks();
         for (i = 0; i < 8; i++)
-            draw_item(4, (slot_x[i] >> 3) - 1, slot_y[i] - 8, slot_w[i] + 2, (slot_h[i] + 2) << 3);
+            copy_page_rect(PAGE_SCREEN_TO_WORK, (slot_x[i] >> 3) - 1, slot_y[i] - 8, slot_w[i] + 2, (slot_h[i] + 2) << 3);
         for (;;) {
             g_idleTicks++;
-            draw_items(3);
+            copy_dirty_actor_rects(PAGE_WORK_TO_BACK);
             for (i = 0; i < 8; i++) {
-                slot_shown[i] = run_script(i);
+                slot_shown[i] = step_actor_script(i);
                 if (slot_shown[i] != -1)
                     slot_frame[i] = slot_shown[i];
             }
@@ -544,16 +542,16 @@ void game(void)
                     break;
                 }
             if (!i) {
-                check_collisions();
-                draw_items(2);
+                propagate_dirty_overlap();
+                copy_dirty_actor_rects(PAGE_BACK_TO_WORK);
                 for (i = 0; i < 8; i++)
                     if (slot_shown[i] != -1 && slot_shown[i] != 0) {
                         if (slot_flag[i] == 0)
-                            draw_frame(1, slot_frame[i], slot_x[i], slot_y[i]);
+                            draw_actor_frame(DRAW_BACK, slot_frame[i], slot_x[i], slot_y[i]);
                         else
-                            draw_frame(2, slot_frame[i], slot_x[i], slot_y[i]);
+                            draw_actor_frame(DRAW_BACK_MIRRORED, slot_frame[i], slot_x[i], slot_y[i]);
                     }
-                draw_items(1);
+                copy_dirty_actor_rects(PAGE_BACK_TO_SCREEN);
             }
             do {
                 now = timer_ticks();
@@ -603,7 +601,7 @@ int handle_key(void)
             key = 0;
     }
     if (key && key != KEY_ESC && !g_letterPicked && key != KEY_SOUND) {
-        r = level_sum();
+        r = completed_group_score();
         if (r)
             goto done;
         key -= 'A';
@@ -618,13 +616,13 @@ int handle_key(void)
             load_level_gfx();
             reset_actors();
         } else if (key != g_curLetter)
-            setup_level(key);
+            prepare_letter_selection(key);
         else
             play_sound(0);
         g_curLetter = g_pickedLetter = key;
         g_letterPicked = 1;
         g_letterDone[g_pickedLetter] = 1;
-        slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+        slot_pc[SLOT_BUBBLE] = g_scriptTable[SCR_BUBBLE];
         bubble_arg2 = 0;
         bubble_arg1 = 3;
         bubble_frame = (key - g_groupFirst[g_group]) * 4 + 1;
@@ -643,7 +641,7 @@ done:
 }
 
 /* FUNCTION: DONALD 0304:11AA */
-int run_script(register int i)
+int step_actor_script(register int i)
 {
     int r;
     int cont;
@@ -696,7 +694,7 @@ int run_script(register int i)
             slot_delay[i] = slot_timer[i] = *slot_pc[i]++;
             break;
         case OP_NEXT:
-            if ((t = level_sum()) != 0) {
+            if ((t = completed_group_score()) != 0) {
                 slot_pc[i] = g_scriptTable[SCR_LEVEL_DONE];
                 break;
             }
@@ -707,11 +705,11 @@ int run_script(register int i)
                     break;
                 }
                 do
-                    j = roll(1, group_letter_count[g_group], group_roll_base[g_group]);
+                    j = roll_bounded_random_sum(1, group_letter_count[g_group], group_roll_base[g_group]);
                 while (g_letterScore[j]);
                 slot_pc[j - g_groupFirst[g_group]] = g_scriptTable[j];
                 g_curLetter = j;
-                slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+                slot_pc[SLOT_BUBBLE] = g_scriptTable[SCR_BUBBLE];
                 bubble_arg1 = 3;
                 bubble_arg2 = 0;
                 bubble_frame = ((j - g_groupFirst[g_group]) << 2) + 1;
@@ -724,7 +722,7 @@ int run_script(register int i)
                 break;
             }
         case OP_WAIT_DONALD_X:
-            if (slot_x[7] >> 3 == *slot_pc[i])
+            if (slot_x[SLOT_DONALD] >> 3 == *slot_pc[i])
                 slot_pc[i]++;
             else {
         back3:
@@ -754,7 +752,7 @@ int run_script(register int i)
             break;
         case OP_RANDOM:
             j = *slot_pc[i]++;
-            j = roll(1, j, -1);
+            j = roll_bounded_random_sum(1, j, -1);
             slot_pc[i] += j;
             slot_pc[i] = g_scriptTable[*slot_pc[i]];
             break;
@@ -778,13 +776,13 @@ int run_script(register int i)
             next_level();
             break;
         case OP_WAIT_DONALD_Y:
-            if (slot_y[7] >> 3 != *slot_pc[i])
+            if (slot_y[SLOT_DONALD] >> 3 != *slot_pc[i])
                 goto back3;
             else
                 goto inc;
             break;
         case OP_WAIT_DONALD_DX:
-            if ((slot_x[i] >> 3) + *slot_pc[i] != slot_x[7] >> 3)
+            if ((slot_x[i] >> 3) + *slot_pc[i] != slot_x[SLOT_DONALD] >> 3)
                 goto back3;
             else
                 slot_pc[i]++;
@@ -798,20 +796,20 @@ int run_script(register int i)
             }
             break;
         case OP_BUBBLE_X:
-            slot_pc[7][3] = *slot_pc[i]++ + (slot_x[i] >> 3);
+            slot_pc[SLOT_DONALD][3] = *slot_pc[i]++ + (slot_x[i] >> 3);
             break;
         case OP_JUMP_CATCH:
             if (!g_jumping) {
                 slot_timer[i] = slot_delay[i] = 4;
                 g_jumping++;
-                aim(i);
+                initialize_jump_path(i);
                 bubble_arg1 = bubble_arg2 = 0;
-                slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+                slot_pc[SLOT_BUBBLE] = g_scriptTable[SCR_BUBBLE];
                 bubble_frame = 0x25;
                 play_sound(11);
             }
             if (jump_steps) {
-                step(i);
+                step_jump_path(i);
                 jump_steps--;
             }
             if (!jump_steps) {
@@ -900,7 +898,7 @@ int run_script(register int i)
         case OP_RESET_BUBBLE:
             g_curLetter = -1;
             bubble_arg1 = bubble_arg2 = 0;
-            slot_pc[5] = g_scriptTable[SCR_BUBBLE];
+            slot_pc[SLOT_BUBBLE] = g_scriptTable[SCR_BUBBLE];
             bubble_frame = 0x25;
             break;
         case OP_IF_PICKED:
@@ -908,10 +906,10 @@ int run_script(register int i)
         inc:
                 slot_pc[i]++;
             else
-                setup_level(g_curLetter);
+                prepare_letter_selection(g_curLetter);
             break;
         case OP_BESIDE_DONALD:
-            slot_x[i] = slot_x[7] + 16;
+            slot_x[i] = slot_x[SLOT_DONALD] + 16;
             slot_y[i] = 0x60;
             break;
         case OP_CLEAR_LETTER:
@@ -933,7 +931,7 @@ int run_script(register int i)
 }
 
 /* FUNCTION: DONALD 0304:1A71 */
-int roll(int n, int max, int base)
+int roll_bounded_random_sum(int n, int max, int base)
 {
     register int sum = 0;
     register int d;
@@ -973,7 +971,7 @@ int wait_key(int any)
     register int i;
 
     for (i = key = 0; i < 250; i++) {
-        repeat_call(1);
+        wait_frame_intervals(1);
         if (key_ready()) {
             key = get_key();
             if (any || key == KEY_ESC)
@@ -998,7 +996,7 @@ int ending(void)
     draw_pic(g_workBuf, g_backBuf);
     if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     play_sound(24);
     draw_pic(g_workBuf + 0x1b8a, g_backBuf);
     if (g_videoMode == VM_EGA)
@@ -1006,21 +1004,21 @@ int ending(void)
     k = wait_key(0);
     if (k == KEY_ESC)
         return k;
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     draw_pic(g_workBuf + 0x3714, g_backBuf);
     if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     k = wait_key(0);
     if (k == KEY_ESC)
         return k;
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     draw_pic(g_workBuf + 0x5910, g_backBuf);
     if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
     k = wait_key(0);
     if (k == KEY_ESC)
         return k;
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     k = wait_key(0);
     if (k == KEY_ESC)
         return k;
@@ -1034,7 +1032,7 @@ int ending(void)
     draw_pic(g_workBuf, g_backBuf);
     if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
-    blit_dispatch(g_backBuf, 0, 0, 40, 200);
+    present_rect(g_backBuf, 0, 0, 40, 200);
     k = wait_key(1);
     if (k != KEY_ESC)
         k = wait_key(1);
@@ -1042,10 +1040,10 @@ int ending(void)
 }
 
 /* FUNCTION: DONALD 0304:1E5B */
-void about(void)
+void prompt_insert_game_disk(void)
 {
     clear_screen();
-    set_and_redraw(2);
+    select_and_clear_window(2);
     draw_line((g_win.x - 1) << 3, (g_win.y - 1) << 3, ((g_win.x + g_win.w + 1) << 3) - 1, (g_win.y - 1) << 3, 15);
     draw_line((g_win.x - 1) << 3, ((g_win.y + g_win.h + 1) << 3) - 1, ((g_win.x + g_win.w + 1) << 3) - 1, ((g_win.y + g_win.h + 1) << 3) - 1, 15);
     draw_line((g_win.x - 1) << 3, (g_win.y - 1) << 3, (g_win.x - 1) << 3, ((g_win.y + g_win.h + 1) << 3) - 1, 15);

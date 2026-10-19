@@ -88,7 +88,7 @@ Embedded tables and trailing scratch are excluded from routine bounds.
 Access analysis also corrected misleading earlier names: the old C `cga` and
 `tandy` glyph names were reversed, `clear_buffer` converts pixels and masks,
 and `sprite_mask_*` mirrors sprites. C callers now use the semantic assembly
-names through documented compatibility aliases in `proto.h`; the assembly
+names through documented compatibility aliases in `donald.h`; the assembly
 linker names remain stable. The C wrapper is named `draw_sprite_mirrored`.
 
 ## Sound

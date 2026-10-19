@@ -130,7 +130,7 @@ gfx_check_sprite_work m3_mirror
 ; The last three bytes are genuinely accessed through the graphics frame but
 ; physically belong to KBD_DATA:0000..0002. Do not allocate them in GFX_DATA:
 ; the retail paragraph identity is 0B7F:14E0 == 0CCD:0000.
-; seg056a.asm owns m3_mirror_subpixel_shift and m3_mirror_clip_columns.
+; keyboard.asm owns m3_mirror_subpixel_shift and m3_mirror_clip_columns.
 
 %macro gfx_assert 1
     times (0 / (($ - gfx_data_start + GFX_DATA_BASE) = GFX.%1)) db 0

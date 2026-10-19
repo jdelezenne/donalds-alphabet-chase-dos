@@ -90,9 +90,44 @@ Both output digests matched. The expected digests above predate these changes in
 They are not generated from the rebuilt output. The exact-build result is
 reported by `tools/check_build.py`; a nonzero status is a failure.
 
-No interactive gameplay/audio/input playthrough was performed, because the
-separate `.CMP` runtime assets were not available. Whole-file identity and
-source reconstruction are distinct from a fresh interactive playtest.
+The earlier recovery checks did not include an interactive gameplay/audio/input
+playthrough; separate `.CMP` runtime assets were unavailable then. Runtime assets
+are now available locally, but this structure-only change did not add a new
+interactive playthrough. Whole-file identity and source reconstruction are
+distinct from a fresh interactive playtest.
+
+## Purpose-based source reorganization (2026-10-19)
+
+The source guide and complete old/new path map are in [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md)
+and `config/retail/modules.csv`. This change preserves all 27 C translation
+units and seven original assembly modules, separates headers by role, introduces
+16 evidence-backed API names, uses the existing `script_t` type, and names the
+page-copy/drawing modes and fixed actor slots. It adds no synthetic tests.
+
+Validation repeated after the reorganization:
+
+- All four exact TC 2.0 toolchain fingerprints in `config/tc20.sha256`: passed.
+- Clean `rm -rf build && tools/relink.sh all --check-hashes`: passed for both
+  targets, with exactly the sizes and original hashes recorded above.
+- A second build in a fresh source/config/tools copy with no pre-existing
+  objects and only `game/README.md`: passed for both targets. Neither game
+  executables nor `.CMP` assets were present in this clean workspace.
+- Independent source review normalized only the documented identifier/type/
+  constant changes and explicit `int main`: all 34 source units retained their
+  prior token streams; all seven assembly bodies were text-identical.
+- The review also checked every one of the 35 link inputs and all 27 C units:
+  DOS link aliases, order, stable compiler stems and effective flags unchanged.
+- Source consistency: 73 annotated C functions, 27 C units, seven ASM modules,
+  81 ASM callable entries and 171 ASM data objects. NASM's real-object inventory
+  and boundary checks passed for both retail and alternate variants.
+- Python syntax, shell syntax and `git diff --check`: passed. `matchreport.py`
+  regenerated the inventory with current source paths and API names.
+
+The original executables were not available as separate comparison inputs for
+this change, so `--verify` and the original-file function matcher were not rerun.
+Recorded function statuses are retained from the prior recovery; the fresh
+whole-file hashes independently prove the complete rebuilt files still equal
+the recorded originals. No interactive gameplay result is claimed here.
 
 ## CI
 

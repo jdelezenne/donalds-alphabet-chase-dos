@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Compile src/*.c (or the given files) with Turbo C 2.0 inside headless DOSBox-X into build/obj/<name>.OBJ.
-# DOS needs 8.3 names: a longer name is compiled as Cnnn.C in build/dos and the object renamed back.
+# Compile cataloged C units (or the given subset) with Turbo C 2.0 into build/obj/<semantic-name>.OBJ.
+# config/retail/modules.csv preserves the pre-refactor 8.3 compiler filename and CODE segment identity.
 # Flags: config/retail/cflags.txt line 1 (default) + optional per-file override "name.c: flags".
 # DAC_TARGET=alt builds the alternate DONALD variant (-DDONALD_ALT) into build/alt/obj.
 set -euo pipefail
@@ -16,28 +16,27 @@ for required in TCC.EXE TLINK.EXE LIB/C0L.OBJ LIB/CL.LIB INCLUDE/DOS.H; do
 done
 mkdir -p "$OUT"; rm -rf "$DOS"; mkdir -p "$DOS"
 FLAGS=$(head -1 "$ROOT/config/retail/cflags.txt")
-FILES=("$@"); [ ${#FILES[@]} -gt 0 ] || mapfile -t FILES < <(find "$ROOT/src" -name '*.c' | sort)
+python3 "$ROOT/tools/source_manifest.py" --compile-list "$@" > "$DOS/SOURCES.TSV"
 if [ "$#" -eq 0 ]; then
   # A removed/renamed source must never be satisfied by an object from a previous build.
   rm -rf "$OUT"; mkdir -p "$OUT"
 fi
 for h in "$ROOT"/src/include/*.h; do [ -f "$h" ] && sed "s/\r*$/\r/" "$h" > "$DOS/$(basename "$h" | tr a-z A-Z)"; done
-cmds=(); names=(); i=0
-for f in "${FILES[@]}"; do
+cmds=(); names=()
+while IFS=$'\t' read -r f short; do
   [ -f "$f" ] || { echo "Missing source: $f" >&2; exit 1; }
   f=$(realpath "$f")
-  base=$(basename "$f" .c); short=$(printf 'C%03d' $i); i=$((i+1))
-  # 8.3-safe names compile under their own name: TCC names the code segment NAME_TEXT after the file, and TLINK
-  # combines equal segment names (seg06e3/harderr.c shares HARDERR_TEXT with CL.LIB's HARDERR module)
-  [[ "$base" =~ ^[A-Za-z0-9_]{1,8}$ ]] && short=$(echo "$base" | tr a-z A-Z)
+  base=$(basename "$f" .c)
+  # Stable compiler names preserve TC segment identity even when source paths change.
+  # HARDERR_TEXT must continue sharing the runtime's HARDERR segment.
   sed "s/\r*$/\r/" "$f" > "$DOS/$short.C"; names+=("$short:$base")
   rm -f "$OUT/$base.OBJ"
   rel=${f#"$ROOT/src/"}; over=""
-  # override lines: "<glob relative to src/>: flags" (last match wins), e.g. "seg06f0/*: -ml -Z"
+  # override lines: "<glob relative to src/>: flags" (last match wins), e.g. "engine/files.c: -ml"
   while IFS= read -r line; do g=${line%%:*}; [[ "$line" == *:* && "$line" != \#* ]] || continue
     [[ "$rel" == $g ]] && over=${line#*:}; done < <(tail -n +2 "$ROOT/config/retail/cflags.txt")
   cmds+=("TCC -c -IC:\\INCLUDE ${DEF}${over:-$FLAGS} $short.C")
-done
+done < "$DOS/SOURCES.TSV"
 "$ROOT/tools/dosrun.sh" "$DOS" "${cmds[@]}"
 rc=0
 for p in "${names[@]}"; do

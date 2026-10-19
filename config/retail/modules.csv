@@ -1,0 +1,35 @@
+source,kind,segment,compiler_stem,previous_source,purpose
+src/game.c,c,0304,M0304,src/seg0304/m0304.c,"Game rendering, actor scripts and letter selection"
+src/data/scripts.c,c,DGROUP,SCRIPTS,src/data/scripts.c,Actor bytecode and writable script operands
+src/data/tables.c,c,DGROUP,TABLES,src/data/tables.c,"Game resource, palette and letter-group tables"
+src/main.c,c,04FC,M04FC,src/seg04fc/m04fc.c,"Program startup, initialization and shutdown"
+src/asm/graphics_bios.asm,asm,0000,,src/asm/seg0000_01c9.asm,Video BIOS probes and mode helpers
+src/asm/sound.asm,asm,0512,,src/asm/seg0512.asm,PIT interrupt and music byte-stream driver
+src/audio/music.c,c,0567,SOUND,src/seg0567/sound.c,Music streams and high-level sound selection
+src/asm/keyboard.asm,asm,056A,,src/asm/seg056a.asm,"Keyboard interrupt, translation and queue"
+src/engine/input.c,c,05C2,INPUT,src/seg05c2/input.c,Keyboard availability and character wrappers
+src/asm/graphics_rect.asm,asm,0000,,src/asm/seg0000_0217.asm,Graphics spans and rectangle copies
+src/engine/egablit.c,c,05C5,M05C5,src/seg05c5/m05c5.c,Clipped EGA rectangle-copy wrapper
+src/asm/graphics_core.asm,asm,0000,,src/asm/seg0000_08b9.asm,"Graphics drivers, codecs, palettes and glyphs"
+src/engine/retrace.c,c,05D4,REPEAT,src/seg05d4/repeat.c,Calibrated frame-interval waits
+src/engine/text.c,c,05D5,M05D5,src/seg05d5/m05d5.c,Text glyph output and cursor wrapping
+src/engine/fillrect.c,c,05E7,M05E7,src/seg05e7/m05e7.c,Filled rectangle wrapper
+src/engine/lines.c,c,05ED,M05ED,src/seg05ed/m05ed.c,Clipped lines and point output
+src/engine/picture.c,c,0604,M0604,src/seg0604/m0604.c,CMP picture decompression and CGA conversion
+src/engine/palette.c,c,060B,M060B,src/seg060b/m060b.c,Video-mode palette selection
+src/engine/xalloc.c,c,0612,M0612,src/seg0612/m0612.c,Far allocation with on-screen error reporting
+src/asm/graphics_window.asm,asm,0000,,src/asm/seg0000_277e.asm,Window background capture and restoration
+src/engine/loadfile.c,c,061A,M061A,src/seg061a/m061a.c,Length-prefixed resource-file loader
+src/engine/calibrat.c,c,061F,M061F,src/seg061f/m061f.c,BIOS-timer and vertical-retrace calibration
+src/engine/capture.c,c,062D,M062D,src/seg062d/m062d.c,Sprite capture from the back buffer
+src/engine/drive.c,c,065B,MUSIC,src/seg065b/music.c,Removable-disk drive selection
+src/engine/setwin.c,c,065E,M065E,src/seg065e/m065e.c,Text window state switching
+src/engine/redraw.c,c,066F,REDRAW,src/seg066f/redraw.c,Active text window clear and cursor reset
+src/engine/wraptext.c,c,0671,M0671,src/seg0671/m0671.c,Word-wrapped text formatting
+src/engine/wordtext.c,c,06AD,M06AD,src/seg06ad/m06ad.c,Text output and scrolling in the active window
+src/engine/sprite.c,c,06C3,M06C3,src/seg06c3/m06c3.c,Clipped sprite dispatch
+src/engine/mirror.c,c,06D3,M06D3,src/seg06d3/m06d3.c,Clipped mirrored-sprite dispatch
+src/engine/harderr.c,c,06E3,HARDERR,src/seg06e3/harderr.c,DOS critical-error handler
+src/asm/graphics_mode3.asm,asm,0000,,src/asm/seg0000_2a15.asm,Mode-3 forward and mirrored RLE sprites
+src/engine/window.c,c,06EF,M06EF,src/seg06ef/m06ef.c,Window selection and clearing
+src/engine/files.c,c,06F0,M06F0,src/seg06f0/m06f0.c,DOS and resident-file I/O plus error dialogs

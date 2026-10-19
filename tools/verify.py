@@ -11,7 +11,7 @@ This mode does not compile, assemble, compare bytes, or update recorded match re
 This is a fixup-masked comparison, not a replacement for a whole-executable relink comparison."""
 import csv, re, subprocess, sys, struct
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent)); import omf, asm_inventory
+sys.path.insert(0, str(Path(__file__).parent)); import omf, asm_inventory, source_manifest
 ROOT = Path(__file__).resolve().parents[1]
 if "-h" in sys.argv or "--help" in sys.argv: print(__doc__); sys.exit(0)
 args = [a for a in sys.argv[1:] if not a.startswith("-")]
@@ -23,6 +23,10 @@ ANN = re.compile(r"/\*\s*FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\
 DEF = re.compile(r"^(?:[A-Za-z_][\w \*]*?[\s\*])?(\w+)\s*\([^;]*$")
 selected = {}; seen_addr = {}; seen_name = {}; stems = set()
 errors = []
+try:
+    source_manifest.read_modules()
+except (OSError, ValueError) as exc:
+    errors.append(str(exc))
 for src in srcs:
     if not src.is_file(): errors.append(f"missing source: {src}"); continue
     if src.stem in stems: errors.append(f"duplicate object stem: {src.stem}")

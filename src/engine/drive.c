@@ -8,8 +8,8 @@ char far *g_videoMem;
 int g_fixedDrive;
 char unused_3AFE[80];
 
-/* FUNCTION: DONALD 065B:000C */
 /* Before opening a file of disk `disk`: go to drive A:, or B: when disks >0 live in a second drive. */
+/* FUNCTION: DONALD 065B:000C */
 void select_drive(int disk)
 {
     if (!g_fixedDrive) {

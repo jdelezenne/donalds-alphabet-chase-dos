@@ -1,97 +1,55 @@
-/* Prototypes of every function (C definitions in src/seg*, asm publics in src/asm). Included by donald.h. */
-#ifndef PROTO_H
-#define PROTO_H
+/* Engine services and low-level hardware ABI. Include through donald.h. */
+#ifndef DONALD_ENGINE_H
+#define DONALD_ENGINE_H
 
-/* Semantic API names. Keep the already reconstructed ASM linker aliases so
-   public-symbol records and original object ordering remain unchanged. The
-   prior cga/tandy glyph names were reversed; sprite_mask_* mirrors the source. */
-#define draw_char_tandy4bpp draw_char_cga
-#define draw_char_cga2bpp draw_char_tandy
-#define draw_char_vga8bpp draw_char_buf
-#define convert_cga_pixels_and_masks clear_buffer
-#define fill_rect_cells redraw_rect_hw
-#define sprite_mirror_ega sprite_mask_ega
-#define sprite_mirror_packed sprite_mask_cga
-#define sprite_mirror_m3 sprite_mask_m3
-
-/* m0304.c */
-void blit_dispatch(char far *src, int x, int y, int w, int h);
-void check_collisions(void);
-void draw_items(int mode);
-void draw_item(int mode, int x, int y, int w, int h);
-void step(int i);
-void draw_frame(int mode, int i, int x, int y);
-void next_level(void);
-int rom_check(void);
-void detect_video(void);
-int level_sum(void);
-void aim(int i);
-void reset_actors(void);
-void setup_level(int lv);
-void show_picture(int n);
-void load_level_gfx(void);
-void game(void);
-int handle_key(void);
-int run_script(int i);
-int roll(int n, int max, int base);
-void init_slots(void);
-int wait_key(int any);
-int ending(void);
-void about(void);
-/* m04fc.c */
-void init_game(void);
-void shutdown(void);
-/* sound.c */
-void play_sound(int i);
-void stop_sound(void);
-/* input.c */
+/* engine/input.c */
 int key_ready(void);
 int get_key(void);
-/* m05c5.c */
+/* engine/egablit.c */
 void blit_ega(int x, int y, int sx, int sy, int w, int h, char far *p1, char far *p2);
-/* repeat.c */
-void repeat_call(int n);
-/* m05d5.c */
+/* engine/retrace.c */
+void wait_frame_intervals(int n);
+/* engine/text.c */
 void print_text(char far *s, int col, int y, int fg, int bg);
-/* m05e7.c */
+/* engine/fillrect.c */
 void fill_rect(int x1, int y, int x2, int y2, int c);
-/* m05ed.c */
+/* engine/lines.c */
 void hline(int y, int x, int x2, int c);
 void draw_line(int x1, int y1, int x2, int y2, int c);
 void plot(int x, int y, int c);
-/* m0604.c */
+/* engine/picture.c */
 void draw_pic(char far *p, char far *dst);
-/* m060b.c */
+/* engine/palette.c */
 void set_palette(char far *pal);
-/* m0612.c */
+/* engine/xalloc.c */
 char far *xalloc(long size);
-/* m061a.c */
+/* engine/loadfile.c */
 void load_file(char far *name, void far *buf);
-/* m061f.c */
+/* engine/calibrat.c */
 void calibrate(void);
-/* m062d.c */
+/* engine/capture.c */
 char far *grab(int x, int y, int w, int h);
 char far *grab_vga(int x, int y, int w, int h);
-/* music.c */
+/* engine/drive.c */
 void select_drive(int disk);
-/* m065e.c */
+/* engine/setwin.c */
 void set_window(int n);
-/* redraw.c */
+/* engine/redraw.c */
 void redraw_rect(void);
-/* m0671.c */
+/* engine/wraptext.c */
 void print_wrapped(char far *s);
-/* m06ad.c */
+/* engine/wordtext.c */
 void print_word(char far *s, int nl);
-/* m06c3.c */
+/* engine/sprite.c */
 void draw_sprite(char far *dst, char far *src, int x, int y, int idx);
-/* m06d3.c */
+/* engine/mirror.c */
 void draw_sprite_mirrored(char far *dst, char far *src, int x, int y, int idx);
-/* harderr.c */
+/* engine/harderr.c */
 int harderr_handler(int errval, int ax, int bp, int si);
 void install_harderr(void);
-/* m06ef.c */
-void set_and_redraw(int x);
-/* m06f0.c */
+/* engine/window.c */
+void select_and_clear_window(int x);
+/* engine/files.c */
 void fatal(char far *msg);
 void quit(int code);
 int Open_File(char far *name, int mode);
@@ -112,7 +70,9 @@ int Get_Resident_Index(char far *name);
 long Read_Resident(int i, char far *buf, long len);
 void inset_rect(int n);
 
-/* assembly (src/asm); parameter types follow the call sites */
+/* Original assembly interfaces (src/asm), with types from the call sites.
+   Keep the declaration order, including sound, interrupts and keyboard
+   primitives at the end: donald.h preserves the original compiler input. */
 int ega_present(void);
 void set_text_mode(void);
 void ega_select_palette(int pal);

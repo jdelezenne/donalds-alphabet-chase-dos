@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Brute-force source variants (decomp-permuter-lite for Turbo C under DOSBox).
 Write alternatives inline as  @P{alt1|alt2|...}  in a copy of the source, then:
-  permute.py src/seg0304/foo.c.perm src/seg0304/foo.c [--flags "-ml|-ml -O|-ml -O -Z"]
+  permute.py src/game.c.perm src/game.c [--flags "-ml|-ml -O|-ml -O -Z"]
 Every combination (x every flag set) is compiled in one DOSBox batch per 40 variants and scored with
 the verify masker; best scores are printed and the first full match is written to the target file."""
 import itertools, os, re, subprocess, sys, shutil, struct
