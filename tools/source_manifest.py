@@ -16,12 +16,41 @@ ROOT = Path(__file__).resolve().parents[1]
 FIELDS = ["source", "kind", "segment", "compiler_stem", "previous_source", "purpose"]
 
 
+def read_headers():
+    """Validate the flattened DOS header namespace and every actual C include."""
+    headers = sorted((ROOT / "src").rglob("*.h"))
+    by_name = {}
+    for path in headers:
+        name = path.name.upper()
+        if not re.fullmatch(r"[A-Z0-9_]{1,8}\.H", name) or name in by_name:
+            raise ValueError(f"Invalid or duplicate DOS header basename: {path}")
+        if path.is_symlink():
+            raise ValueError(f"Source header must not be a symlink: {path}")
+        by_name[name] = path
+    declared_system = {line.split()[1] for line in
+                       (ROOT / "config/tc20.sha256").read_text().splitlines()}
+    referenced = set()
+    for source in sorted((ROOT / "src").rglob("*.c")) + headers:
+        for delimiter, name in re.findall(r'^\s*#\s*include\s*([<"])([^>"\n]+)[>"]',
+                                          source.read_text(), re.M):
+            if delimiter == '"':
+                if "/" in name or "\\" in name or name.upper() not in by_name:
+                    raise ValueError(f"Missing/non-basename source include: {source}: {name}")
+                referenced.add(name.upper())
+            elif "INCLUDE/" + name.upper() not in declared_system:
+                raise ValueError(f"Undeclared toolchain header: {source}: {name}")
+    if referenced != set(by_name):
+        raise ValueError(f"Unreferenced source headers: {sorted(set(by_name) - referenced)}")
+    return headers
+
+
 def read_modules():
     with (ROOT / "config/retail/modules.csv").open(newline="") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames != FIELDS:
             raise ValueError("modules.csv has unexpected columns")
         rows = list(reader)
+    read_headers()
     errors = []
     sources, objects, compiler_stems = set(), set(), set()
     for row in rows:
@@ -49,12 +78,17 @@ def read_modules():
             compiler_stems.add(stem)
         elif row["compiler_stem"]:
             errors.append(f"{source}: NASM does not use a Turbo C compiler stem")
+        if path.is_symlink():
+            errors.append(f"source must not be a symlink: {source}")
         if not path.is_file():
             errors.append(f"missing source {source}")
             continue
         text = path.read_text()
         annotation = r"(?:FUNCTION|SEGMENT):\s*DONALD\s+([0-9A-Fa-f]{4})"
         segments = {s.upper() for s in re.findall(annotation, text)}
+        addresses = re.findall(r"FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})", text)
+        if kind == "c" and addresses != sorted(addresses, key=lambda pair: tuple(int(x, 16) for x in pair)):
+            errors.append(f"{source}: C function annotations are not in original address order")
         expected = set() if row["segment"] == "DGROUP" else {row["segment"]}
         if segments != expected:
             errors.append(f"{source}: segment annotations {sorted(segments)} disagree with {row['segment']}")
@@ -87,6 +121,7 @@ def read_modules():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--headers", action="store_true", help="print validated source header paths")
     parser.add_argument("--compile-list", action="store_true", help="print source path and stable DOS stem, tab-separated")
     parser.add_argument("paths", nargs="*", help="optional C source subset")
     args = parser.parse_args()
@@ -95,8 +130,17 @@ def main():
         c_rows = [row for row in rows if row["kind"] == "c"]
         if args.paths:
             by_path = {(ROOT / row["source"]).resolve(): row for row in c_rows}
-            c_rows = [by_path[Path(path).resolve()] for path in args.paths]
-        if args.compile_list:
+            requested = [Path(path).resolve() for path in args.paths]
+            if len(requested) != len(set(requested)):
+                raise ValueError("Duplicate C source in requested subset")
+            unknown = [str(path) for path in requested if path not in by_path]
+            if unknown:
+                raise ValueError("Unknown C source subset: " + ", ".join(unknown))
+            c_rows = [by_path[path] for path in requested]
+        if args.headers:
+            for path in read_headers():
+                print(path)
+        elif args.compile_list:
             for row in c_rows:
                 print(f"{ROOT / row['source']}\t{row['compiler_stem']}")
         else:

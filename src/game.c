@@ -20,34 +20,34 @@ char msg_insert_disk[100] = "Please make sure that Donald's Alphabet Chase disk 
 
 /* Uninitialised data (_BSS): DGROUP 3868-3AE3 (ownership inferred, see docs/MATCHING.md). */
 int jump_right;
-int slot_x[8];
-int slot_y[8];
+int slot_x[NUM_SLOTS];
+int slot_y[NUM_SLOTS];
 int g_group;
-int slot_frame[8];
+int slot_frame[NUM_SLOTS];
 int jump_x_major;
-int slot_shown[8];
+int slot_shown[NUM_SLOTS];
 int jump_major;
 int jump_minor;
 int g_keysEnabled;
 char far *g_packBuf;
 int jump_steps;
-script_t far *slot_pc[8];
+script_t far *slot_pc[NUM_SLOTS];
 int g_letterPicked;
 int jump_err;
 int g_idleTicks;
 int g_pickedLetter;
 char unused_38E2[40];
-int slot_delay[8];
+int slot_delay[NUM_SLOTS];
 int g_gameWon;
-int slot_w[8];
-int slot_timer[8];
+int slot_w[NUM_SLOTS];
+int slot_timer[NUM_SLOTS];
 char far *g_workBuf;
-int g_letterDone[26];
-int slot_flag[8];
-char far *g_sprites[70];
+int g_letterDone[NUM_LETTERS];
+int slot_flag[NUM_SLOTS];
+char far *g_sprites[NUM_SPRITES];
 char unused_3A9C[2];
-int slot_h[8];
-int g_letterScore[26];
+int slot_h[NUM_SLOTS];
+int g_letterScore[NUM_LETTERS];
 int g_jumping;
 
 /* FUNCTION: DONALD 0304:000C */
@@ -67,10 +67,10 @@ void propagate_dirty_overlap(void)
     int x1, x2, y1, y2, ox1, ox2, oy1, oy2, k;
 
     for (k = 0; k < 8; k++)
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < NUM_SLOTS; i++) {
             if (slot_shown[i] == -1)
                 continue;
-            for (j = 0; j < 8; j++) {
+            for (j = 0; j < NUM_SLOTS; j++) {
                 if (j == i)
                     continue;
                 x1 = (slot_x[i] >> 3) - 1;
@@ -98,7 +98,7 @@ void copy_dirty_actor_rects(int mode)
     register int grow;
     int padX, padY;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < NUM_SLOTS; i++) {
         padX = 1;
         padY = 8;
         grow = 2;
@@ -243,12 +243,12 @@ void next_level(void)
 {
     char i, sum;
 
-    for (i = sum = 0; i < 26; i++)
+    for (i = sum = 0; i < NUM_LETTERS; i++)
         sum += g_letterScore[i];
-    if (sum < 26) {
+    if (sum < NUM_LETTERS) {
         do {
             g_group++;
-            if (g_group >= 6)
+            if (g_group >= NUM_GROUPS)
                 g_group = 0;
             sum = 0;
             for (i = g_groupFirst[g_group]; i < g_groupFirst[g_group + 1]; i++)
@@ -378,7 +378,7 @@ void reset_actors(void)
 {
     register int i;
 
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < NUM_SLOTS; i++) {
         slot_w[i] = slot_h[i] = 3;
         slot_pc[i] = g_scriptTable[SCR_IDLE];
         slot_x[i] = -160;
@@ -400,7 +400,7 @@ void prepare_letter_selection(int lv)
 {
     char i;
 
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < NUM_SLOTS; i++)
         slot_timer[i] = 0;
     for (i = 0; i < 5; i++) {
         slot_pc[i] = g_scriptTable[SCR_PICK_LETTER];
@@ -484,13 +484,13 @@ void run_game(void)
     register int i;
     register int key;
 
-    for (i = key = 0; i < 70; i++)
+    for (i = key = 0; i < NUM_SPRITES; i++)
         g_sprites[i] = (char far *)-1L;
     set_palette(pal_title);
     if (g_videoMode)
         ega_select_palette(1);
     kbd_flush();
-    show_picture(26);
+    show_picture(PIC_TITLE);
     present_rect(g_backBuf, 0, 0, 40, 200);
     play_sound(24);
     for (i = 0; i < 1000; i++) {
@@ -501,12 +501,12 @@ void run_game(void)
         }
     }
     play_sound(17);
-    show_picture(25);
+    show_picture(PIC_DONALD_SHEET);
     for (i = 41; i < 56; i++)
         g_sprites[i] = grab(((i - 41) % 5) * 8, ((i - 41) / 5) * 64, 8, 64);
-    show_picture(24);
+    show_picture(PIC_DONALD_SINGLE);
     g_sprites[56] = grab(0, 0, 8, 64);
-    show_picture(23);
+    show_picture(PIC_LIGHTBULB);
     g_sprites[1] = grab(0, 0, 1, 1);
     g_sprites[2] = grab(3, 0, 1, 1);
     g_sprites[3] = grab(6, 0, 3, 24);
@@ -520,23 +520,23 @@ void run_game(void)
     if (key != KEY_ESC)
         key = 0;
     while (key != KEY_ESC) {
-        for (i = 0; i < 26; i++)
+        for (i = 0; i < NUM_LETTERS; i++)
             g_letterScore[i] = g_letterDone[i] = 0;
         i = 0; g_gameWon = 0; g_idleTicks = 0; g_letterPicked = 0; g_keysEnabled = g_group = g_jumping = 0;
         load_level_gfx();
         reset_actors();
         last = now = timer_ticks();
-        for (i = 0; i < 8; i++)
+        for (i = 0; i < NUM_SLOTS; i++)
             copy_page_rect(PAGE_SCREEN_TO_WORK, (slot_x[i] >> 3) - 1, slot_y[i] - 8, slot_w[i] + 2, (slot_h[i] + 2) << 3);
         for (;;) {
             g_idleTicks++;
             copy_dirty_actor_rects(PAGE_WORK_TO_BACK);
-            for (i = 0; i < 8; i++) {
+            for (i = 0; i < NUM_SLOTS; i++) {
                 slot_shown[i] = step_actor_script(i);
                 if (slot_shown[i] != -1)
                     slot_frame[i] = slot_shown[i];
             }
-            for (i = 0; i < 8; i++)
+            for (i = 0; i < NUM_SLOTS; i++)
                 if (slot_shown[i] != -1) {
                     i = 0;
                     break;
@@ -544,7 +544,7 @@ void run_game(void)
             if (!i) {
                 propagate_dirty_overlap();
                 copy_dirty_actor_rects(PAGE_BACK_TO_WORK);
-                for (i = 0; i < 8; i++)
+                for (i = 0; i < NUM_SLOTS; i++)
                     if (slot_shown[i] != -1 && slot_shown[i] != 0) {
                         if (slot_flag[i] == 0)
                             draw_actor_frame(DRAW_BACK, slot_frame[i], slot_x[i], slot_y[i]);
@@ -987,12 +987,12 @@ int ending(void)
     register int k = 0;
 
     play_sound(17);
-    load_file(g_cmpFiles[18].name, g_workBuf);
-    load_file(g_cmpFiles[19].name, g_workBuf + 0x1b8a);
-    load_file(g_cmpFiles[20].name, g_workBuf + 0x3714);
-    load_file(g_cmpFiles[21].name, g_workBuf + 0x5910);
+    load_file(g_cmpFiles[PIC_WIN1].name, g_workBuf);
+    load_file(g_cmpFiles[PIC_WIN2].name, g_workBuf + 0x1b8a);
+    load_file(g_cmpFiles[PIC_WIN3].name, g_workBuf + 0x3714);
+    load_file(g_cmpFiles[PIC_WIN4].name, g_workBuf + 0x5910);
     if (g_videoMode == VM_CGA)
-        set_palette16(g_palettes[18]);
+        set_palette16(g_palettes[PIC_WIN1]);
     draw_pic(g_workBuf, g_backBuf);
     if (g_videoMode == VM_EGA)
         present_buffer(g_backBuf, 0xA800);
@@ -1023,9 +1023,9 @@ int ending(void)
     if (k == KEY_ESC)
         return k;
     play_sound(17);
-    load_file(g_cmpFiles[22].name, g_workBuf);
+    load_file(g_cmpFiles[PIC_CREDITS].name, g_workBuf);
     if (g_videoMode == VM_CGA)
-        set_palette16(g_palettes[22]);
+        set_palette16(g_palettes[PIC_CREDITS]);
     set_palette(pal_ending);
     if (g_videoMode)
         ega_select_palette(1);

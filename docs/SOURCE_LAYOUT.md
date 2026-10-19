@@ -158,3 +158,21 @@ python3 tools/matchreport.py
 See [BUILD_VALIDATION.md](BUILD_VALIDATION.md) for actual build evidence and
 which checks require original game files. No compiler binaries, original game
 files, synthetic tests or generated data are added by this reorganization.
+
+## Maintenance constants and checks
+
+`src/data/gamedata.h` names resource indices 18-26 (`PIC_*`) from the actual
+`g_cmpFiles` entries and their matching palette table in `src/data/tables.c`.
+`run_game` and `ending` use these names at the load/draw callers. The single
+`0DONALD.CMP` sprite and `0DONALD0.CMP` sheet names describe their existing grab
+calls; they do not claim recovered historical identifiers. Actor/letter/sprite
+array extents and their loops in `game.c` reuse the existing `NUM_*` macros.
+Every substitution expands to exactly the same literal token, preserving type
+and width. The preamble's eight printed lines and coordinate/frame literals
+remain separate because they have different meanings.
+
+`make check-source` checks the flat DOS header namespace, include resolution,
+original C function order and module/link provenance, then assembles and checks
+both real NASM variants. `make check-exact` rebuilds both complete executables
+in a fresh original-free source snapshot with pinned Turbo C inputs. See
+[BUILD_VALIDATION.md](BUILD_VALIDATION.md) for current evidence and limits.

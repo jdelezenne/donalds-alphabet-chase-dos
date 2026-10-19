@@ -17,10 +17,47 @@ instruction `db` exceptions and executable NOP bytes are also mnemonics.
 `tasm.inc`'s `rr` macro selects TASM's register-register instruction encoding
 from mnemonic/register operands; it is not a stored game-code blob.
 
+## Current maintenance checks (2026-10-19)
+
+`make check-source` checks the actual source/header/link inventories, address
+order, Python/shell syntax, forbidden binary inputs, and the real NASM object
+inventories for both variants. It needs no Turbo C, DOSBox, originals or assets.
+Assembly runs in temporary copies and leaves any existing exact build intact.
+
+`make check-exact` creates a fresh source-only copy, verifies all nine declared
+Turbo C 2.0 inputs (compiler, linker, runtime/startup and five used headers),
+builds both targets, and checks their full sizes and independently recorded
+SHA-256 hashes. Its evidence directory retains an input manifest, toolchain
+fingerprints, logs and a machine-readable result. Python file-open auditing
+rejects parent-checkout/reference reads in build subprocesses; it is additional
+instrumentation, not an OS sandbox or a native DOSBox file-access trace.
+
+The current receipt is [verification/maintenance-pass.json](verification/maintenance-pass.json).
+It records identical preprocessed tokens in all 27 C units for both variants,
+real-source compiler staging/negative checks, and complete file identity.
+The semantic changes only name proven resource-table indices at callers and
+use the existing actor/letter/sprite/group counts. Header ownership, include
+order, C types, original translation units, function order, flags, assembly,
+data initializer values and link order are unchanged. No historical names or
+new structure layouts are inferred.
+
+The supported C builder uses a new staging directory on every invocation,
+ignores old output and ambient `TCC.CFG`/headers, and retains diagnostic logs.
+`dosrun.sh` stages only the manifest's compiler inputs and runs from an isolated
+cwd/HOME with explicit DOSBox settings, disabling ambient config/autoexec/mapper
+loading. The shared emulator lock serializes actual DOSBox commands. The
+low-level runner still mounts its supplied work directory, so callers other
+than the supported build/relink scripts are responsible for that directory's
+contents. This is reproducible input staging, not a security sandbox.
+
+No new interactive gameplay/audio/input playthrough was added. Exact executable
+identity does not establish a fresh runtime test or recover unknown original
+identifiers, historical type names, or development-tool provenance.
+
 ## Reproducing the complete build
 
-Use NASM, DOSBox-X, Python 3 and the exact Turbo C 2.0 distribution. The four
-compiler/linker/runtime fingerprints are recorded in `config/tc20.sha256`.
+Use NASM, DOSBox-X, Python 3 and the exact Turbo C 2.0 distribution. The nine
+compiler/linker/runtime/header fingerprints are recorded in `config/tc20.sha256`.
 Verify them from the installed toolchain directory with `sha256sum -c` and an
 absolute path to that manifest. Compiler binaries are not distributed here.
 
@@ -28,23 +65,27 @@ From a clean checkout:
 
 ```sh
 export TC_ROOT=/path/to/tc20
-python3 tools/verify.py --sources-only
-rm -rf build
-tools/relink.sh all --check-hashes
+make check-source
+make check-exact
 ```
 
-`game/` may contain only its README. Both targets are built unconditionally;
+`make check-exact` never copies local originals or prior output. Its new
+`build/exact-*/source/game/` contains only the README. Both targets are built;
 `alt` also builds independently, rather than borrowing retail objects. Full
 builds discard their target's old objects so removed sources cannot be hidden
 by stale output. No comparison or splice helper participates in the build.
 
 For optional direct reference comparisons, supply legally obtained originals
-in `game/` and add `--verify`. An explicitly requested comparison fails if a
+in `game/` and run `tools/relink.sh all --check-hashes --verify`. An explicitly requested comparison fails if a
 reference is absent. `tools/verify.py`'s function checks mask relocations; the
 complete-file hashes/comparison are the proof of call targets, data references,
 MZ header, relocation table, layout and padding.
 
-## Checks performed on 2026-10-19
+## Historical recovery checks (2026-10-19)
+
+The sections below preserve earlier validation snapshots. Statements about local
+asset availability, tool versions or test timing apply to those runs only; the
+current maintenance result is linked above.
 
 - Source manifest and annotation coverage: passed, 73 C functions, 27 units,
   81 assembly callable entries, 171 assembly data objects and seven assembly
@@ -96,7 +137,7 @@ are now available locally, but this structure-only change did not add a new
 interactive playthrough. Whole-file identity and source reconstruction are
 distinct from a fresh interactive playtest.
 
-## Purpose-based source reorganization (2026-10-19)
+## Historical purpose-based source reorganization (2026-10-19)
 
 The source guide and complete old/new path map are in [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md)
 and `config/retail/modules.csv`. This change preserves all 27 C translation
@@ -129,7 +170,7 @@ Recorded function statuses are retained from the prior recovery; the fresh
 whole-file hashes independently prove the complete rebuilt files still equal
 the recorded originals. No interactive gameplay result is claimed here.
 
-## Shallow subsystem layout follow-up (2026-10-19)
+## Historical shallow subsystem layout follow-up (2026-10-19)
 
 Headers now live beside their owning sources, with the ordered umbrella and
 shared/game declarations directly in `src/`. Sound assembly is in `src/audio/`;
@@ -167,6 +208,6 @@ runtime assets are committed. No new interactive gameplay test is claimed.
 
 Public CI checks source coverage, assembles both real variants, and verifies the assembly catalogs against actual NASM symbol/data bounds. The gated
 self-hosted job requires a separately provisioned exact Turbo C 2.0 toolchain,
-DOSBox-X and NASM; it builds from `git archive HEAD`, with no game files, and
-checks both complete executable hashes. Public assembly-only CI is not
+DOSBox-X and NASM; it runs `make check-exact` from a fresh source-only snapshot, with no game
+files or existing objects, and checks both complete executable hashes. Public assembly-only CI is not
 presented as a full compile/link or gameplay test.

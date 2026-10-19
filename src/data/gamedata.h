@@ -2,6 +2,18 @@
 #ifndef DONALD_GAMEDATA_H
 #define DONALD_GAMEDATA_H
 
+/* Fixed g_cmpFiles/g_palettes indices, proven by tables.c resource names.
+   Keep literal spellings: these macros do not change the TC token stream. */
+#define PIC_WIN1          18
+#define PIC_WIN2          19
+#define PIC_WIN3          20
+#define PIC_WIN4          21
+#define PIC_CREDITS       22
+#define PIC_LIGHTBULB     23
+#define PIC_DONALD_SINGLE  24  /* 0DONALD.CMP: the single sprite grabbed by run_game */
+#define PIC_DONALD_SHEET  25  /* 0DONALD0.CMP: the multi-frame sheet */
+#define PIC_TITLE        26
+
 /* Shared record layouts (docs/DATA.md). */
 /* Westwood file-library entry: one per game file (tables.c, 18 bytes, accessed as g_cmpFiles[i].field) */
 struct file_entry {

@@ -1,35 +1,23 @@
 name: ci
 on: [push, pull_request]
 jobs:
-  lint:
+  source:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          python3 -m py_compile tools/*.py
-          for script in tools/*.sh; do bash -n "$script"; done
-      - run: python3 tools/verify.py --sources-only
-      - name: no game or compiler binaries committed
-        run: "! git ls-files | grep -iE '\\.(exe|cmp|com|obj|lib|img|ima)$|^game/DONALD$'"
-      - name: assemble both real source variants without game files
+      - name: install source-check assembler
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y nasm
-          DAC_TARGET=retail tools/assemble.sh
-          DAC_TARGET=alt tools/assemble.sh
-  standalone:
-    # The compiler/runtime is licensed separately; the runner needs Turbo C 2.0,
-    # DOSBox-X and NASM. Neither original EXE nor CMP data is needed for this job.
+      - name: source checks and both real assembly variants (no Turbo C or originals)
+        run: make check-source
+  exact:
+    # Separately licensed Turbo C 2.0, DOSBox-X and NASM must be provisioned.
+    # The checker stages only declared compiler/header/runtime inputs and copies
+    # source files, never ignored game/build output from a persistent runner.
     if: ${{ vars.DAC_SELF_HOSTED == 'true' }}
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: clean build and whole-executable hash proof without originals
-        shell: bash
-        run: |
-          clean=$(mktemp -d)
-          trap 'rm -rf "$clean"' EXIT
-          git archive HEAD | tar -x -C "$clean"
-          cd "$clean"
-          test -z "$(find game -type f ! -name README.md -print -quit)"
-          tools/relink.sh all --check-hashes
+      - name: original-free clean build and both whole-executable hashes
+        run: make check-exact

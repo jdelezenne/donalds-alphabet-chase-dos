@@ -1,7 +1,7 @@
 # donalds-alphabet-chase-dos
 
 A matching decompilation of *Donald's Alphabet Chase* (Disney Software, 1988) for IBM PC DOS.
-The goal is C (and, only where unavoidable, asm) source that rebuilds a **byte-identical** `DONALD.EXE`.
+The recovered C and assembly rebuild both recorded releases byte-identically, including the primary `DONALD.EXE`.
 
 ## No game files in this repo
 Do **not** commit copyrighted game files: no executables, `*.CMP` data or disk images.
@@ -14,7 +14,7 @@ Expected hashes are in [config/originals.sha256](config/originals.sha256).
 | alt build | `DONALD` (no extension) | 55,432 | `61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23` |
 
 ## Status
-Both complete source-only builds were verified with Turbo C 2.0 against the original SHA-256 hashes, with no game files present. See [validation evidence](docs/BUILD_VALIDATION.md).
+Both complete source-only builds pass `make check-exact` with pinned Turbo C 2.0 inputs and no original game files in the copied build. The latest maintenance receipt is [docs/verification/maintenance-pass.json](docs/verification/maintenance-pass.json); [validation evidence](docs/BUILD_VALIDATION.md) separates current checks from historical recovery snapshots.
 
 The recorded reference results cover all 73 C functions (16,710 bytes), byte-matching with Turbo C 2.0 (`-ml`, plus `-O -Z` on some modules; see `config/retail/cflags.txt`).
 The seven assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14,020 bytes including embedded data) are readable NASM sources, with all executable byte blobs recovered as instructions. All 81 assembly callable entries (including interrupts and overlapping near helpers) and 171 bounded assembly data objects have explicit catalogs and access evidence; see [assembly structures](docs/ASM_DATA.md). Function classification remains in `config/retail/functions.csv`. The 71 recorded runtime symbol spans are identified against the real `CL.LIB`/`C0L.OBJ` (they are not 71 separate library modules).
@@ -39,9 +39,12 @@ See [the source guide](docs/SOURCE_LAYOUT.md) for the complete module map, seman
 |---|---|
 | `tools/setup.sh` | apt packages (DOSBox-X, nasm, mtools), Python venv with Capstone; no game files needed |
 | `tools/install_tc.sh` | installs **your own** Turbo C 2.0 to `/opt/tc20` (never into the repo) |
-| `tools/dosrun.sh` | runs DOS commands headless in DOSBox-X (C: = compiler, D: = work dir) |
+| `tools/dosrun.sh` | explicit DOSBox configuration and isolated compiler/HOME snapshot (C:); D: is the supplied work directory |
 | `tools/build.sh` | compiles cataloged C units with stable DOS compiler names into semantic `build/obj/` objects; flags are in `config/retail/cflags.txt` |
-| `tools/source_manifest.py` | checks all source paths, segment provenance, compiler names, flag overrides and exact link order without game files |
+| `tools/source_manifest.py` | checks source/header inventories, flat DOS include resolution, segment/function order, compiler names, flag overrides and exact link order |
+| `tools/check_source.py` | compiler-free syntax and source checks, then real NASM inventories for both builds in temporary copies |
+| `tools/verify_clean_build.py` | stages a new source-only copy, verifies pinned compiler/header inputs, builds both targets and records complete hash evidence |
+| `tools/toolchain.py` | stages only the declared compiler/linker/runtime/header files; `--exact` enforces their fingerprints |
 | `tools/verify.py` | **the checker**: builds, compares every `/* FUNCTION: DONALD SSSS:OOOO */` function (fixups masked) and every linked assembly module, updates `symbols.csv`, prints byte progress |
 | `tools/fndiff.py` | instruction-level diff of one function with operands normalised (handles jump tables with `--skip`) |
 | `tools/permute.py` | permuter: tries `@P{a\|b}` source alternatives times a flag list and writes the first 100% match |
@@ -66,9 +69,14 @@ Requirements: Linux with DOSBox-X, `nasm`, Python 3, and your own **Turbo C 2.0*
 
 1. `tools/setup.sh`
 2. `tools/install_tc.sh /path/to/your/TC20-floppies.7z /opt/tc20` (or set `TC_ROOT` to an installed toolchain).
-3. `rm -rf build && tools/relink.sh all --check-hashes`
+3. `make check-source` (Python, Bash and NASM only).
+4. `make check-exact` (adds DOSBox-X and the pinned Turbo C 2.0 inputs).
 
-The outputs are `build/link/DONALD.EXE` and `build/link-alt/DONALD`. Both targets build even when `game/` contains only its README. Use `retail` or `alt` to build one target. Each variant has its own complete objects; alternate builds never reuse stale retail objects. Omit `--check-hashes` for an exploratory build whose output may not yet match.
+`make check-exact` writes a fresh `build/exact-*/` evidence directory with `inputs.json`, `verification.json`, `build.log`, Python audit logs and a `source/` copy. Its executables are `source/build/link/DONALD.EXE` and `source/build/link-alt/DONALD`. It ignores existing objects and never copies game binaries/assets.
+
+For the direct development build, run `tools/relink.sh all --check-hashes`; its outputs are `build/link/DONALD.EXE` and `build/link-alt/DONALD`. Both targets build even when `game/` contains only its README. Use `retail` or `alt` to build one target. Each variant has its own complete objects; alternate builds never reuse stale retail objects. Omit `--check-hashes` for an exploratory build whose output may not yet match.
+
+C compilation uses a fresh work directory and a declared compiler/header snapshot. Only diagnostic logs are copied to `build/dos` or `build/alt/dos`; those output directories are never compiler inputs. DOSBox runs from an isolated directory/HOME with explicit configuration, no ambient autoexec/mapper/config, and a shared `/tmp/disney-dosbox.lock`. Low-level `dosrun.sh WORKDIR ...` intentionally mounts the supplied work directory; the supported build/relink callers create or clear their own staging.
 
 The hash check covers the entire executable, including the MZ header, relocation table, code, data and padding. It uses the hashes already recorded in `config/originals.sha256`, not bytes extracted from a retail executable. Turbo C 2.01 can compile the sources, but its different runtime library is **not** a substitute for the exact Turbo C 2.0 matching toolchain.
 

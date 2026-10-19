@@ -3,12 +3,19 @@
 # Propagate emulator failures, timeouts and DOS command ERRORLEVEL to the caller.
 set -euo pipefail
 if [ "$#" -lt 2 ]; then echo "Usage: dosrun.sh WORKDIR DOS_COMMAND..." >&2; exit 2; fi
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TC=${TC_ROOT:-/opt/tc20}; WORK="$(realpath "$1")"; shift
 DOSBOX=${DOSBOX:-dosbox-x}
 command -v "$DOSBOX" >/dev/null || { echo "DOSBox-X is required (set DOSBOX to its executable)." >&2; exit 1; }
 [ -d "$TC" ] || { echo "Turbo C directory not found: $TC (set TC_ROOT)." >&2; exit 1; }
+DOSBOX=$(command -v "$DOSBOX")
+DOSBOX=$(realpath "$DOSBOX")
+STAGE=$(mktemp -d)
 BAT="$WORK/_RUN.BAT"
-trap 'rm -f "$BAT"' EXIT
+trap 'rm -f "$BAT"; rm -rf "$STAGE"' EXIT
+python3 "$ROOT/tools/toolchain.py" "$TC" --stage "$STAGE/compiler"
+mkdir "$STAGE/home"
+cp "$ROOT/config/compiler-dosbox.conf" "$STAGE/compiler.conf"
 {
   echo "@echo off"
   echo "set PATH=C:\\"
@@ -31,12 +38,19 @@ trap 'rm -f "$BAT"' EXIT
 } | sed 's/$/\r/' > "$BAT"
 rm -f "$WORK/_OUT.TXT" "$WORK/_DONE.TXT" "$WORK/_FAIL.TXT"
 rc=0
-# Adaptive cycles=max can throttle almost to a halt with SDL's headless driver.
-# A fixed budget keeps compiler runs deterministic and quick on headless hosts.
-# Retain the normal CPU core for portability; only its cycle budget is changed.
-SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy timeout --kill-after=5 "${DOS_TIMEOUT:-300}" "$DOSBOX" -silent -nogui -nomenu -fastlaunch \
-  -set "cpu core=normal" -set "cpu cycles=${DOS_CYCLES:-fixed 100000}" -set "dos ver=3.3" -set "dosbox memsize=16" \
-  -c "mount c \"$TC\"" -c "mount d \"$WORK\"" -c "d:" -c "call _RUN.BAT" -c "exit" >"$WORK/_EMU.LOG" 2>&1 || rc=$?
+# Only this invocation's compiler snapshot and caller-supplied work directory
+# are mounted. Ignore host DOSBox config, mapper and autoexec files explicitly.
+# Serialize the real emulator process across the related DOS recoveries.
+(
+  cd "$STAGE"
+  export HOME="$STAGE/home" XDG_CONFIG_HOME="$STAGE/home"
+  export SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy
+  flock /tmp/disney-dosbox.lock timeout --kill-after=5 "${DOS_TIMEOUT:-300}" "$DOSBOX" \
+    -conf "$STAGE/compiler.conf" -noautoexec -noconfig -defaultmapper \
+    -silent -nogui -nomenu -fastlaunch -set "cpu cycles=${DOS_CYCLES:-fixed 100000}" \
+    -c "mount c \"$STAGE/compiler\"" -c "mount d \"$WORK\"" \
+    -c "d:" -c "call _RUN.BAT" -c "exit"
+) >"$WORK/_EMU.LOG" 2>&1 || rc=$?
 if [ -f "$WORK/_OUT.TXT" ]; then tr -d '\r' < "$WORK/_OUT.TXT"; fi
 if [ "$rc" -ne 0 ]; then
   cat "$WORK/_EMU.LOG" >&2
