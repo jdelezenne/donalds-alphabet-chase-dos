@@ -5,14 +5,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 -m py_compile tools/*.py && bash -n tools/*.sh
-      - name: no game binaries committed
+      - run: |
+          python3 -m py_compile tools/*.py
+          for script in tools/*.sh; do bash -n "$script"; done
+      - run: python3 tools/verify.py --sources-only
+      - name: no game or compiler binaries committed
         run: "! git ls-files | grep -iE '\\.(exe|cmp|com|obj|lib|img|ima)$|^game/DONALD$'"
-  relink:
-    # Needs game/DONALD.EXE and Turbo C 2.0 (TC_ROOT) + DOSBox-X + NASM, which cannot live in the repo:
-    # runs only on a self-hosted runner that has them (set repository variable DAC_SELF_HOSTED=true).
+      - name: assemble both real source variants without game files
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y nasm
+          DAC_TARGET=retail tools/assemble.sh
+          DAC_TARGET=alt tools/assemble.sh
+  standalone:
+    # The compiler/runtime is licensed separately; the runner needs Turbo C 2.0,
+    # DOSBox-X and NASM. Neither original EXE nor CMP data is needed for this job.
     if: ${{ vars.DAC_SELF_HOSTED == 'true' }}
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - run: tools/relink.sh   # verify.py (all functions) + TLINK + whole-EXE byte compare
+      - name: clean build and whole-executable hash proof without originals
+        shell: bash
+        run: |
+          clean=$(mktemp -d)
+          trap 'rm -rf "$clean"' EXIT
+          git archive HEAD | tar -x -C "$clean"
+          cd "$clean"
+          test -z "$(find game -type f ! -name README.md -print -quit)"
+          tools/relink.sh all --check-hashes

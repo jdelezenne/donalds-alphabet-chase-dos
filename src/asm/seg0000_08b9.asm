@@ -109,7 +109,7 @@ L08B9:
     je short L08F1
     shl ch, 1
     jmp short L0908
-    db 0x90
+    nop
 L08F1:
     mov cx, 0xfa0
     mov dx, 0x3ce
@@ -171,7 +171,7 @@ L092B:
     jne short L0963
     shr ax, 1
     jmp short L097D
-    db 0x90
+    nop
 L0963:
     shl dx, 1
     shl cx, 1
@@ -181,7 +181,7 @@ L0963:
     shr ax, 1
     shr ax, 1
     jmp short L097D
-    db 0x90
+    nop
 L0977:
     shl dx, 1
     shl cx, 1
@@ -226,7 +226,7 @@ L09C0:
     jns short L09F7
     sub di, 0x7f60
     jmp short L09F7
-    db 0x90
+    nop
 L09E9:
     add di, 0x1fb0
     test dx, 1
@@ -941,7 +941,7 @@ L0EFE:
     pop es
     mov ax, 0x280
     jmp short L0F27
-    db 0x90
+    nop
 L0F20:
     rr mov, ax, bx
     mov cx, 6
@@ -971,13 +971,13 @@ L0F2C:
     mov es, dx
     mov ds, ax
     jmp short L0F52
-    db 0x90
+    nop
 L0F4B:
     inc si
     mov ax, word [si]
     inc si
     jmp short L0F63
-    db 0x90
+    nop
 L0F52:
     mov dx, 0x7d00
 L0F55:
@@ -1034,13 +1034,13 @@ L0F83:
     mov es, dx
     mov ds, ax
     jmp short L0FA9
-    db 0x90
+    nop
 L0FA2:
     inc si
     mov ax, word [si]
     inc si
     jmp short L0FBC
-    db 0x90
+    nop
 L0FA9:
     mov dx, 0x7d00
     mov bl, 0xc8
@@ -1214,7 +1214,7 @@ L109B:
     je short L10C2
     loop L109B
     jmp short L10CC
-    db 0x90
+    nop
 L10C2:
     xor dh, 1
     je short L1094
@@ -1291,7 +1291,7 @@ L113D:
     je short L114C
     loop L1103
     jmp short L1159
-    db 0x90
+    nop
 L114C:
     dec cx
     je short L1159
@@ -1369,8 +1369,8 @@ L1197:
     mov al, byte [es:si]
     shr al, 1
     shr al, 1
-    db 0x26,0xD0,0x54,0x02  ; rcl byte ptr es:[si + 2]
-    db 0x26,0xD0,0x54,0x01  ; rcl byte ptr es:[si + 1]
+    rcl byte [es:si + 2], 1
+    rcl byte [es:si + 1], 1
     cmc
     sbb al, byte [es:si]
     shr al, 1
@@ -1880,7 +1880,7 @@ L170F:
     rr add, di, ax
     mov byte [0x2a0], 0
     sar bx, 1
-    db 0xD0,0x16,0xA0,0x02  ; rcl byte ptr [0x2a0]
+    rcl byte [0x2a0], 1
     rr sub, bx, ax
     mov word [0x294], bx
     mov ax, word [0x28a]
@@ -1955,7 +1955,7 @@ L17DC:
     mov word [0x29a], ax
     mov word [cs:0x16f4], 1
     jmp short L1808
-    db 0x90
+    nop
 L1805:
     jmp near L188A
 L1808:
@@ -2220,7 +2220,7 @@ L1A5C:
     mov word [0x29a], ax
     mov word [cs:0x16f4], 1
     jmp short L1A86
-    db 0x90
+    nop
 L1A83:
     jmp near L1B1A
 L1A86:
@@ -2434,7 +2434,7 @@ L1D32:
     rr add, di, ax
     mov byte [0x2a0], 0
     sar bx, 1
-    db 0xD0,0x16,0xA0,0x02  ; rcl byte ptr [0x2a0]
+    rcl byte [0x2a0], 1
     rr sub, bx, ax
     mov word [0x294], bx
     mov ax, word [0x28a]
@@ -2508,7 +2508,7 @@ L1DF5:
     mov word [0x29a], ax
     mov word [cs:0x16f4], 1
     jmp short L1E27
-    db 0x90
+    nop
 L1E24:
     jmp near L1EC8
 L1E27:
@@ -2798,7 +2798,7 @@ L20B2:
     mov word [0x29a], ax
     mov word [cs:0x16f4], 1
     jmp short L20E8
-    db 0x90
+    nop
 L20E5:
     jmp near L1EC8
 L20E8:
@@ -3223,7 +3223,7 @@ L244E:
     inc di
     loop L244E
     jmp short L2461
-    db 0x90
+    nop
 L245B:
     mov byte [es:di], dh
     inc di
@@ -3270,7 +3270,7 @@ L249D:
     cmp si, 0x4a5
     jne short L249D
     jmp short L24D7
-    db 0x90
+    nop
 L24B2:
     add di, 0x7fe
 L24B6:
@@ -3497,7 +3497,7 @@ L261B:
     cmp dx, word [0x14b1]
     jle short L261B
     jmp short L269C
-    db 0x90
+    nop
 L262E:
     mov cx, 4
     shl ax, cl
@@ -3541,7 +3541,7 @@ L267A:
     add di, 0x2000
     loop L267A
     jmp short L269C
-    db 0x90
+    nop
 L2696:
     sub di, 0x5f60
     loop L267A

@@ -136,7 +136,7 @@ L2B01:
     sub ax, word [0x14c7]
     mov word [cs:0x2a11], ax
     jmp short L2B38
-    db 0x90
+    nop
 L2B35:
     jmp near L2BD4
 L2B38:
@@ -188,7 +188,7 @@ L2B8F:
     stosb
     loop L2B8F
     jmp short L2BA1
-    db 0x90
+    nop
 L2B9A:
     lodsb
     rr add, di, ax
@@ -357,7 +357,7 @@ L2CCC:
     sub ax, word [0x14da]
     mov word [cs:0x2bdc], ax
     jmp short L2D03
-    db 0x90
+    nop
 L2D00:
     jmp near L2DA5
 L2D03:
@@ -412,7 +412,7 @@ L2D5D:
     dec di
     loop L2D5D
     jmp short L2D72
-    db 0x90
+    nop
 L2D6B:
     lodsb
     rr sub, di, ax

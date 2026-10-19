@@ -50,6 +50,7 @@ wait_vretrace,0000:2553,49,asm,waits for (the end of) vertical retrace
 vline,0000:2584,410,asm,"(x, y1, y2, colour)"
 set_dac_regs,0000:271E,96,asm,int 10h AX=1010h
 save_window,0000:277E,309,asm,"window background save/blit (x, y, w, h, buf)"
+blit_generic,0000:28B3,354,asm,"sprite/picture blit for CGA/Tandy (x, y, w, rows, src)"
 sprite_put_m3,0000:2A15,459,asm,"draw_sprite, g_videoMode 3"
 sprite_mask_m3,0000:2BE0,467,asm,"draw_sprite_masked, g_videoMode 3"
 setargv_local,0000:2DAB,8,lib,CL.LIB:SETARGV

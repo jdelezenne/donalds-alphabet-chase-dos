@@ -23,8 +23,8 @@ Runtime strings: `Divide error`, `Abnormal program termination`.
 ## Memory model: large (confirmed by C0L.OBJ/CL.LIB match, see MATCHING.md)
 - **Far code**: ~47 distinct code segments in the relocation table (one per module, Borland style), 462 `9A` far-call bytes vs 204 `E8`, 249 `RETF` (`CB`).
 - **Far data**: no `Null pointer assignment` message (Turbo C only emits that check in tiny/small/medium), 440 `LES` bytes.
-- 58 `push ds; mov ax,seg; mov ds,ax` sequences: could be huge-model prologues or library code; **large vs huge is open** (match `C0L.OBJ` vs `C0H.OBJ` startup with `libmatch`).
+- The DS-reloading sequences belong to the hand-written drivers and runtime code. `C0L.OBJ`/`CL.LIB` matching confirms the large model; the earlier large-versus-huge question is closed (see `MATCHING.md`).
 
 ## Data files
-`*.CMP` (30 files): compressed pictures/animations (title, credits, per-letter-group `*DON`/`*PET`/`*SCR`, `WIN1-4`, `LIGHTBLB`). Format not yet analysed.
+`*.CMP` (30 files): compressed pictures/animations (title, credits, per-letter-group `*DON`/`*PET`/`*SCR`, `WIN1-4`, `LIGHTBLB`). The format is documented in [CMP.md](CMP.md), with a decoder in `tools/cmp_extract.py`.
 Video: CGA, EGA and Tandy are detected (`A CGA / An EGA / A TANDY graphic card has been detected`).
