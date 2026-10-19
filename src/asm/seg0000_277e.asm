@@ -117,7 +117,7 @@ L282B:
     sub dx, 4
     jne short L282B
     jmp short L28A6
-    db 0x90
+    nop
 L2863:
     mov ax, 0x140
     mul dx
@@ -282,7 +282,7 @@ L2973:
     sub dx, 4
     jne short L2973
     jmp short L2A09
-    db 0x90
+    nop
 L29AB:
     mov ax, 0x140
     mul dx

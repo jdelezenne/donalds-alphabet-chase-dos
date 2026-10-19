@@ -144,7 +144,7 @@ while editing). The relink above supersedes it as the proof.
 - These changes make M04FC 74 bytes shorter. The hand-written drivers seg0512/seg056a then start 8 bytes further into
   their paragraph (0512 at offset 9, 056A at offset 8), and their TASM-style hard-coded `cs:` offsets move with them.
   They are written as `CSO(n)` (= `n`, or `n + 8` under `DONALD_ALT`).
-Only units that mention `DONALD_ALT` are rebuilt for the alt target (`build/alt/obj`, `build/alt/asm`). Everything else is shared.
+Originally only units mentioning `DONALD_ALT` were rebuilt. The standalone build now compiles and assembles every unit separately for each variant (`build/alt/obj`, `build/alt/asm`), avoiding fallback to stale retail objects.
 
 ## Names (batch 6)
 
@@ -171,3 +171,33 @@ messages and file names, and those name the message globals (`msg_*`, `msg_err_*
   them; they only fill layout gaps. `arrow_scancodes` and `msg_err_write_io` are named from their contents, but nothing
   references them either.
 
+
+## Standalone build and assembly completion
+
+`tools/relink.sh [retail|alt|all]` now compiles every C and assembly module for
+each selected variant and invokes TLINK without reading an original executable.
+`--check-hashes` verifies the complete resulting files against the existing
+`config/originals.sha256`; `--verify` additionally opts into local reference
+comparison (and retail function-level verification). Neither flag is required
+to build. Turbo C startup/runtime objects remain legitimate compiler inputs.
+
+The previous assembly sources had four opaque executable byte blocks despite
+the report counting only six commented instruction exceptions. The sound
+interrupt/music interpreter, Ctrl-C handler, sound driver's keyboard filter,
+and keyboard queue ISR (including its Ctrl-C IRET) are now mnemonic assembly.
+The sound/keyboard data tables and three bytes of keyboard ISR state remain
+data. These edits must preserve every segment byte and OMF fixup for both
+variants; see `BUILD_VALIDATION.md` for the checks actually run.
+
+No compiler or original game files are downloaded by the build. The source-only
+self-hosted CI job uses a fresh tracked-files archive with no game data and
+checks both full executable hashes. Its Turbo C 2.0 installation is provisioned
+separately. Public CI assembles both real assembly variants; this alone is not
+a full link or runtime proof.
+
+Recovered instructions retain TASM's register-register direction bits using
+`rr`, explicit near/short branches and alignment NOPs, strict-word AX immediate
+compares, and forced 16-bit memory displacements where needed. The six old
+single-instruction `db` exceptions also had valid NASM spellings (explicit
+rotate count 1 or forced disp16) and are now mnemonics. `rr` is an instruction
+encoding macro, not a stored executable slice.

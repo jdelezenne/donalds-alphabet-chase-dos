@@ -15,4 +15,13 @@ find "$T" -type f | while read -r f; do
 done
 rm -rf "$T"
 ( cd "$DST" && sha256sum TCC.EXE TLINK.EXE LIB/C0L.OBJ LIB/CL.LIB > MANIFEST.sha256 && cat MANIFEST.sha256 )
-SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy TC_ROOT="$DST" "$(dirname "$0")/dosrun.sh" "$(mktemp -d)" "TCC" | head -1
+# TCC without an input prints its version and returns ERRORLEVEL 1. This is a
+# version probe, not a compilation; still reject an emulator failure/no banner.
+PROBE=$(mktemp -d)
+probe_status=0
+probe_output=$(TC_ROOT="$DST" "$(dirname "$0")/dosrun.sh" "$PROBE" "TCC" 2>&1) || probe_status=$?
+rm -rf "$PROBE"
+if [ "$probe_status" -gt 1 ] || ! grep -q '^Turbo C ' <<< "$probe_output"; then
+  printf '%s\n' "$probe_output" >&2; exit 1
+fi
+grep -m1 '^Turbo C ' <<< "$probe_output"

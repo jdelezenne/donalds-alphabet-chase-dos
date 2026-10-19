@@ -37,7 +37,7 @@ results = []
 for i in range(0, len(jobs), 40):
     batch = jobs[i:i + 40]
     subprocess.run([str(ROOT / "tools/dosrun.sh"), str(work)] + [f"TCC -c -IC:\\INCLUDE {fl} {n}.C" for n, fl, _, _ in batch],
-                   stdout=subprocess.DEVNULL)
+                   stdout=subprocess.DEVNULL, env={**os.environ, "DOS_CONTINUE_ON_ERROR": "1"})
     for n, fl, c, src in batch:
         o = work / f"{n}.OBJ"; results.append((score(o) if o.exists() else 0.0, fl, c, src))
 results.sort(key=lambda r: -r[0])

@@ -84,7 +84,7 @@ L02A6:
     stosb
     loop L02A6
     jmp short L02EF
-    db 0x90
+    nop
 L02AF:
     mov cx, 4
     shl al, cl
@@ -268,7 +268,7 @@ L0438:
     cmp word [GV_MODE], 2
     je short L0442
     jmp short L04B6
-    db 0x90
+    nop
 L0442:
     mov ax, word [0x20]
     add ax, word [0x18]
@@ -634,7 +634,7 @@ L07AA:
     jmp near L086C
 L07C0:
     jmp short L0827
-    db 0x90
+    nop
 L07C3:
     cmp word [0x16], 0xa000
     je short L07F9
@@ -659,7 +659,7 @@ L07DA:
     dec dx
     jne short L07D8
     jmp short L086C
-    db 0x90
+    nop
 L07F9:
     mov dx, word [0x22]
     mov bx, word [0x20]
@@ -682,7 +682,7 @@ L0808:
     dec dx
     jne short L0806
     jmp short L086C
-    db 0x90
+    nop
 L0827:
     rr sub, bx, bx
     mov ax, 0x2000

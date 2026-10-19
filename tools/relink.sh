@@ -1,25 +1,41 @@
 #!/usr/bin/env bash
-# Full relink check: compile C, assemble asm, TLINK, whole-EXE compare. Every byte comes from src/ (the original
-# EXEs are only read for the comparison).
-# Usage: tools/relink.sh [retail|alt|all]   (default all; alt is skipped when game/DONALD is absent)
-#   retail: build/link/DONALD.EXE     vs game/DONALD.EXE (sha256 c72ed190...)
-#   alt:    build/link-alt/DONALD     vs game/DONALD     (sha256 61d3bc8b...), the same sources with DONALD_ALT
+# Build complete DOS executables from source and the Turbo C 2.0 runtime.
+# No game files are read unless --verify is explicitly requested.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-T=${1:-all}
-python3 tools/verify.py >/dev/null || { echo "verify.py failed (function mismatch)"; exit 1; }
-rc=0
-if [ "$T" != alt ]; then python3 tools/relink.py || rc=1; fi
-if [ "$T" != retail ]; then
-  if [ -f game/DONALD ]; then
-    # only the units that have DONALD_ALT variants are rebuilt; everything else is shared with retail
-    mapfile -t C < <(grep -l DONALD_ALT $(find src -name '*.c' | sort))
-    DAC_TARGET=alt tools/build.sh "${C[@]}" >/dev/null
-    mkdir -p build/alt/asm
-    for a in $(grep -l DONALD_ALT src/asm/*.asm); do
-      nasm -f obj -DDONALD_ALT -i src/asm/ -o "build/alt/asm/$(basename "$a" .asm).OBJ" "$a"
-    done
-    python3 tools/relink.py --alt || rc=1
-  else echo "game/DONALD not present: alt target skipped"; fi
+target=all; verify=(); check_hashes=false
+for arg in "$@"; do
+  case "$arg" in
+    retail|alt|all) target=$arg ;;
+    --verify) verify=(--verify) ;;
+    --check-hashes) check_hashes=true ;;
+    -h|--help)
+      echo "Usage: tools/relink.sh [retail|alt|all] [--check-hashes] [--verify]"
+      echo "Default: build both targets without reading game/."
+      echo "--check-hashes checks the built files against config/originals.sha256 (no originals needed)."
+      echo "--verify also compares with the selected original executable(s) in game/."
+      exit 0 ;;
+    *) echo "Unknown argument: $arg" >&2; exit 2 ;;
+  esac
+done
+python3 tools/verify.py --sources-only
+if [ ${#verify[@]} -gt 0 ]; then
+  if [ "$target" != alt ] && [ ! -f game/DONALD.EXE ]; then
+    echo "--verify requires game/DONALD.EXE; omit --verify for a source-only build." >&2; exit 1
+  fi
+  if [ "$target" != retail ] && [ ! -f game/DONALD ]; then
+    echo "--verify requires game/DONALD; omit --verify for a source-only build." >&2; exit 1
+  fi
 fi
-exit $rc
+if [ "$target" != alt ]; then
+  DAC_TARGET=retail tools/build.sh
+  DAC_TARGET=retail tools/assemble.sh
+  python3 tools/relink.py "${verify[@]}"
+  if [ ${#verify[@]} -gt 0 ]; then python3 tools/verify.py --no-build; fi
+fi
+if [ "$target" != retail ]; then
+  DAC_TARGET=alt tools/build.sh
+  DAC_TARGET=alt tools/assemble.sh
+  python3 tools/relink.py --alt "${verify[@]}"
+fi
+if "$check_hashes"; then python3 tools/check_build.py "$target"; fi

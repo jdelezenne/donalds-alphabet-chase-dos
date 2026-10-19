@@ -1,49 +1,90 @@
 #!/usr/bin/env python3
-"""Relink DONALD.EXE with the Turbo C 2.0 TLINK from build objects and compare the whole EXE with the original.
-Inputs: build/obj/*.OBJ (tools/build.sh), build/asm/*.OBJ (tools/verify.py),
-C:\\LIB\\C0L.OBJ + C:\\LIB\\CL.LIB from $TC_ROOT, object order from config/retail/link.txt.
-Output: build/link/DONALD.EXE (+ DONALD.MAP); prints the first differences. Exit 0 only if byte-identical.
-Usage: relink.py [--alt]
---alt: the alternate build game/DONALD (sha256 61d3bc8b...): objects from build/alt/obj override build/obj
-(DAC_TARGET=alt tools/build.sh), asm variants assembled with -DDONALD_ALT into build/alt/asm, output build/link-alt."""
-import hashlib, shutil, struct, subprocess, sys
+"""Link source-built OMF objects with Turbo C 2.0; optionally compare an original.
+
+Usage: relink.py [--alt] [--verify]
+Run tools/relink.sh to compile and assemble first. Without --verify, no game files
+are read. The startup object and C library come from the installed toolchain.
+"""
+import argparse
+import hashlib
 from pathlib import Path
+import shutil
+import struct
+import subprocess
+import sys
+
 ROOT = Path(__file__).resolve().parents[1]
-ALT = "--alt" in sys.argv
-L = ROOT / ("build/link-alt" if ALT else "build/link")
-TARGET, ORIG = ("DONALD", "game/DONALD") if ALT else ("DONALD.EXE", "game/DONALD.EXE")
-if L.exists(): shutil.rmtree(L)
-L.mkdir(parents=True)
-objs = []
-for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
-    if not line.strip() or line.startswith("#"): continue
-    n, s = line.split()[:2]
-    kind, name = s.split(":")
-    if kind == "lib": objs.append("C:\\LIB\\" + name); continue
-    src = ROOT / {"obj": "build/obj", "asm": "build/asm"}[kind] / (name + ".OBJ")
-    alt = ROOT / {"obj": "build/alt/obj", "asm": "build/alt/asm"}[kind] / (name + ".OBJ")
-    if ALT and alt.exists(): src = alt
-    if not src.exists(): sys.exit(f"missing {src} (run tools/build.sh, tools/verify.py)")
-    shutil.copy(src, L / (n + ".OBJ")); objs.append(n)
-rsp = "/m /s /l /c " + " +\r\n".join(objs) + "\r\nDONALD\r\nDONALD\r\nC:\\LIB\\CL\r\n"
-(L / "LINK.RSP").write_bytes(rsp.encode())
-out = subprocess.run([str(ROOT / "tools/dosrun.sh"), str(L), "TLINK @LINK.RSP"], capture_output=True, text=True).stdout
-msgs = [l for l in out.splitlines() if l.strip() and not l.startswith("Turbo Link")]
-for m in msgs: print("tlink:", m)
-exe = L / "DONALD.EXE"
-if not exe.exists(): sys.exit("link failed")
-a, b = exe.read_bytes(), (ROOT / ORIG).read_bytes()
-if ALT: (L / "DONALD").write_bytes(a)
-print(f"{L.relative_to(ROOT)}/{TARGET} {len(a)} bytes sha256 {hashlib.sha256(a).hexdigest()[:16]}; original {len(b)} bytes")
-if a == b: print(f"IDENTICAL to {ORIG}"); sys.exit(0)
-ha, hb = struct.unpack_from("<14H", a), struct.unpack_from("<14H", b)
-print("header mine", ha); print("header orig", hb)
-hs = hb[4] * 16
-diffs = [i for i in range(min(len(a), len(b))) if a[i] != b[i]]
-print(f"{len(diffs)} differing bytes in common length")
-def where(i): return f"hdr+{i:#x}" if i < hs else f"img {i - hs:#07x}"
-shown, last = 0, -99
-for i in diffs:
-    if i > last + 16 and shown < 25: print("  diff at", where(i), a[i:i + 8].hex(" "), "| orig", b[i:i + 8].hex(" ")); shown += 1
-    last = i
-sys.exit(1)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--alt", action="store_true", help="link the alternate DONALD build")
+    parser.add_argument("--verify", action="store_true", help="compare with the original in game/")
+    args = parser.parse_args()
+    link_dir = ROOT / ("build/link-alt" if args.alt else "build/link")
+    object_root = ROOT / ("build/alt" if args.alt else "build")
+    target = "DONALD" if args.alt else "DONALD.EXE"
+    original = ROOT / "game" / target
+    if args.verify and not original.is_file():
+        parser.error(f"--verify requires {original}; omit --verify to link without it")
+
+    # Check every input before discarding a previous successful link.
+    inputs = []
+    for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        name, source = line.split()
+        kind, stem = source.split(":")
+        if kind == "lib":
+            inputs.append((name, "C:\\LIB\\" + stem))
+            continue
+        path = object_root / {"obj": "obj", "asm": "asm"}[kind] / (stem + ".OBJ")
+        if not path.is_file():
+            sys.exit(f"Missing {path}; run tools/relink.sh {'alt' if args.alt else 'retail'}")
+        inputs.append((name, path))
+    if link_dir.exists():
+        shutil.rmtree(link_dir)
+    link_dir.mkdir(parents=True)
+    objects = []
+    for name, source in inputs:
+        if isinstance(source, Path):
+            shutil.copyfile(source, link_dir / (name + ".OBJ"))
+            objects.append(name)
+        else:
+            objects.append(source)
+    response = "/m /s /l /c " + " +\r\n".join(objects) + "\r\nDONALD\r\nDONALD\r\nC:\\LIB\\CL\r\n"
+    (link_dir / "LINK.RSP").write_bytes(response.encode("ascii"))
+    subprocess.run([str(ROOT / "tools/dosrun.sh"), str(link_dir), "TLINK @LINK.RSP"], check=True)
+    executable = link_dir / "DONALD.EXE"
+    if not executable.is_file():
+        sys.exit("TLINK did not produce DONALD.EXE")
+    built = executable.read_bytes()
+    if len(built) < 28 or built[:2] != b"MZ":
+        sys.exit("TLINK output is not a DOS MZ executable")
+    if args.alt:
+        executable.rename(link_dir / target)
+    print(f"{link_dir.relative_to(ROOT)}/{target}: {len(built)} bytes, sha256 {hashlib.sha256(built).hexdigest()}")
+    if not args.verify:
+        return 0
+
+    reference = original.read_bytes()
+    if built == reference:
+        print(f"IDENTICAL to game/{target}")
+        return 0
+    print(f"MISMATCH against game/{target}: built {len(built)}, original {len(reference)} bytes")
+    if len(reference) >= 28:
+        print("header mine", struct.unpack_from("<14H", built))
+        print("header orig", struct.unpack_from("<14H", reference))
+    differences = [i for i in range(min(len(built), len(reference))) if built[i] != reference[i]]
+    print(f"{len(differences)} differing bytes in common length")
+    shown, last = 0, -99
+    for offset in differences:
+        if offset > last + 16 and shown < 25:
+            print(f"  file+{offset:#x}: {built[offset:offset + 8].hex(' ')} | orig {reference[offset:offset + 8].hex(' ')}")
+            shown += 1
+        last = offset
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -3,41 +3,116 @@
 Every function in src/**.c carries `/* FUNCTION: DONALD SSSS:OOOO */` on the line(s) before its definition.
 verify.py builds everything (tools/build.sh), compares each annotated function against game/DONALD.EXE with
 fixup bytes masked, updates config/retail/symbols.csv (matched/nonmatching + %), and prints byte progress.
-Usage: verify.py [-n|--no-build] [-v] [paths...]   exit 1 if any annotated function does not match."""
+Usage: verify.py [--sources-only] [-n|--no-build] [-v] [paths...]
+No paths checks the complete C source manifest. Explicit paths check only those units; a subset run never
+refreshes the full-build coverage summary. Both modes check every linked assembly module.
+--sources-only: check source annotations and link-manifest coverage, then exit without a compiler or original.
+This mode does not compile, assemble, compare bytes, or update recorded match results.
+This is a fixup-masked comparison, not a replacement for a whole-executable relink comparison."""
 import csv, re, subprocess, sys, struct
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent)); import omf
 ROOT = Path(__file__).resolve().parents[1]
+if "-h" in sys.argv or "--help" in sys.argv: print(__doc__); sys.exit(0)
 args = [a for a in sys.argv[1:] if not a.startswith("-")]
 srcs = [Path(a).resolve() for a in args] or sorted((ROOT / "src").rglob("*.c"))
-if "-n" not in sys.argv and "--no-build" not in sys.argv:
-    subprocess.run([str(ROOT / "tools/build.sh"), *map(str, srcs)], check=False, stdout=subprocess.DEVNULL)
-exe = (ROOT / "game/DONALD.EXE").read_bytes(); img = exe[struct.unpack_from("<H", exe, 8)[0] * 16:]
+full = not args
+fn = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
+expected = {r["addr"]: int(r["size"]) for r in fn if r["kind"] == "c"}
 ANN = re.compile(r"/\*\s*FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\s*\*/")
 DEF = re.compile(r"^(?:[A-Za-z_][\w \*]*?[\s\*])?(\w+)\s*\([^;]*$")
-res = {}
+selected = {}; seen_addr = {}; seen_name = {}; stems = set()
+errors = []
 for src in srcs:
+    if not src.is_file(): errors.append(f"missing source: {src}"); continue
+    if src.stem in stems: errors.append(f"duplicate object stem: {src.stem}")
+    stems.add(src.stem)
     lines = src.read_text().splitlines(); want = []
     for i, l in enumerate(lines):
         m = ANN.search(l)
-        if m:
-            for l2 in lines[i + 1:]:
-                d = DEF.match(l2)
-                if d: want.append((d.group(1), m.group(1).upper() + ":" + m.group(2).upper())); break
+        if not m: continue
+        address = m.group(1).upper() + ":" + m.group(2).upper()
+        definition = None
+        for l2 in lines[i + 1:]:
+            if ANN.search(l2): break
+            definition = DEF.match(l2)
+            if definition: break
+        if not definition:
+            errors.append(f"{src}:{i + 1}: annotation has no function definition"); continue
+        name = definition.group(1)
+        if address not in expected: errors.append(f"{src}:{i + 1}: {address} is not a manifest C function")
+        if address in seen_addr: errors.append(f"duplicate C address: {address}")
+        if name in seen_name: errors.append(f"duplicate C function: {name}")
+        seen_addr[address] = src; seen_name[name] = src
+        want.append((name, address))
+    # All current game definitions use an opening brace on the following line. Detect accidentally dropped
+    # annotations too, instead of letting an extra untracked definition escape verification.
+    definitions = {m.group(1) for i, line in enumerate(lines[:-1])
+                   if (m := DEF.match(line)) and lines[i + 1].strip() == "{"}
+    unannotated = definitions - {name for name, _ in want}
+    if unannotated: errors.append(f"{src}: unannotated functions: {', '.join(sorted(unannotated))}")
+    selected[src] = want
+if full:
+    missing = set(expected) - set(seen_addr)
+    if missing: errors.append("missing C sources/annotations: " + " ".join(sorted(missing)))
+asm_sources = sorted((ROOT / "src/asm").glob("*.asm"))
+link_inputs = [line.split()[1].split(":", 1)
+               for line in (ROOT / "config/retail/link.txt").read_text().splitlines()
+               if line.strip() and not line.lstrip().startswith("#")]
+linked_asm = {name for kind, name in link_inputs if kind == "asm"}
+if full and stems != {name for kind, name in link_inputs if kind == "obj"}:
+    errors.append("C sources (including data-only units) do not equal the C objects in config/retail/link.txt")
+if {a.stem for a in asm_sources} != linked_asm:
+    errors.append("assembly sources do not equal the assembly objects in config/retail/link.txt")
+for asm_src in asm_sources:
+    if not re.search(r"SEGMENT:\s*DONALD\s+[0-9A-Fa-f]{4}\s+[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}", asm_src.read_text()):
+        errors.append(f"{asm_src}: missing SEGMENT annotation")
+if not expected or not srcs or not linked_asm: errors.append("empty source or function manifest")
+if errors: sys.exit("source coverage check failed:\n" + "\n".join(errors))
+if "--sources-only" in sys.argv:
+    data_units = sum(not want for want in selected.values())
+    print(f"{'Full' if full else 'Subset'} source coverage OK: {len(seen_addr)} annotated C functions, "
+          f"{len(srcs)} C units ({data_units} data-only), {len(asm_sources)} linked assembly modules. "
+          "No build or byte comparison performed.")
+    sys.exit(0)
+if "-n" not in sys.argv and "--no-build" not in sys.argv:
+    result = subprocess.run([str(ROOT / "tools/build.sh"), *map(str, srcs)])
+    if result.returncode: sys.exit("C build failed; no objects were verified")
+original = ROOT / "game/DONALD.EXE"
+if not original.is_file(): sys.exit("comparison requires game/DONALD.EXE; use the source-only build to compile without it")
+exe = original.read_bytes()
+if len(exe) < 28 or exe[:2] != b"MZ": sys.exit("invalid MZ comparison executable")
+header_size = struct.unpack_from("<H", exe, 8)[0] * 16
+if header_size < 28 or header_size + 3 > len(exe): sys.exit("invalid MZ comparison header size")
+img = exe[header_size:]
+res = {}; details = {}
+for src in srcs:
+    want = selected[src]
     obj = ROOT / "build/obj" / (src.stem + ".OBJ")
     if not obj.exists():
-        for n, a in want: res[n] = (a, 0, 0.0, "nobuild", src)
+        for n, a in want: res[n] = (a, expected[a], 0.0, "nobuild", src)
+        if not want: errors.append(f"missing data-only object: {obj}")
         continue
     segs, pubs, data, fix = omf.read(obj)
     code = sorted((si, off, nm.lstrip("_")) for nm, si, off in pubs if segs[si]["class"].upper().endswith("CODE"))
     for n, a in want:
         hit = [(k, c) for k, c in enumerate(code) if c[2] == n]
-        if not hit: res[n] = (a, 0, 0.0, "missing", src); continue
+        if not hit: res[n] = (a, expected[a], 0.0, "missing", src); continue
         k, (si, off, _) = hit[0]
         end = next((x[1] for x in code[k + 1:] if x[0] == si), segs[si]["len"])
         mine = data[si][off:end]
-        while len(mine) > 1 and mine[-1] == 0x90: mine = mine[:-1]
+        # Ignore only alignment beyond the manifest boundary, never bytes inside the expected function.
+        # Comparing a shorter matching prefix used to be enough to report a complete match.
+        while len(mine) > expected[a] and mine[-1] == 0x90: mine = mine[:-1]
+        if len(mine) != expected[a]:
+            res[n] = (a, expected[a], 0.0, "nonmatching", src)
+            details[n] = f"object size {len(mine)}, expected {expected[a]}"
+            continue
         lin = int(a[:4], 16) * 16 + int(a[5:], 16); orig = img[lin:lin + len(mine)]
+        if len(orig) != len(mine):
+            res[n] = (a, expected[a], 0.0, "nonmatching", src)
+            details[n] = "comparison executable ends before function boundary"
+            continue
         fx = {p - off for p in fix.get(si, ()) if off <= p < end}
         # near calls (push cs; call rel16) inside the module: compare resolved targets via annotations,
         # because the intra-segment layout is incomplete until every function of the module is placed
@@ -57,19 +132,21 @@ p = ROOT / "config/retail/symbols.csv"; rows = list(csv.DictReader(open(p)))
 byaddr = {r["addr"]: r for r in rows}
 for n, (a, size, pct, st, src) in res.items():
     r = byaddr.get(a) or {}
-    r.update(name=n, addr=a, size=str(size), status=st, notes=f"{pct:.1f}% {src.relative_to(ROOT)}")
+    extra = f"; {details[n]}" if n in details else ""
+    r.update(name=n, addr=a, size=str(size), status=st, notes=f"{pct:.1f}% {src.relative_to(ROOT)}{extra}")
     byaddr[a] = r
 rows = sorted(byaddr.values(), key=lambda r: int(r["addr"][:4], 16) * 16 + int(r["addr"][5:], 16))
 w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"]); w.writeheader(); w.writerows(rows)
 for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
-    if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st}")
+    if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st} {details.get(n, '')}".rstrip())
 # assembly modules: src/asm/*.asm (NASM -f obj, `; SEGMENT: DONALD SSSS AAAA-BBBB` header). The module's first CODE
 # segment must equal the original bytes with fixup (relocation) bytes masked; build/asm/<name>.OBJ feeds tools/relink.sh
 # and build/asm/<name>.bin (fixup bytes taken from the original) feeds tools/splice.py.
 asm_ok = 0; asm_bad = []
-for a in sorted((ROOT / "src/asm").glob("*.asm")):
+for a in asm_sources:
     m = re.search(r"SEGMENT:\s*DONALD\s+([0-9A-Fa-f]{4})\s+([0-9A-Fa-f]{4})-([0-9A-Fa-f]{4})", a.read_text())
-    if not m: continue
+    if not m:
+        asm_bad.append(a.name); print(f"{a.name}: missing SEGMENT annotation"); continue
     out = ROOT / "build/asm" / (a.stem + ".OBJ"); out.parent.mkdir(parents=True, exist_ok=True)
     r = subprocess.run(["nasm", "-f", "obj", "-i", str(a.parent) + "/", "-o", str(out), str(a)], capture_output=True, text=True)
     sg, s0, s1 = (int(x, 16) for x in m.groups()); want = img[sg * 16 + s0: sg * 16 + s1]
@@ -85,19 +162,24 @@ for a in sorted((ROOT / "src/asm").glob("*.asm")):
         asm_bad.append(a.name)
         k = next((i for i in range(min(len(got), len(want))) if got[i] != want[i]), min(len(got), len(want)))
         print(f"{a.name}: MISMATCH at {sg:04X}:{s0 + k:04X} (got {len(got)} bytes, want {len(want)}) {r.stderr.strip()}")
-fn = list(csv.DictReader(open(ROOT / "config/retail/functions.csv")))
-ctot = sum(int(r["size"]) for r in fn if r["kind"] == "c")
+ctot = sum(expected[a] for a in seen_addr)
 code_end = struct.unpack_from("<H", img, 1)[0] * 16       # DGROUP start = end of code
-matched = {r["addr"] for r in rows if r["status"] == "matched"}
-mc = sum(int(r["size"]) for r in fn if r["kind"] == "c" and r["addr"] in matched)   # sizes from functions.csv (data-trimmed)
+matched = {v[0] for v in res.values() if v[3] == "matched"}
+mc = sum(expected[a] for a in matched)
 lib = sum(int(r["size"]) for r in rows if r["status"] == "lib")
-nm = sum(1 for r in rows if r["status"] == "matched")
-unc = [r["addr"] for r in fn if r["kind"] == "c" and r["addr"] not in matched]
+nm = len(matched)
+unc = sorted(set(seen_addr) - matched)
 if unc: print("unmatched C:", " ".join(unc))
-summary = (f"checked {len(res)}, all matched {nm}; C {mc}/{ctot} bytes = {100*mc/ctot:.2f}%; "
-           f"code {mc+lib+asm_ok}/{code_end} bytes = {100*(mc+lib+asm_ok)/code_end:.2f}% (incl. {lib} lib, {asm_ok} asm)")
+for error in errors: print(error)
+summary = (f"{'Full' if full else 'Subset'} fixup-masked comparison: checked {len(res)} C functions, matched {nm}; "
+           f"C {mc}/{ctot} bytes; assembly modules matched {len(asm_sources) - len(asm_bad)}/{len(asm_sources)} "
+           f"({asm_ok} bytes).")
+if full:
+    summary += (f" Recorded CRT coverage: {lib} bytes; C + assembly + recorded CRT: "
+                f"{mc+lib+asm_ok}/{code_end} image bytes before DGROUP. Whole-EXE comparison is separate.")
 print(summary)
-(ROOT / "build").mkdir(exist_ok=True)
-(ROOT / "build/progress.txt").write_text(f"{100*mc/ctot:.2f}\n")
-(ROOT / "build/summary.txt").write_text(summary + "\n")
-sys.exit(0 if all(v[3] == "matched" for v in res.values()) and not asm_bad else 1)
+if full:
+    (ROOT / "build").mkdir(exist_ok=True)
+    (ROOT / "build/progress.txt").write_text(f"{100*mc/ctot:.2f}\n")
+    (ROOT / "build/summary.txt").write_text(summary + "\n")
+sys.exit(0 if not unc and not errors and not asm_bad else 1)
