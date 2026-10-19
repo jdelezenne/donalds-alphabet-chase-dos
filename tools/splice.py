@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Full-layout splice build (the maniac-mansion-dos / tintin-tibet-dos convention): start from the local
 game/DONALD.EXE, overwrite every byte we can produce ourselves (compiled C functions at non-fixup positions,
-assembled src/asm modules), write build/DONALD.EXE and byte-compare it with the original.
+assembled src/engine and src/audio modules), write build/DONALD.EXE and byte-compare it with the original.
 Fixup bytes (segment/offset values TLINK would write) and everything outside matched code (header, DGROUP data,
 library code) come from the local original; they are never stored in git. A real TLINK relink is the next step.
 Usage: splice.py   (run tools/verify.py first so build/obj and build/asm exist)"""
@@ -39,7 +39,7 @@ for src in sorted((ROOT / "src").rglob("*.c")):
             if i >= 3 and mine[i - 3] == 0x0E and mine[i - 2] == 0xE8: continue
             if out[p] != b: differ += 1
             out[p] = b; ours += 1
-for a in sorted((ROOT / "src/asm").glob("*.asm")):
+for a in sorted((ROOT / "src").rglob("*.asm")):
     m = re.search(r"SEGMENT:\s*DONALD\s+(\w{4})\s+(\w{4})-(\w{4})", a.read_text())
     sg, a0, a1 = (int(x, 16) for x in m.groups()); b = (ROOT / "build/asm" / (a.stem + ".bin")).read_bytes()
     for i, x in enumerate(b):

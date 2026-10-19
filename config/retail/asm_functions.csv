@@ -1,82 +1,82 @@
 addr,size,name,source,role,evidence
-0000:01C9,31,ega_present,src/asm/graphics_bios.asm,far API,ega_present: int 10h AH=12h BL=10h: EGA BIOS present; C compatibility symbol _ega_present
-0000:01E8,22,set_text_mode,src/asm/graphics_bios.asm,far API,set_text_mode: int 10h mode 3; C compatibility symbol _set_text_mode
-0000:01FE,25,ega_select_palette,src/asm/graphics_bios.asm,far API,"ega_select_palette: int 10h AH=10h, palette 0/1; C compatibility symbol _ega_select_palette"
-0000:0217,299,hspan,src/asm/graphics_rect.asm,far API,"hspan: horizontal EGA span (x, y, n, colour); C compatibility symbol _hspan"
-0000:0342,120,copy_rect,src/asm/graphics_rect.asm,far API,"copy_rect: rectangle copy (src, dst, x, y, w, h); scales x/w by the video mode, then copy_rect_core; C compatibility symbol _copy_rect"
-0000:03BA,116,copy_rect_ega,src/asm/graphics_rect.asm,far API,"copy_rect_ega: EGA rectangle copy (src, dst, x, y, w, h); C compatibility symbol _copy_rect_ega"
-0000:042E,585,copy_rect_core,src/asm/graphics_rect.asm,near dispatcher; overlapping embedded EGA latch entry,Called by copy_rect and copy_rect_ega; mode dispatch branches terminate at RET 0564 or 0676.
-0000:048B,43,copy_rect_ega_latch,src/asm/graphics_rect.asm,near entry overlapping copy_rect_core,Called by blit_ega_core; also entered by fallthrough from 042E dispatcher; local span 048B-04B5 jumps to shared RET at 0564.
-0000:0677,578,blit_ega_core,src/asm/graphics_rect.asm,far API,blit_ega_core: EGA latch blit used by blit_ega; C compatibility symbol _blit_ega_core
-0000:08B9,89,clear_screen,src/asm/graphics_core.asm,far API,clear_screen: clears video memory B800/A000 per mode; C compatibility symbol _clear_screen
-0000:0912,284,fill_rect_cells,src/asm/graphics_core.asm,far API,fill_rect_cells: solid fill of an eight-pixel-cell rectangle in the active video mode; C compatibility symbol _redraw_rect_hw
-0000:0A2E,61,far_copy,src/asm/graphics_core.asm,far API,"far_copy: rep movsw far copy (src, dst, len); C compatibility symbol _far_copy"
-0000:0A6B,185,present_buffer,src/asm/graphics_core.asm,far API,present_buffer: copies the off-screen buffer to video memory (EGA planes via 3C4/3CE); C compatibility symbol _present_buffer
-0000:0B2E,494,sprite_put_ega,src/asm/graphics_core.asm,far API,"sprite_put_ega: draw_sprite, EGA; C compatibility symbol _sprite_put_ega"
-0000:0D1C,58,cga_shift_rows,src/asm/graphics_core.asm,far API,cga_shift_rows: moves the converted CGA rows into place (small-window mode); C compatibility symbol _cga_shift_rows
-0000:0D56,281,pack_rect,src/asm/graphics_core.asm,far API,"pack_rect: packs a screen rectangle into a buffer, returns its size; C compatibility symbol _pack_rect"
-0000:0E6F,19,take_nibble,src/asm/graphics_core.asm,near helper,"Called by pack_rect; extracts high nibble of BX into DL, shifts BX four places, RET."
-0000:0E82,124,gfx_fill_rect,src/asm/graphics_core.asm,far API,"gfx_fill_rect: (x, y, w, h, colour); C compatibility symbol _gfx_fill_rect"
-0000:0EFE,46,dos_free_kb,src/asm/graphics_core.asm,far API,dos_free_kb: int 21h AH=48h probe; returns free conventional memory in KB; C compatibility symbol _dos_free_kb
-0000:0F2C,87,cmp_unpack_planar,src/asm/graphics_core.asm,far API,"cmp_unpack_planar: decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_planar"
-0000:0F83,107,cmp_unpack_cga,src/asm/graphics_core.asm,far API,"cmp_unpack_cga: decodes a .CMP picture (CGA layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_cga"
-0000:0FEE,2,enable_ints,src/asm/graphics_core.asm,far API,enable_ints: sti; C compatibility symbol _enable_ints
-0000:0FF0,2,disable_ints,src/asm/graphics_core.asm,far API,disable_ints: cli; C compatibility symbol _disable_ints
-0000:0FF2,121,set_palette16,src/asm/graphics_core.asm,far API,set_palette16: loads a 16-entry palette table; C compatibility symbol _set_palette16
-0000:106B,103,cga_convert,src/asm/graphics_core.asm,far API,cga_convert: 4-bit pixels -> CGA 2-bit via xlat table; C compatibility symbol _cga_convert
-0000:10D2,141,convert_cga_pixels_and_masks,src/asm/graphics_core.asm,far API,convert_cga_pixels_and_masks: in-place 4bpp -> CGA pixel byte plus transparency-mask byte; C compatibility symbol _clear_buffer
-0000:115F,33,normalize_ptr,src/asm/graphics_core.asm,far API,normalize_ptr: far pointer normalisation (offset < 16); C compatibility symbol _normalize_ptr
-0000:1180,23,dos_putc,src/asm/graphics_core.asm,far API,dos_putc: int 21h AH=06h; C compatibility symbol _dos_putc
-0000:1197,59,rand8,src/asm/graphics_core.asm,far API,rand8: shift-register random byte (state at GFX_DATA:027B); C compatibility symbol _rand8
-0000:11DC,645,sprite_mirror_ega,src/asm/graphics_core.asm,far API,sprite_mirror_ega: horizontally mirrored transparent EGA sprite; C compatibility symbol _sprite_mask_ega
-0000:1461,23,dos_set_drive,src/asm/graphics_core.asm,far API,dos_set_drive: int 21h AH=0Eh; C compatibility symbol _dos_set_drive
-0000:1478,25,cga_select_palette,src/asm/graphics_core.asm,far API,cga_select_palette: int 10h AH=0Bh BH=1; C compatibility symbol _cga_select_palette
-0000:1491,54,set_palette_reg,src/asm/graphics_core.asm,far API,"set_palette_reg: EGA attribute controller register (index, value); C compatibility symbol _set_palette_reg"
-0000:14C7,22,set_video_type,src/asm/graphics_core.asm,far API,set_video_type: stores g_videoMode in the graphics driver (GFX_DATA:0286); C compatibility symbol _set_video_type
-0000:14DD,23,set_bios_mode,src/asm/graphics_core.asm,far API,set_bios_mode: int 10h AH=00h; C compatibility symbol _set_bios_mode
-0000:16FA,1308,sprite_put_cga,src/asm/graphics_core.asm,far API,"sprite_put_cga: draw_sprite, CGA/Tandy buffer; C compatibility symbol _sprite_put_cga"
-0000:1D16,1371,sprite_mirror_packed,src/asm/graphics_core.asm,far API,sprite_mirror_packed: horizontally mirrored transparent CGA/Tandy sprite; C compatibility symbol _sprite_mask_cga; bounding span includes independent near helper 1F96-1FC7; main body resumes at 1FC8
-0000:1F96,50,merge_mirrored_tandy_edge,src/asm/graphics_core.asm,near helper embedded in sprite_mirror_packed,CALL at 1F33 path; local RET at 1FC7; caller body resumes 1FC8. Its 50 bytes overlap caller bounding span 1D16-2270.
-0000:2271,39,merge_mirrored_cga_edge,src/asm/graphics_core.asm,near helper,"Called by shifted mirrored CGA path; reverses pixel groups through GFX.reverse_cga_pixels, merges first edge byte, RET."
-0000:2298,129,set_text_colours,src/asm/graphics_core.asm,far API,"set_text_colours: (fg, bg) for draw_char_*; C compatibility symbol _set_text_colours"
-0000:2319,97,draw_char_tandy4bpp,src/asm/graphics_core.asm,far API,"draw_char_tandy4bpp: four bytes per row, four interleaved Tandy video banks; C compatibility symbol _draw_char_cga"
-0000:237A,72,draw_char_cga2bpp,src/asm/graphics_core.asm,far API,"draw_char_cga2bpp: two bytes per row, two interleaved CGA video banks; C compatibility symbol _draw_char_tandy"
-0000:23C2,91,draw_char_ega,src/asm/graphics_core.asm,far API,draw_char_ega: glyph to EGA planes; C compatibility symbol _draw_char_ega
-0000:241D,83,draw_char_vga8bpp,src/asm/graphics_core.asm,far API,draw_char_vga8bpp: one byte per pixel in linear A000 VGA video memory; C compatibility symbol _draw_char_buf
-0000:2470,109,gfx_init,src/asm/graphics_core.asm,far API,gfx_init: graphics driver init; C compatibility symbol _gfx_init
-0000:24DD,30,expand_bits4,src/asm/graphics_core.asm,near helper,Called twice per source byte by gfx_init Tandy expansion; STOSW then RET.
-0000:24FB,64,set_palette_regs,src/asm/graphics_core.asm,far API,set_palette_regs: all 16 attribute registers; C compatibility symbol _set_palette_regs
-0000:253B,24,in_vretrace,src/asm/graphics_core.asm,far API,in_vretrace: 3DA bit 3; C compatibility symbol _in_vretrace
-0000:2553,49,wait_vretrace,src/asm/graphics_core.asm,far API,wait_vretrace: waits for (the end of) vertical retrace; C compatibility symbol _wait_vretrace
-0000:2584,410,vline,src/asm/graphics_core.asm,far API,"vline: (x, y1, y2, colour); C compatibility symbol _vline"
-0000:271E,96,set_dac_regs,src/asm/graphics_core.asm,far API,set_dac_regs: int 10h AX=1010h; C compatibility symbol _set_dac_regs
-0000:277E,307,save_window,src/asm/graphics_window.asm,far API,"save_window: window background save/blit (x, y, w, h, buf); C compatibility symbol _save_window"
-0000:28B3,348,blit_generic,src/asm/graphics_window.asm,far API,"blit_generic: sprite/picture blit for CGA/Tandy (x, y, w, rows, src); C compatibility symbol _blit_generic"
-0000:2A15,453,sprite_put_m3,src/asm/graphics_mode3.asm,far API,"sprite_put_m3: draw_sprite, g_videoMode 3; C compatibility symbol _sprite_put_m3"
-0000:2BE0,459,sprite_mirror_m3,src/asm/graphics_mode3.asm,far API,"sprite_mirror_m3: horizontally mirrored transparent RLE sprite, VGA mode 13h; C compatibility symbol _sprite_mask_m3"
-0512:00EE,20,snd_get_option,src/asm/sound.asm,public far API,"Range [0512:00EE,0512:0102); last 0512:0101: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0102,23,snd_set_option,src/asm/sound.asm,public far API,"Range [0512:0102,0512:0119); last 0512:0118: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0119,90,snd_timer_isr,src/asm/sound.asm,interrupt handler,"Range [0512:0119,0512:0173); last 0512:0172: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by snd_init at 0512:037D for DOS AH=25h AL=08h."
-0512:0173,460,snd_music_tick,src/asm/sound.asm,internal near helper,"Range [0512:0173,0512:033F); last 0512:033E: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:014C: call 0x173"
-0512:033F,7,snd_speaker_enable,src/asm/sound.asm,internal near helper,"Range [0512:033F,0512:0346); last 0512:0345: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F7: call 0x33f"
-0512:0346,7,snd_speaker_disable,src/asm/sound.asm,internal near helper,"Range [0512:0346,0512:034D); last 0512:034C: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01FD: call 0x346; 0512:0332: call 0x346"
-0512:034D,7,snd_program_divisor,src/asm/sound.asm,internal near helper,"Range [0512:034D,0512:0354); last 0512:0353: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F4: call 0x34d"
-0512:0354,68,snd_init,src/asm/sound.asm,public far API,"Range [0512:0354,0512:0398); last 0512:0397: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0398,53,snd_shutdown,src/asm/sound.asm,public far API,"Range [0512:0398,0512:03CD); last 0512:03CC: retf; no overlap with any other function body; all direct branches stay in body."
-0512:03CD,36,snd_play,src/asm/sound.asm,public far API,"Range [0512:03CD,0512:03F1); last 0512:03F0: retf; no overlap with any other function body; all direct branches stay in body."
-0512:03F1,22,snd_stop,src/asm/sound.asm,public far API,"Range [0512:03F1,0512:0407); last 0512:0406: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0407,41,ctrlc_install,src/asm/sound.asm,public far API,"Range [0512:0407,0512:0430); last 0512:042F: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0430,10,ctrlc_isr,src/asm/sound.asm,interrupt handler,"Range [0512:0430,0512:043A); last 0512:0439: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by ctrlc_install at 0512:0422 for DOS AH=25h AL=23h."
-0512:043A,34,ctrlc_remove,src/asm/sound.asm,public far API,"Range [0512:043A,0512:045C); last 0512:045B: retf; no overlap with any other function body; all direct branches stay in body."
-0512:045C,41,kbbreak_install,src/asm/sound.asm,public far API,"Range [0512:045C,0512:0485); last 0512:0484: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0485,157,kbbreak_isr,src/asm/sound.asm,interrupt handler,"Range [0512:0485,0512:0522); last 0512:0521: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by kbbreak_install at 0512:0477 for DOS AH=25h AL=09h."
-0512:0522,34,kbbreak_remove,src/asm/sound.asm,public far API,"Range [0512:0522,0512:0544); last 0512:0543: retf; no overlap with any other function body; all direct branches stay in body."
-0512:0544,20,timer_ticks,src/asm/sound.asm,public far API,"Range [0512:0544,0512:0558); last 0512:0557: retf; no overlap with any other function body; all direct branches stay in body."
-056A:0194,10,kbd_hit,src/asm/keyboard.asm,far callable,0194 reads read-offset; 0198 XORs write-offset; RETF
-056A:019E,11,kbd_flush,src/asm/keyboard.asm,far callable,019F reads read-offset; 01A3 copies it into write-offset; RETF
-056A:01A9,34,kbd_getcode,src/asm/keyboard.asm,far callable,01AA waits for unequal indices; 01B7 word dequeue; index +=2 & 127; RETF
-056A:01CB,83,kbd_getchar,src/asm/keyboard.asm,far callable,far CALL getcode; indexed byte reads at 01E5/01ED; Ctrl-letter bitmap 0207; RETF at021D; ASCII data begins021E
-056A:029A,168,kbd_install,src/asm/keyboard.asm,far callable,reads BIOS keyboard state; INT21 AH35 saves IRQ9/INT23 vectors; AH25 installs0342/0561; RETF at0341
-056A:0342,540,kbd_irq9,src/asm/keyboard.asm,hardware interrupt handler,IRQ1 port60 input; make/break state and queue updates; far chain0531 or IRET055D; scratch begins055E
-056A:0561,1,kbd_ignore_ctrl_break,src/asm/keyboard.asm,DOS INT23 interrupt handler,address passed to INT21 AX2523 by install; single IRET byte
-056A:0562,41,kbd_remove,src/asm/keyboard.asm,far callable,saved far vectors restored using INT21 AX2523 and AX2509; RETF at058A
+0000:01C9,31,ega_present,src/engine/graphics_bios.asm,far API,ega_present: int 10h AH=12h BL=10h: EGA BIOS present; C compatibility symbol _ega_present
+0000:01E8,22,set_text_mode,src/engine/graphics_bios.asm,far API,set_text_mode: int 10h mode 3; C compatibility symbol _set_text_mode
+0000:01FE,25,ega_select_palette,src/engine/graphics_bios.asm,far API,"ega_select_palette: int 10h AH=10h, palette 0/1; C compatibility symbol _ega_select_palette"
+0000:0217,299,hspan,src/engine/graphics_rect.asm,far API,"hspan: horizontal EGA span (x, y, n, colour); C compatibility symbol _hspan"
+0000:0342,120,copy_rect,src/engine/graphics_rect.asm,far API,"copy_rect: rectangle copy (src, dst, x, y, w, h); scales x/w by the video mode, then copy_rect_core; C compatibility symbol _copy_rect"
+0000:03BA,116,copy_rect_ega,src/engine/graphics_rect.asm,far API,"copy_rect_ega: EGA rectangle copy (src, dst, x, y, w, h); C compatibility symbol _copy_rect_ega"
+0000:042E,585,copy_rect_core,src/engine/graphics_rect.asm,near dispatcher; overlapping embedded EGA latch entry,Called by copy_rect and copy_rect_ega; mode dispatch branches terminate at RET 0564 or 0676.
+0000:048B,43,copy_rect_ega_latch,src/engine/graphics_rect.asm,near entry overlapping copy_rect_core,Called by blit_ega_core; also entered by fallthrough from 042E dispatcher; local span 048B-04B5 jumps to shared RET at 0564.
+0000:0677,578,blit_ega_core,src/engine/graphics_rect.asm,far API,blit_ega_core: EGA latch blit used by blit_ega; C compatibility symbol _blit_ega_core
+0000:08B9,89,clear_screen,src/engine/graphics_core.asm,far API,clear_screen: clears video memory B800/A000 per mode; C compatibility symbol _clear_screen
+0000:0912,284,fill_rect_cells,src/engine/graphics_core.asm,far API,fill_rect_cells: solid fill of an eight-pixel-cell rectangle in the active video mode; C compatibility symbol _redraw_rect_hw
+0000:0A2E,61,far_copy,src/engine/graphics_core.asm,far API,"far_copy: rep movsw far copy (src, dst, len); C compatibility symbol _far_copy"
+0000:0A6B,185,present_buffer,src/engine/graphics_core.asm,far API,present_buffer: copies the off-screen buffer to video memory (EGA planes via 3C4/3CE); C compatibility symbol _present_buffer
+0000:0B2E,494,sprite_put_ega,src/engine/graphics_core.asm,far API,"sprite_put_ega: draw_sprite, EGA; C compatibility symbol _sprite_put_ega"
+0000:0D1C,58,cga_shift_rows,src/engine/graphics_core.asm,far API,cga_shift_rows: moves the converted CGA rows into place (small-window mode); C compatibility symbol _cga_shift_rows
+0000:0D56,281,pack_rect,src/engine/graphics_core.asm,far API,"pack_rect: packs a screen rectangle into a buffer, returns its size; C compatibility symbol _pack_rect"
+0000:0E6F,19,take_nibble,src/engine/graphics_core.asm,near helper,"Called by pack_rect; extracts high nibble of BX into DL, shifts BX four places, RET."
+0000:0E82,124,gfx_fill_rect,src/engine/graphics_core.asm,far API,"gfx_fill_rect: (x, y, w, h, colour); C compatibility symbol _gfx_fill_rect"
+0000:0EFE,46,dos_free_kb,src/engine/graphics_core.asm,far API,dos_free_kb: int 21h AH=48h probe; returns free conventional memory in KB; C compatibility symbol _dos_free_kb
+0000:0F2C,87,cmp_unpack_planar,src/engine/graphics_core.asm,far API,"cmp_unpack_planar: decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_planar"
+0000:0F83,107,cmp_unpack_cga,src/engine/graphics_core.asm,far API,"cmp_unpack_cga: decodes a .CMP picture (CGA layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_cga"
+0000:0FEE,2,enable_ints,src/engine/graphics_core.asm,far API,enable_ints: sti; C compatibility symbol _enable_ints
+0000:0FF0,2,disable_ints,src/engine/graphics_core.asm,far API,disable_ints: cli; C compatibility symbol _disable_ints
+0000:0FF2,121,set_palette16,src/engine/graphics_core.asm,far API,set_palette16: loads a 16-entry palette table; C compatibility symbol _set_palette16
+0000:106B,103,cga_convert,src/engine/graphics_core.asm,far API,cga_convert: 4-bit pixels -> CGA 2-bit via xlat table; C compatibility symbol _cga_convert
+0000:10D2,141,convert_cga_pixels_and_masks,src/engine/graphics_core.asm,far API,convert_cga_pixels_and_masks: in-place 4bpp -> CGA pixel byte plus transparency-mask byte; C compatibility symbol _clear_buffer
+0000:115F,33,normalize_ptr,src/engine/graphics_core.asm,far API,normalize_ptr: far pointer normalisation (offset < 16); C compatibility symbol _normalize_ptr
+0000:1180,23,dos_putc,src/engine/graphics_core.asm,far API,dos_putc: int 21h AH=06h; C compatibility symbol _dos_putc
+0000:1197,59,rand8,src/engine/graphics_core.asm,far API,rand8: shift-register random byte (state at GFX_DATA:027B); C compatibility symbol _rand8
+0000:11DC,645,sprite_mirror_ega,src/engine/graphics_core.asm,far API,sprite_mirror_ega: horizontally mirrored transparent EGA sprite; C compatibility symbol _sprite_mask_ega
+0000:1461,23,dos_set_drive,src/engine/graphics_core.asm,far API,dos_set_drive: int 21h AH=0Eh; C compatibility symbol _dos_set_drive
+0000:1478,25,cga_select_palette,src/engine/graphics_core.asm,far API,cga_select_palette: int 10h AH=0Bh BH=1; C compatibility symbol _cga_select_palette
+0000:1491,54,set_palette_reg,src/engine/graphics_core.asm,far API,"set_palette_reg: EGA attribute controller register (index, value); C compatibility symbol _set_palette_reg"
+0000:14C7,22,set_video_type,src/engine/graphics_core.asm,far API,set_video_type: stores g_videoMode in the graphics driver (GFX_DATA:0286); C compatibility symbol _set_video_type
+0000:14DD,23,set_bios_mode,src/engine/graphics_core.asm,far API,set_bios_mode: int 10h AH=00h; C compatibility symbol _set_bios_mode
+0000:16FA,1308,sprite_put_cga,src/engine/graphics_core.asm,far API,"sprite_put_cga: draw_sprite, CGA/Tandy buffer; C compatibility symbol _sprite_put_cga"
+0000:1D16,1371,sprite_mirror_packed,src/engine/graphics_core.asm,far API,sprite_mirror_packed: horizontally mirrored transparent CGA/Tandy sprite; C compatibility symbol _sprite_mask_cga; bounding span includes independent near helper 1F96-1FC7; main body resumes at 1FC8
+0000:1F96,50,merge_mirrored_tandy_edge,src/engine/graphics_core.asm,near helper embedded in sprite_mirror_packed,CALL at 1F33 path; local RET at 1FC7; caller body resumes 1FC8. Its 50 bytes overlap caller bounding span 1D16-2270.
+0000:2271,39,merge_mirrored_cga_edge,src/engine/graphics_core.asm,near helper,"Called by shifted mirrored CGA path; reverses pixel groups through GFX.reverse_cga_pixels, merges first edge byte, RET."
+0000:2298,129,set_text_colours,src/engine/graphics_core.asm,far API,"set_text_colours: (fg, bg) for draw_char_*; C compatibility symbol _set_text_colours"
+0000:2319,97,draw_char_tandy4bpp,src/engine/graphics_core.asm,far API,"draw_char_tandy4bpp: four bytes per row, four interleaved Tandy video banks; C compatibility symbol _draw_char_cga"
+0000:237A,72,draw_char_cga2bpp,src/engine/graphics_core.asm,far API,"draw_char_cga2bpp: two bytes per row, two interleaved CGA video banks; C compatibility symbol _draw_char_tandy"
+0000:23C2,91,draw_char_ega,src/engine/graphics_core.asm,far API,draw_char_ega: glyph to EGA planes; C compatibility symbol _draw_char_ega
+0000:241D,83,draw_char_vga8bpp,src/engine/graphics_core.asm,far API,draw_char_vga8bpp: one byte per pixel in linear A000 VGA video memory; C compatibility symbol _draw_char_buf
+0000:2470,109,gfx_init,src/engine/graphics_core.asm,far API,gfx_init: graphics driver init; C compatibility symbol _gfx_init
+0000:24DD,30,expand_bits4,src/engine/graphics_core.asm,near helper,Called twice per source byte by gfx_init Tandy expansion; STOSW then RET.
+0000:24FB,64,set_palette_regs,src/engine/graphics_core.asm,far API,set_palette_regs: all 16 attribute registers; C compatibility symbol _set_palette_regs
+0000:253B,24,in_vretrace,src/engine/graphics_core.asm,far API,in_vretrace: 3DA bit 3; C compatibility symbol _in_vretrace
+0000:2553,49,wait_vretrace,src/engine/graphics_core.asm,far API,wait_vretrace: waits for (the end of) vertical retrace; C compatibility symbol _wait_vretrace
+0000:2584,410,vline,src/engine/graphics_core.asm,far API,"vline: (x, y1, y2, colour); C compatibility symbol _vline"
+0000:271E,96,set_dac_regs,src/engine/graphics_core.asm,far API,set_dac_regs: int 10h AX=1010h; C compatibility symbol _set_dac_regs
+0000:277E,307,save_window,src/engine/graphics_window.asm,far API,"save_window: window background save/blit (x, y, w, h, buf); C compatibility symbol _save_window"
+0000:28B3,348,blit_generic,src/engine/graphics_window.asm,far API,"blit_generic: sprite/picture blit for CGA/Tandy (x, y, w, rows, src); C compatibility symbol _blit_generic"
+0000:2A15,453,sprite_put_m3,src/engine/graphics_mode3.asm,far API,"sprite_put_m3: draw_sprite, g_videoMode 3; C compatibility symbol _sprite_put_m3"
+0000:2BE0,459,sprite_mirror_m3,src/engine/graphics_mode3.asm,far API,"sprite_mirror_m3: horizontally mirrored transparent RLE sprite, VGA mode 13h; C compatibility symbol _sprite_mask_m3"
+0512:00EE,20,snd_get_option,src/audio/sound.asm,public far API,"Range [0512:00EE,0512:0102); last 0512:0101: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0102,23,snd_set_option,src/audio/sound.asm,public far API,"Range [0512:0102,0512:0119); last 0512:0118: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0119,90,snd_timer_isr,src/audio/sound.asm,interrupt handler,"Range [0512:0119,0512:0173); last 0512:0172: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by snd_init at 0512:037D for DOS AH=25h AL=08h."
+0512:0173,460,snd_music_tick,src/audio/sound.asm,internal near helper,"Range [0512:0173,0512:033F); last 0512:033E: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:014C: call 0x173"
+0512:033F,7,snd_speaker_enable,src/audio/sound.asm,internal near helper,"Range [0512:033F,0512:0346); last 0512:0345: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F7: call 0x33f"
+0512:0346,7,snd_speaker_disable,src/audio/sound.asm,internal near helper,"Range [0512:0346,0512:034D); last 0512:034C: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01FD: call 0x346; 0512:0332: call 0x346"
+0512:034D,7,snd_program_divisor,src/audio/sound.asm,internal near helper,"Range [0512:034D,0512:0354); last 0512:0353: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F4: call 0x34d"
+0512:0354,68,snd_init,src/audio/sound.asm,public far API,"Range [0512:0354,0512:0398); last 0512:0397: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0398,53,snd_shutdown,src/audio/sound.asm,public far API,"Range [0512:0398,0512:03CD); last 0512:03CC: retf; no overlap with any other function body; all direct branches stay in body."
+0512:03CD,36,snd_play,src/audio/sound.asm,public far API,"Range [0512:03CD,0512:03F1); last 0512:03F0: retf; no overlap with any other function body; all direct branches stay in body."
+0512:03F1,22,snd_stop,src/audio/sound.asm,public far API,"Range [0512:03F1,0512:0407); last 0512:0406: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0407,41,ctrlc_install,src/audio/sound.asm,public far API,"Range [0512:0407,0512:0430); last 0512:042F: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0430,10,ctrlc_isr,src/audio/sound.asm,interrupt handler,"Range [0512:0430,0512:043A); last 0512:0439: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by ctrlc_install at 0512:0422 for DOS AH=25h AL=23h."
+0512:043A,34,ctrlc_remove,src/audio/sound.asm,public far API,"Range [0512:043A,0512:045C); last 0512:045B: retf; no overlap with any other function body; all direct branches stay in body."
+0512:045C,41,kbbreak_install,src/audio/sound.asm,public far API,"Range [0512:045C,0512:0485); last 0512:0484: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0485,157,kbbreak_isr,src/audio/sound.asm,interrupt handler,"Range [0512:0485,0512:0522); last 0512:0521: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by kbbreak_install at 0512:0477 for DOS AH=25h AL=09h."
+0512:0522,34,kbbreak_remove,src/audio/sound.asm,public far API,"Range [0512:0522,0512:0544); last 0512:0543: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0544,20,timer_ticks,src/audio/sound.asm,public far API,"Range [0512:0544,0512:0558); last 0512:0557: retf; no overlap with any other function body; all direct branches stay in body."
+056A:0194,10,kbd_hit,src/engine/keyboard.asm,far callable,0194 reads read-offset; 0198 XORs write-offset; RETF
+056A:019E,11,kbd_flush,src/engine/keyboard.asm,far callable,019F reads read-offset; 01A3 copies it into write-offset; RETF
+056A:01A9,34,kbd_getcode,src/engine/keyboard.asm,far callable,01AA waits for unequal indices; 01B7 word dequeue; index +=2 & 127; RETF
+056A:01CB,83,kbd_getchar,src/engine/keyboard.asm,far callable,far CALL getcode; indexed byte reads at 01E5/01ED; Ctrl-letter bitmap 0207; RETF at021D; ASCII data begins021E
+056A:029A,168,kbd_install,src/engine/keyboard.asm,far callable,reads BIOS keyboard state; INT21 AH35 saves IRQ9/INT23 vectors; AH25 installs0342/0561; RETF at0341
+056A:0342,540,kbd_irq9,src/engine/keyboard.asm,hardware interrupt handler,IRQ1 port60 input; make/break state and queue updates; far chain0531 or IRET055D; scratch begins055E
+056A:0561,1,kbd_ignore_ctrl_break,src/engine/keyboard.asm,DOS INT23 interrupt handler,address passed to INT21 AX2523 by install; single IRET byte
+056A:0562,41,kbd_remove,src/engine/keyboard.asm,far callable,saved far vectors restored using INT21 AX2523 and AX2509; RETF at058A

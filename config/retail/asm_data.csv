@@ -1,172 +1,172 @@
 source,segment,offset,size,name,type,evidence
-src/asm/graphics_core.asm,0000,0B24,2,ega_forward_left_minus1,word,left clip column minus one
-src/asm/graphics_core.asm,0000,0B26,2,ega_forward_right_minus1,word,exclusive right clip column minus one
-src/asm/graphics_core.asm,0000,0B28,2,ega_forward_bottom_offset,word,exclusive bottom scanline times 40
-src/asm/graphics_core.asm,0000,0B2A,2,ega_forward_bottom_y,word,exclusive bottom scanline
-src/asm/graphics_core.asm,0000,0B2C,2,ega_forward_top_y,word,first allowed scanline
-src/asm/graphics_core.asm,0000,11D2,2,ega_mirror_left_minus1,word,left clip column minus one
-src/asm/graphics_core.asm,0000,11D4,2,ega_mirror_right_minus1,word,exclusive right clip column minus one
-src/asm/graphics_core.asm,0000,11D6,2,ega_mirror_bottom_offset,word,exclusive bottom scanline times 40
-src/asm/graphics_core.asm,0000,11D8,2,ega_mirror_bottom_y,word,exclusive bottom scanline
-src/asm/graphics_core.asm,0000,11DA,2,ega_mirror_top_y,word,first allowed scanline
-src/asm/graphics_core.asm,0000,14F4,256,tandy_transparency_masks,byte[256],two 4-bit pixels per index; zero nibble -> preservation mask 0xF
-src/asm/graphics_core.asm,0000,15F4,256,cga_transparency_masks,byte[256],four 2-bit pixels per index; zero pixel -> preservation mask 3
-src/asm/graphics_core.asm,0000,16F4,2,packed_right_clipped,word,rightmost packed output byte is partial after clipping
-src/asm/graphics_core.asm,0000,16F6,2,packed_left_clipped,word,leftmost packed output byte is partial after clipping
-src/asm/graphics_core.asm,0000,16F8,2,packed_clip_reserved,reserved word,unreferenced two-byte slot; no CS or other static references
-src/asm/graphics_core.asm,0000,1C16,256,tandy_swap_nibbles,byte[256],"((index & 15) << 4) | (index >> 4), used by mirrored Tandy sprites"
-src/asm/graphics_window.asm,0000,28B1,2,blit_src_segment,word,source segment saved in CS while DS is the source
-src/asm/graphics_window.asm,0000,2A0F,2,m3_forward_skip_left,word,pixels to skip at left of each RLE source row
-src/asm/graphics_window.asm,0000,2A11,2,m3_forward_skip_right,word,pixels to skip at right of each RLE source row
-src/asm/graphics_window.asm,0000,2A13,2,m3_forward_draw_width,word,clipped pixels to draw in each RLE row
-src/asm/graphics_mode3.asm,0000,2BDA,2,m3_mirror_skip_left,word,pixels to skip on left of the unmirrored source row
-src/asm/graphics_mode3.asm,0000,2BDC,2,m3_mirror_skip_right,word,pixels to skip on right before mirrored drawing begins
-src/asm/graphics_mode3.asm,0000,2BDE,2,m3_mirror_draw_width,word,clipped pixels drawn backward in destination
-src/asm/sound.asm,0512,0001,4,snd_old_timer_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 08h saved by snd_init, restored by snd_shutdown, far-chained by snd_timer_isr. Accesses: 0512:0161: ljmp cs:[1]; 0512:0365: mov word ptr cs:[1], bx; 0512:036A: mov word ptr cs:[3], es; 0512:03A3: mov dx, word ptr cs:[1]; 0512:03A8: mov bx, word ptr cs:[3]"
-src/asm/sound.asm,0512,0005,4,ctrlc_old_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 23h saved by ctrlc_install and restored by ctrlc_remove. Accesses: 0512:0418: mov word ptr cs:[5], bx; 0512:041D: mov word ptr cs:[7], es; 0512:0445: mov dx, word ptr cs:[5]; 0512:044A: mov bx, word ptr cs:[7]"
-src/asm/sound.asm,0512,0009,4,kbbreak_old_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 09h saved by kbbreak_install, restored by kbbreak_remove, far-chained by kbbreak_isr. Accesses: 0512:046D: mov word ptr cs:[9], bx; 0512:0472: mov word ptr cs:[0xb], es; 0512:050A: ljmp cs:[9]; 0512:052D: mov dx, word ptr cs:[9]; 0512:0532: mov bx, word ptr cs:[0xb]"
-src/asm/sound.asm,0512,000D,2,snd_chain_reload,uint16 storage,"snd_init sets 15; snd_timer_isr copies full word to chain_count. Accesses: 0512:0157: mov ax, word ptr cs:[0xd]; 0512:036F: mov word ptr cs:[0xd], 0xf"
-src/asm/sound.asm,0512,000F,2,snd_chain_count,"uint16 storage, effective uint8 counter","full-word transfers; AL tested/decremented; counts 15 intervening acknowledgements between chained timer interrupts. Accesses: 0512:014F: mov ax, word ptr cs:[0xf]; 0512:015B: mov word ptr cs:[0xf], ax; 0512:0168: mov word ptr cs:[0xf], ax; 0512:0376: mov word ptr cs:[0xf], 0"
-src/asm/sound.asm,0512,0011,4,snd_stream_pointer,"far byte pointer (offset:uint16, segment:uint16)","copied from pending pointer on start; loaded into ES:SI. Accesses: 0512:0197: mov word ptr cs:[0x11], ax; 0512:019F: mov word ptr cs:[0x13], ax; 0512:01C9: mov es, word ptr cs:[0x13]; 0512:01CE: mov si, word ptr cs:[0x11]"
-src/asm/sound.asm,0512,0015,2,snd_stream_position,uint16 byte index,"stored/read as BX, zeroed for new tune; incremented/subtracted for commands/loops. Accesses: 0512:01A3: mov word ptr cs:[0x15], 0; 0512:01B9: mov bx, word ptr cs:[0x15]; 0512:0335: mov word ptr cs:[0x15], bx"
-src/asm/sound.asm,0512,0017,4,snd_pending_pointer,"far byte pointer (offset:uint16, segment:uint16)","snd_play copies its far pointer argument; snd_music_tick transfers it to stream_pointer. Accesses: 0512:0193: mov ax, word ptr cs:[0x17]; 0512:019B: mov ax, word ptr cs:[0x19]; 0512:03DB: mov word ptr cs:[0x17], ax; 0512:03E2: mov word ptr cs:[0x19], ax"
-src/asm/sound.asm,0512,001B,1,snd_playing,uint8 flag,"0/1 state tested by snd_music_tick. Accesses: 0512:017B: mov byte ptr cs:[0x1b], 1; 0512:01AA: cmp byte ptr cs:[0x1b], 0; 0512:0326: mov byte ptr cs:[0x1b], 0"
-src/asm/sound.asm,0512,001C,1,snd_start_pending,uint8 flag,"snd_play sets; snd_music_tick tests/clears. Accesses: 0512:0173: cmp byte ptr cs:[0x1c], 0; 0512:0187: mov byte ptr cs:[0x1c], 0; 0512:03E6: mov byte ptr cs:[0x1c], 1"
-src/asm/sound.asm,0512,001D,1,snd_stop_pending,uint8 flag,"snd_stop sets; snd_music_tick tests/clears. Accesses: 0512:018D: mov byte ptr cs:[0x1d], 0; 0512:031E: cmp byte ptr cs:[0x1d], 0; 0512:032C: mov byte ptr cs:[0x1d], 0; 0512:03FC: mov byte ptr cs:[0x1d], 1"
-src/asm/sound.asm,0512,001E,1,snd_read_note,uint8 flag,"controls fetch versus duration countdown. Accesses: 0512:0181: mov byte ptr cs:[0x1e], 1; 0512:01BE: cmp byte ptr cs:[0x1e], 0; 0512:0216: mov byte ptr cs:[0x1e], 0; 0512:0318: mov byte ptr cs:[0x1e], 1"
-src/asm/sound.asm,0512,001F,1,snd_duration_scale,uint8 multiplier,"MUL byte and E2/E8/E9 command byte stores/arithmetic. Accesses: 0512:0208: mul byte ptr cs:[0x1f]; 0512:02BC: mov byte ptr cs:[0x1f], al; 0512:02CF: sub byte ptr cs:[0x1f], al; 0512:02D8: mov byte ptr cs:[0x1f], 1; 0512:02ED: add byte ptr cs:[0x1f], al; 0512:02F4: mov byte ptr cs:[0x1f], 0xff"
-src/asm/sound.asm,0512,0020,2,snd_reserved_state,reserved uint8[2] initialized zero,"no driver access, no data public, no generated pointer; no unsupported original-purpose claim. Accesses: none in all 1130 driver code bytes; no data public; only indexed CS operand accesses note table 0024..00E3."
-src/asm/sound.asm,0512,0022,2,snd_duration_left,int16 countdown,"AX word store; DEC word; JNS plus comparison with -1. Accesses: 0512:020E: mov word ptr cs:[0x22], ax; 0512:0309: dec word ptr cs:[0x22]; 0512:0310: cmp word ptr cs:[0x22], -1"
-src/asm/sound.asm,0512,0024,192,snd_note_divisors,uint16[96],"AL is nonnegative and <=95; XOR AH,AH; SHL AX,1; DI=AX; read CS:[DI+0024]; zero entry gates speaker off. Accesses: 0512:01EA: mov ax, word ptr cs:[di + 0x24]"
-src/asm/sound.asm,0512,00E4,1,snd_loop_count_1,uint8 repeat count,"CDh load and CEh decrement. Accesses: 0512:0223: dec byte ptr cs:[0xe4]; 0512:0250: mov byte ptr cs:[0xe4], al"
-src/asm/sound.asm,0512,00E5,1,snd_loop_count_2,uint8 repeat count,"D1h load and D2h decrement. Accesses: 0512:025F: dec byte ptr cs:[0xe5]; 0512:028E: mov byte ptr cs:[0xe5], al"
-src/asm/sound.asm,0512,00E6,2,snd_ticks,int16 tick counter,"word increment; signed <=0x123 test; zero reset after 291; timer_ticks returns AX. Accesses: 0512:013C: mov ax, word ptr cs:[0xe6]; 0512:0148: mov word ptr cs:[0xe6], ax; 0512:054F: mov ax, word ptr cs:[0xe6]"
-src/asm/sound.asm,0512,00E8,1,kbbreak_ctrl_down,uint8 make-code state,"Ctrl make stores 1Dh; release stores zero; TEST byte controls combinations. Accesses: 0512:04A4: mov byte ptr cs:[0xe8], al; 0512:04AB: mov byte ptr cs:[0xe8], 0; 0512:04DB: test byte ptr cs:[0xe8], 0xff"
-src/asm/sound.asm,0512,00E9,1,kbbreak_left_shift_down,uint8 make-code state,"left Shift make stores 2Ah; release stores zero; TEST byte controls PrintScreen. Accesses: 0512:04B9: mov byte ptr cs:[0xe9], al; 0512:04C0: mov byte ptr cs:[0xe9], 0; 0512:04EF: test byte ptr cs:[0xe9], 0xff"
-src/asm/sound.asm,0512,00EA,1,kbbreak_right_shift_down,uint8 make-code state,"right Shift make stores 36h; release stores zero; TEST byte controls PrintScreen. Accesses: 0512:04CE: mov byte ptr cs:[0xea], al; 0512:04D5: mov byte ptr cs:[0xea], 0; 0512:04FB: test byte ptr cs:[0xea], 0xff"
-src/asm/sound.asm,0512,00EB,2,snd_option,int16 option/countdown,"get/set word API; ISR skips -1 or 0, decrements other values every 256 timer ticks. Accesses: 0512:00F9: mov ax, word ptr cs:[0xeb]; 0512:0110: mov word ptr cs:[0xeb], ax; 0512:0128: mov ax, word ptr cs:[0xeb]; 0512:0137: mov word ptr cs:[0xeb], ax"
-src/asm/sound.asm,0512,00ED,1,snd_option_ticks,uint8 modulo-256 divider,"DEC byte, JNE: wraps initial zero through 255 down to zero. Accesses: 0512:0121: dec byte ptr cs:[0xed]"
-src/asm/keyboard.asm,056A,0000,8,kbd_bit_masks,uint8[8],01FC reads a byte indexed by key & 7; entries are 1 << bit.
-src/asm/keyboard.asm,056A,0008,26,kbd_bios_policy_keys,packed_key16[13],050A loads DI; 050D sets count to 28 then halves it; 0512 uses REPNE SCASW. Only the first 13 iterations can succeed; the rejected final probe overlaps masks[0].
-src/asm/keyboard.asm,056A,0022,26,kbd_bios_policy_masks,uint16[13],"0518 reads a word at post-SCASW DI + 24, pairing key[i] with mask[i]; 051B ANDs it with the policy in DX."
-src/asm/keyboard.asm,056A,003C,2,kbd_escape_callback.offset,far_callback16.offset,Low word of the optional four-byte far Escape callback; CALL FAR [003C] at 0505 reads the complete pointer.
-src/asm/keyboard.asm,056A,003E,2,kbd_escape_callback.segment,far_callback16.segment,High word of the callback; tested for nonzero at 04FD before CALL FAR at 0505; initialized NULL.
-src/asm/keyboard.asm,056A,0040,16,kbd_e0_scans,uint8[16],03D9 loads DI; CX is 17; REPNE SCASB at 03DF. The rejected final probe overlaps distinct_keys[0].
-src/asm/keyboard.asm,056A,0050,16,kbd_e0_distinct_keys,keycode8[16],03E1 reads a byte at post-SCASB DI + 15. A failed terminal search also speculatively reads compatible_keys[0] before discarding the result.
-src/asm/keyboard.asm,056A,0060,16,kbd_e0_compatible_keys,keycode8[16],0453 restores the post-SCASB cursor; 0458 reads [SI + 31] when the distinct-E0 policy bit is clear.
-src/asm/keyboard.asm,056A,0070,128,kbd_queue,packed_key16[64],01B7 loads a word using read_offset; 04CB stores a word using write_offset. Both indices advance by 2 modulo 128; the full test keeps one slot empty.
-src/asm/keyboard.asm,056A,00F0,2,kbd_queue_read_offset,uint16 byte_offset,"Read at 0194, 019F, 01AA and 04C4; written at 01C2 after dequeue."
-src/asm/keyboard.asm,056A,00F2,2,kbd_queue_write_offset,uint16 byte_offset,"Read at 0198, 01AE and 04B7; written at 01A3 by flush and at 04D0 by enqueue."
-src/asm/keyboard.asm,056A,00F4,2,kbd_irq_policy,uint16 policy_bitmask,0379 stores a word from KBD_DATA:0006; 037D reads it into DX. Initial value is 0110h.
-src/asm/keyboard.asm,056A,00F6,2,kbd_lock_flags,uint16 lock_bitmask,OR 1/2 at 02AC/02B6 and 035D/036B; clear the low two bits at 034A; test bits 1/2 at 0473/0486.
-src/asm/keyboard.asm,056A,00F8,89,kbd_scan_to_key,keycode8[89],03F3 reads a byte indexed by the raw non-E0 scan code. Entries cover scans 00h through 58h; there is no original bounds check for higher values.
-src/asm/keyboard.asm,056A,0151,16,kbd_letter_bitmap,uint8[16] bitset128,"0207 uses the bitmap for Ctrl-letter folding; 047C tests it for Caps Lock. Set bits 17-26, 31-39 and 46-52 are exactly the driver codes for A-Z."
-src/asm/keyboard.asm,056A,0161,16,kbd_numlock_bitmap,uint8[16] bitset128,"048F tests the bitmap for Num Lock. Set bits 91, 92, 93, 96, 97, 98, 99, 101, 102, 103 and 104 identify numeric-pad digits/navigation."
-src/asm/keyboard.asm,056A,0171,16,kbd_pressed_keys,uint8[16] bitset128,"0410/0417/041C read, clear and set a bit indexed by translated_key >> 3. Members at +5/+7/+8 are read/written for Shift, Ctrl and Alt."
-src/asm/keyboard.asm,056A,0181,1,kbd_e0_pending,uint8 boolean,Seeded at 02F6 from BIOS enhanced-flags bit 1; E0 sets it at 03B4; tested at 03C5 and cleared at 03CD.
-src/asm/keyboard.asm,056A,0182,1,kbd_pause_bytes_remaining,uint8 countdown,Seeded at 0300 from BIOS enhanced-flags bit 0; E1 sets 3 at 0394; tested at 039A and decremented at 03A2.
-src/asm/keyboard.asm,056A,0183,2,kbd_previous_irq9.offset,far_isr16.offset,INT 21h AX=3509h result BX is saved at 030B and restored at 057D. FAR JMP at 0531 reads the complete pointer.
-src/asm/keyboard.asm,056A,0185,2,kbd_previous_irq9.segment,far_isr16.segment,INT 21h AX=3509h result ES is saved at 0310 and restored at 0576. FAR JMP at 0531 reads the complete pointer.
-src/asm/keyboard.asm,056A,0187,2,kbd_previous_int23.offset,far_isr16.offset,INT 21h AX=3523h result BX is saved at 0326 and restored at 056C using AX=2523h.
-src/asm/keyboard.asm,056A,0189,2,kbd_previous_int23.segment,far_isr16.segment,INT 21h AX=3523h result ES is saved at 032B and restored at 0565 using AX=2523h.
-src/asm/keyboard.asm,056A,018B,8,kbd_bios_modifier_keys,keycode8[8],04D5 loads DI; 04DB performs REPNE SCASB with count 9. Matching any of the first eight keys unconditionally chains to BIOS.
-src/asm/keyboard.asm,056A,0193,1,kbd_modifier_scan_sentinel,uint8 sentinel,"The ninth search byte is 80h, which cannot equal a seven-bit translated key. The terminal CX=0 result uses ordinary key policy."
-src/asm/keyboard.asm,056A,021E,62,kbd_ascii_unshifted,char[62],01E5 reads a byte after checking key < 62. Entries are US unshifted ASCII; keys without a character have value zero.
-src/asm/keyboard.asm,056A,025C,62,kbd_ascii_shifted,char[62],01ED reads a byte after checking key < 62 and the Shift bit in AH. Entries are US shifted ASCII; keys without a character have value zero.
-src/asm/keyboard.asm,056A,055E,1,kbd_extended_key,uint8 boolean,03D3 sets 1 for E0; 03E8 clears it for unsupported E0 scans; 043F tests it and 0447 clears it before compatibility translation.
-src/asm/keyboard.asm,056A,055F,2,kbd_translation_position,uint16 scan_or_cursor,03F8 stores either the normal scan index or the post-E0-SCASB CS offset. Only the E0 path reads this word at 0453 for compatibility lookup.
-src/asm/graphics_rect.asm,GFX_DATA,000E,2,gfx_hspan_x,word,hspan x argument; pixel/byte start
-src/asm/graphics_rect.asm,GFX_DATA,0010,2,gfx_hspan_y,word,hspan y argument; scanline
-src/asm/graphics_rect.asm,GFX_DATA,0012,2,gfx_hspan_count,word,hspan count argument; REP count
-src/asm/graphics_rect.asm,GFX_DATA,0014,2,gfx_hspan_colour,word,"hspan colour, expanded to repeated CGA/Tandy pixels"
-src/asm/graphics_rect.asm,GFX_DATA,0016,2,gfx_copy_src_segment,word,copy_rect/blit_ega_core source segment
-src/asm/graphics_rect.asm,GFX_DATA,0018,2,gfx_copy_src_x,word,source x in mode-dependent bytes
-src/asm/graphics_rect.asm,GFX_DATA,001A,2,gfx_copy_dst_x,word,blit_ega_core destination x in bytes
-src/asm/graphics_rect.asm,GFX_DATA,001C,2,gfx_copy_src_y_or_row_skip,word,"source y, reused as banked row skip after clipping"
-src/asm/graphics_rect.asm,GFX_DATA,001E,2,gfx_copy_dst_y,word,blit_ega_core destination scanline
-src/asm/graphics_rect.asm,GFX_DATA,0020,2,gfx_copy_width,word,clipped row width; converted to words for MOVSW
-src/asm/graphics_rect.asm,GFX_DATA,0022,2,gfx_copy_rows,word,clipped row count; decremented in copy loops
-src/asm/graphics_rect.asm,GFX_DATA,0024,2,gfx_copy_src_offset,word,source offset plus computed scanline displacement
-src/asm/graphics_core.asm,GFX_DATA,0026,2,gfx_fill_rows,word,redraw_rect_hw height multiplied by eight
-src/asm/graphics_core.asm,GFX_DATA,0028,2,gfx_fill_row_stride,word,redraw_rect_hw mode stride 40/80/160/320
-src/asm/graphics_core.asm,GFX_DATA,002A,2,gfx_fill_row_count,word,redraw_rect_hw STOSB/STOSW count per row
-src/asm/graphics_core.asm,GFX_DATA,002C,2,gfx_ega_sprite_src_segment,word,sprite_put_ega source segment
-src/asm/graphics_core.asm,GFX_DATA,002E,2,gfx_ega_sprite_x_byte,word,sprite_put_ega arithmetic x>>3
-src/asm/graphics_core.asm,GFX_DATA,0030,2,gfx_ega_sprite_x_pixel,word,sprite_put_ega pixel x; low three bits shift mask
-src/asm/graphics_core.asm,GFX_DATA,0032,2,gfx_ega_clip_x1,word,C-visible EGA left clip column
-src/asm/graphics_core.asm,GFX_DATA,0034,2,gfx_ega_clip_x2,word,"C-visible EGA right clip column, exclusive"
-src/asm/graphics_core.asm,GFX_DATA,0036,2,gfx_ega_clip_y1,word,C-visible EGA first scanline
-src/asm/graphics_core.asm,GFX_DATA,0038,2,gfx_ega_clip_y2,word,"C-visible EGA bottom scanline, exclusive"
-src/asm/graphics_core.asm,GFX_DATA,003A,2,gfx_pack_src_segment,word,pack_rect source segment
-src/asm/graphics_core.asm,GFX_DATA,003C,2,gfx_pack_dst_start,word,pack_rect initial destination offset used to return encoded size
-src/asm/graphics_core.asm,GFX_DATA,003E,1,gfx_pack_rows,byte,pack_rect height byte decremented at row end
-src/asm/graphics_core.asm,GFX_DATA,003F,2,gfx_pack_width,word,pack_rect width reused four times in source row advance
-src/asm/graphics_core.asm,GFX_DATA,0041,1,gfx_pack_columns_left,byte,pack_rect column counter
-src/asm/graphics_core.asm,GFX_DATA,0042,16,gfx_pack_colour_masks,byte[16],pack_rect clears 16 bytes then accumulates one eight-pixel bit mask per colour
-src/asm/graphics_core.asm,GFX_DATA,0052,2,gfx_tandy_fill_count,word,gfx_fill_rect width+1; STOSB count
-src/asm/graphics_core.asm,GFX_DATA,0054,2,gfx_tandy_fill_rows_minus1,word,gfx_fill_rect height; loop uses JNS after decrement
-src/asm/graphics_core.asm,GFX_DATA,0056,2,gfx_tandy_fill_colour,word,gfx_fill_rect repeated nibble colour word; retained write-only scratch
-src/asm/graphics_core.asm,GFX_DATA,0058,256,gfx_cga_even_pixels,byte[256],set_palette16 generates paired-pixel XLAT map; cga_convert/convert_cga_pixels_and_masks alternate rows
-src/asm/graphics_core.asm,GFX_DATA,0158,256,gfx_cga_odd_pixels,byte[256],set_palette16 generates opposite-phase paired-pixel XLAT map
-src/asm/graphics_core.asm,GFX_DATA,0258,16,gfx_cga_even_palette,byte[16],first 16 copied palette entries; high nibble on even rows
-src/asm/graphics_core.asm,GFX_DATA,0268,16,gfx_cga_odd_palette,byte[16],second 16 copied palette entries; low nibble on even rows
-src/asm/graphics_core.asm,GFX_DATA,0278,2,gfx_cga_convert_src_segment,word,cga_convert source segment loaded through ES
-src/asm/graphics_core.asm,GFX_DATA,027A,1,gfx_cga_convert_row_count,byte,cga_convert/convert_cga_pixels_and_masks number of outputs before alternating lookup maps
-src/asm/graphics_core.asm,GFX_DATA,027B,4,gfx_random_seed,dword,C time_t seed; rand8 updates its first three bytes as a shift register
-src/asm/graphics_core.asm,GFX_DATA,027F,2,gfx_ega_mirror_src_segment,word,mirrored EGA source segment
-src/asm/graphics_core.asm,GFX_DATA,0281,2,gfx_ega_mirror_x_byte,word,mirrored EGA x>>3
-src/asm/graphics_core.asm,GFX_DATA,0283,2,gfx_ega_mirror_x_pixel,word,mirrored EGA original x for bit shift
-src/asm/graphics_core.asm,GFX_DATA,0285,1,gfx_ega_mirror_width,byte,"sprite header width, positions rightmost destination byte"
-src/asm/graphics_core.asm,GFX_DATA,0286,2,gfx_video_mode,word,set_video_type writes adapter selector 0=CGA 1=Tandy 2=EGA 3=VGA
-src/asm/graphics_core.asm,GFX_DATA,0288,2,gfx_clip_x1,word,packed/VGA left edge in eight-pixel columns
-src/asm/graphics_core.asm,GFX_DATA,028A,2,gfx_clip_x2,word,packed/VGA exclusive right edge in eight-pixel columns
-src/asm/graphics_core.asm,GFX_DATA,028C,2,gfx_clip_y1,word,packed/VGA first scanline
-src/asm/graphics_core.asm,GFX_DATA,028E,2,gfx_clip_y2,word,packed/VGA exclusive last scanline
-src/asm/graphics_core.asm,GFX_DATA,0290,2,gfx_packed_src_segment,word,source segment saved before switching DS
-src/asm/graphics_core.asm,GFX_DATA,0292,2,gfx_packed_dst_segment,word,destination segment; unused compatibility slot in mode 3
-src/asm/graphics_core.asm,GFX_DATA,0294,2,gfx_packed_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
-src/asm/graphics_core.asm,GFX_DATA,0296,2,gfx_packed_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
-src/asm/graphics_core.asm,GFX_DATA,0298,2,gfx_packed_rows,word,"clipped sprite height, decremented per row"
-src/asm/graphics_core.asm,GFX_DATA,029A,2,gfx_packed_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
-src/asm/graphics_core.asm,GFX_DATA,029C,2,gfx_packed_source_width,word,unclipped source row width
-src/asm/graphics_core.asm,GFX_DATA,029E,2,gfx_packed_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
-src/asm/graphics_core.asm,GFX_DATA,02A0,1,gfx_packed_subpixel_shift,byte,CGA/Tandy shift bits; mode 3 writes zero but never reads it
-src/asm/graphics_core.asm,GFX_DATA,02A1,2,gfx_packed_clip_columns,word,"clip_x2-clip_x1, expanded by pixels/bytes per column"
-src/asm/graphics_core.asm,GFX_DATA,02A3,2,gfx_sprite_underlay,word,value 1 selects destination-preserving underlay branches; no static writer in this game
-src/asm/graphics_core.asm,GFX_DATA,02A5,256,gfx_swap_nibbles_data,byte[256],formula swaps high/low nibbles; unused DS duplicate of CS table used by mirrored Tandy blits
-src/asm/graphics_core.asm,GFX_DATA,03A5,256,gfx_reverse_cga_pixels,byte[256],four two-bit pixel groups reversed; XLAT in mirrored CGA paths
-src/asm/graphics_core.asm,GFX_DATA,04A5,4096,gfx_font_bitmaps,byte[4096] (1024-byte font plus 3072-byte runtime expansion capacity),128 eight-byte 1bpp glyphs in first 1024 bytes; gfx_init expands in place to 2048 CGA or 4096 Tandy bytes
-src/asm/graphics_core.asm,GFX_DATA,14A5,1,gfx_text_fg,byte,"set_text_colours foreground, EGA/VGA pixel colour"
-src/asm/graphics_core.asm,GFX_DATA,14A6,1,gfx_text_bg,byte,set_text_colours background
-src/asm/graphics_core.asm,GFX_DATA,14A7,2,gfx_text_fg_pixels,word,replicated foreground CGA two-bit or Tandy nibble pixels
-src/asm/graphics_core.asm,GFX_DATA,14A9,2,gfx_text_bg_pixels,word,replicated background CGA two-bit or Tandy nibble pixels
-src/asm/graphics_core.asm,GFX_DATA,14AB,2,gfx_text_row_groups,word,draw_char_tandy4bpp two four-row groups
-src/asm/graphics_core.asm,GFX_DATA,14AD,2,gfx_retrace_wait,word,C-visible retrace timing count
-src/asm/graphics_core.asm,GFX_DATA,14AF,2,gfx_vline_y1,word,vline inclusive first scanline
-src/asm/graphics_core.asm,GFX_DATA,14B1,2,gfx_vline_y2,word,vline inclusive last scanline
-src/asm/graphics_core.asm,GFX_DATA,14B3,2,gfx_vline_colour,word,vline colour expanded/masked to packed destination pixels
-src/asm/graphics_core.asm,GFX_DATA,14B5,1,gfx_dac_levels,byte[1] (DAC table head),six-bit DAC intensities indexed by three-bit colour component; split across OMF modules
-src/asm/graphics_mode3.asm,GFX_DATA,14B6,7,gfx_dac_levels_tail,byte[7] (DAC table continuation),six-bit DAC intensities indexed by three-bit colour component; split across OMF modules
-src/asm/graphics_mode3.asm,GFX_DATA,14BD,2,gfx_m3_forward_src_segment,word,source segment saved before switching DS
-src/asm/graphics_mode3.asm,GFX_DATA,14BF,2,gfx_m3_forward_dst_segment,word,destination segment; unused compatibility slot in mode 3
-src/asm/graphics_mode3.asm,GFX_DATA,14C1,2,gfx_m3_forward_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
-src/asm/graphics_mode3.asm,GFX_DATA,14C3,2,gfx_m3_forward_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
-src/asm/graphics_mode3.asm,GFX_DATA,14C5,2,gfx_m3_forward_rows,word,"clipped sprite height, decremented per row"
-src/asm/graphics_mode3.asm,GFX_DATA,14C7,2,gfx_m3_forward_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
-src/asm/graphics_mode3.asm,GFX_DATA,14C9,2,gfx_m3_forward_source_width,word,unclipped source row width
-src/asm/graphics_mode3.asm,GFX_DATA,14CB,2,gfx_m3_forward_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
-src/asm/graphics_mode3.asm,GFX_DATA,14CD,1,gfx_m3_forward_subpixel_shift,byte,CGA/Tandy shift bits; mode 3 writes zero but never reads it
-src/asm/graphics_mode3.asm,GFX_DATA,14CE,2,gfx_m3_forward_clip_columns,word,"clip_x2-clip_x1, expanded by pixels/bytes per column"
-src/asm/graphics_mode3.asm,GFX_DATA,14D0,2,gfx_m3_mirror_src_segment,word,source segment saved before switching DS
-src/asm/graphics_mode3.asm,GFX_DATA,14D2,2,gfx_m3_mirror_dst_segment,word,destination segment; unused compatibility slot in mode 3
-src/asm/graphics_mode3.asm,GFX_DATA,14D4,2,gfx_m3_mirror_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
-src/asm/graphics_mode3.asm,GFX_DATA,14D6,2,gfx_m3_mirror_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
-src/asm/graphics_mode3.asm,GFX_DATA,14D8,2,gfx_m3_mirror_rows,word,"clipped sprite height, decremented per row"
-src/asm/graphics_mode3.asm,GFX_DATA,14DA,2,gfx_m3_mirror_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
-src/asm/graphics_mode3.asm,GFX_DATA,14DC,2,gfx_m3_mirror_source_width,word,unclipped source row width
-src/asm/graphics_mode3.asm,GFX_DATA,14DE,2,gfx_m3_mirror_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
-src/asm/keyboard.asm,KBD_DATA,0000,1,m3_mirror_subpixel_shift,uint8 sprite_workspace_field,GFX frame 0B7F:14E0 aliases 0CCD:0000. sprite_mirror_m3 writes zero; mode 3 does not read it. It corresponds to the subpixel-shift field in other mode workspaces.
-src/asm/keyboard.asm,KBD_DATA,0001,2,m3_mirror_clip_columns,uint16 unaligned_sprite_workspace_field,"GFX frame 0B7F:14E1 aliases 0CCD:0001. sprite_mirror_m3 stores clip_x2 - clip_x1, then reads and multiplies it by eight for pixel width."
-src/asm/keyboard.asm,KBD_DATA,0003,1,kbd_word_alignment_pad,uint8 alignment_padding,"Unreferenced byte after the packed 19-byte mirrored-sprite workspace. The next word, Ctrl-S toggle, begins at aligned offset 0004. Padding purpose is inferred from layout."
-src/asm/keyboard.asm,KBD_DATA,0004,2,kbd_ctrl_s_toggle,uint16 boolean_toggle,04F2 XORs the word with 1 only for Ctrl-S or Ctrl-Shift-S; initial value is 1. No game consumer was found.
-src/asm/keyboard.asm,KBD_DATA,0006,2,kbd_bios_chain_policy,uint16 policy_bitmask,"0376 reads the word on each IRQ, then latches it into CS:00F4. Initial value 0010h enables BIOS chaining for Ctrl-Alt adjustment keys."
+src/engine/graphics_core.asm,0000,0B24,2,ega_forward_left_minus1,word,left clip column minus one
+src/engine/graphics_core.asm,0000,0B26,2,ega_forward_right_minus1,word,exclusive right clip column minus one
+src/engine/graphics_core.asm,0000,0B28,2,ega_forward_bottom_offset,word,exclusive bottom scanline times 40
+src/engine/graphics_core.asm,0000,0B2A,2,ega_forward_bottom_y,word,exclusive bottom scanline
+src/engine/graphics_core.asm,0000,0B2C,2,ega_forward_top_y,word,first allowed scanline
+src/engine/graphics_core.asm,0000,11D2,2,ega_mirror_left_minus1,word,left clip column minus one
+src/engine/graphics_core.asm,0000,11D4,2,ega_mirror_right_minus1,word,exclusive right clip column minus one
+src/engine/graphics_core.asm,0000,11D6,2,ega_mirror_bottom_offset,word,exclusive bottom scanline times 40
+src/engine/graphics_core.asm,0000,11D8,2,ega_mirror_bottom_y,word,exclusive bottom scanline
+src/engine/graphics_core.asm,0000,11DA,2,ega_mirror_top_y,word,first allowed scanline
+src/engine/graphics_core.asm,0000,14F4,256,tandy_transparency_masks,byte[256],two 4-bit pixels per index; zero nibble -> preservation mask 0xF
+src/engine/graphics_core.asm,0000,15F4,256,cga_transparency_masks,byte[256],four 2-bit pixels per index; zero pixel -> preservation mask 3
+src/engine/graphics_core.asm,0000,16F4,2,packed_right_clipped,word,rightmost packed output byte is partial after clipping
+src/engine/graphics_core.asm,0000,16F6,2,packed_left_clipped,word,leftmost packed output byte is partial after clipping
+src/engine/graphics_core.asm,0000,16F8,2,packed_clip_reserved,reserved word,unreferenced two-byte slot; no CS or other static references
+src/engine/graphics_core.asm,0000,1C16,256,tandy_swap_nibbles,byte[256],"((index & 15) << 4) | (index >> 4), used by mirrored Tandy sprites"
+src/engine/graphics_window.asm,0000,28B1,2,blit_src_segment,word,source segment saved in CS while DS is the source
+src/engine/graphics_window.asm,0000,2A0F,2,m3_forward_skip_left,word,pixels to skip at left of each RLE source row
+src/engine/graphics_window.asm,0000,2A11,2,m3_forward_skip_right,word,pixels to skip at right of each RLE source row
+src/engine/graphics_window.asm,0000,2A13,2,m3_forward_draw_width,word,clipped pixels to draw in each RLE row
+src/engine/graphics_mode3.asm,0000,2BDA,2,m3_mirror_skip_left,word,pixels to skip on left of the unmirrored source row
+src/engine/graphics_mode3.asm,0000,2BDC,2,m3_mirror_skip_right,word,pixels to skip on right before mirrored drawing begins
+src/engine/graphics_mode3.asm,0000,2BDE,2,m3_mirror_draw_width,word,clipped pixels drawn backward in destination
+src/audio/sound.asm,0512,0001,4,snd_old_timer_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 08h saved by snd_init, restored by snd_shutdown, far-chained by snd_timer_isr. Accesses: 0512:0161: ljmp cs:[1]; 0512:0365: mov word ptr cs:[1], bx; 0512:036A: mov word ptr cs:[3], es; 0512:03A3: mov dx, word ptr cs:[1]; 0512:03A8: mov bx, word ptr cs:[3]"
+src/audio/sound.asm,0512,0005,4,ctrlc_old_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 23h saved by ctrlc_install and restored by ctrlc_remove. Accesses: 0512:0418: mov word ptr cs:[5], bx; 0512:041D: mov word ptr cs:[7], es; 0512:0445: mov dx, word ptr cs:[5]; 0512:044A: mov bx, word ptr cs:[7]"
+src/audio/sound.asm,0512,0009,4,kbbreak_old_vector,"far interrupt pointer (offset:uint16, segment:uint16)","INT 09h saved by kbbreak_install, restored by kbbreak_remove, far-chained by kbbreak_isr. Accesses: 0512:046D: mov word ptr cs:[9], bx; 0512:0472: mov word ptr cs:[0xb], es; 0512:050A: ljmp cs:[9]; 0512:052D: mov dx, word ptr cs:[9]; 0512:0532: mov bx, word ptr cs:[0xb]"
+src/audio/sound.asm,0512,000D,2,snd_chain_reload,uint16 storage,"snd_init sets 15; snd_timer_isr copies full word to chain_count. Accesses: 0512:0157: mov ax, word ptr cs:[0xd]; 0512:036F: mov word ptr cs:[0xd], 0xf"
+src/audio/sound.asm,0512,000F,2,snd_chain_count,"uint16 storage, effective uint8 counter","full-word transfers; AL tested/decremented; counts 15 intervening acknowledgements between chained timer interrupts. Accesses: 0512:014F: mov ax, word ptr cs:[0xf]; 0512:015B: mov word ptr cs:[0xf], ax; 0512:0168: mov word ptr cs:[0xf], ax; 0512:0376: mov word ptr cs:[0xf], 0"
+src/audio/sound.asm,0512,0011,4,snd_stream_pointer,"far byte pointer (offset:uint16, segment:uint16)","copied from pending pointer on start; loaded into ES:SI. Accesses: 0512:0197: mov word ptr cs:[0x11], ax; 0512:019F: mov word ptr cs:[0x13], ax; 0512:01C9: mov es, word ptr cs:[0x13]; 0512:01CE: mov si, word ptr cs:[0x11]"
+src/audio/sound.asm,0512,0015,2,snd_stream_position,uint16 byte index,"stored/read as BX, zeroed for new tune; incremented/subtracted for commands/loops. Accesses: 0512:01A3: mov word ptr cs:[0x15], 0; 0512:01B9: mov bx, word ptr cs:[0x15]; 0512:0335: mov word ptr cs:[0x15], bx"
+src/audio/sound.asm,0512,0017,4,snd_pending_pointer,"far byte pointer (offset:uint16, segment:uint16)","snd_play copies its far pointer argument; snd_music_tick transfers it to stream_pointer. Accesses: 0512:0193: mov ax, word ptr cs:[0x17]; 0512:019B: mov ax, word ptr cs:[0x19]; 0512:03DB: mov word ptr cs:[0x17], ax; 0512:03E2: mov word ptr cs:[0x19], ax"
+src/audio/sound.asm,0512,001B,1,snd_playing,uint8 flag,"0/1 state tested by snd_music_tick. Accesses: 0512:017B: mov byte ptr cs:[0x1b], 1; 0512:01AA: cmp byte ptr cs:[0x1b], 0; 0512:0326: mov byte ptr cs:[0x1b], 0"
+src/audio/sound.asm,0512,001C,1,snd_start_pending,uint8 flag,"snd_play sets; snd_music_tick tests/clears. Accesses: 0512:0173: cmp byte ptr cs:[0x1c], 0; 0512:0187: mov byte ptr cs:[0x1c], 0; 0512:03E6: mov byte ptr cs:[0x1c], 1"
+src/audio/sound.asm,0512,001D,1,snd_stop_pending,uint8 flag,"snd_stop sets; snd_music_tick tests/clears. Accesses: 0512:018D: mov byte ptr cs:[0x1d], 0; 0512:031E: cmp byte ptr cs:[0x1d], 0; 0512:032C: mov byte ptr cs:[0x1d], 0; 0512:03FC: mov byte ptr cs:[0x1d], 1"
+src/audio/sound.asm,0512,001E,1,snd_read_note,uint8 flag,"controls fetch versus duration countdown. Accesses: 0512:0181: mov byte ptr cs:[0x1e], 1; 0512:01BE: cmp byte ptr cs:[0x1e], 0; 0512:0216: mov byte ptr cs:[0x1e], 0; 0512:0318: mov byte ptr cs:[0x1e], 1"
+src/audio/sound.asm,0512,001F,1,snd_duration_scale,uint8 multiplier,"MUL byte and E2/E8/E9 command byte stores/arithmetic. Accesses: 0512:0208: mul byte ptr cs:[0x1f]; 0512:02BC: mov byte ptr cs:[0x1f], al; 0512:02CF: sub byte ptr cs:[0x1f], al; 0512:02D8: mov byte ptr cs:[0x1f], 1; 0512:02ED: add byte ptr cs:[0x1f], al; 0512:02F4: mov byte ptr cs:[0x1f], 0xff"
+src/audio/sound.asm,0512,0020,2,snd_reserved_state,reserved uint8[2] initialized zero,"no driver access, no data public, no generated pointer; no unsupported original-purpose claim. Accesses: none in all 1130 driver code bytes; no data public; only indexed CS operand accesses note table 0024..00E3."
+src/audio/sound.asm,0512,0022,2,snd_duration_left,int16 countdown,"AX word store; DEC word; JNS plus comparison with -1. Accesses: 0512:020E: mov word ptr cs:[0x22], ax; 0512:0309: dec word ptr cs:[0x22]; 0512:0310: cmp word ptr cs:[0x22], -1"
+src/audio/sound.asm,0512,0024,192,snd_note_divisors,uint16[96],"AL is nonnegative and <=95; XOR AH,AH; SHL AX,1; DI=AX; read CS:[DI+0024]; zero entry gates speaker off. Accesses: 0512:01EA: mov ax, word ptr cs:[di + 0x24]"
+src/audio/sound.asm,0512,00E4,1,snd_loop_count_1,uint8 repeat count,"CDh load and CEh decrement. Accesses: 0512:0223: dec byte ptr cs:[0xe4]; 0512:0250: mov byte ptr cs:[0xe4], al"
+src/audio/sound.asm,0512,00E5,1,snd_loop_count_2,uint8 repeat count,"D1h load and D2h decrement. Accesses: 0512:025F: dec byte ptr cs:[0xe5]; 0512:028E: mov byte ptr cs:[0xe5], al"
+src/audio/sound.asm,0512,00E6,2,snd_ticks,int16 tick counter,"word increment; signed <=0x123 test; zero reset after 291; timer_ticks returns AX. Accesses: 0512:013C: mov ax, word ptr cs:[0xe6]; 0512:0148: mov word ptr cs:[0xe6], ax; 0512:054F: mov ax, word ptr cs:[0xe6]"
+src/audio/sound.asm,0512,00E8,1,kbbreak_ctrl_down,uint8 make-code state,"Ctrl make stores 1Dh; release stores zero; TEST byte controls combinations. Accesses: 0512:04A4: mov byte ptr cs:[0xe8], al; 0512:04AB: mov byte ptr cs:[0xe8], 0; 0512:04DB: test byte ptr cs:[0xe8], 0xff"
+src/audio/sound.asm,0512,00E9,1,kbbreak_left_shift_down,uint8 make-code state,"left Shift make stores 2Ah; release stores zero; TEST byte controls PrintScreen. Accesses: 0512:04B9: mov byte ptr cs:[0xe9], al; 0512:04C0: mov byte ptr cs:[0xe9], 0; 0512:04EF: test byte ptr cs:[0xe9], 0xff"
+src/audio/sound.asm,0512,00EA,1,kbbreak_right_shift_down,uint8 make-code state,"right Shift make stores 36h; release stores zero; TEST byte controls PrintScreen. Accesses: 0512:04CE: mov byte ptr cs:[0xea], al; 0512:04D5: mov byte ptr cs:[0xea], 0; 0512:04FB: test byte ptr cs:[0xea], 0xff"
+src/audio/sound.asm,0512,00EB,2,snd_option,int16 option/countdown,"get/set word API; ISR skips -1 or 0, decrements other values every 256 timer ticks. Accesses: 0512:00F9: mov ax, word ptr cs:[0xeb]; 0512:0110: mov word ptr cs:[0xeb], ax; 0512:0128: mov ax, word ptr cs:[0xeb]; 0512:0137: mov word ptr cs:[0xeb], ax"
+src/audio/sound.asm,0512,00ED,1,snd_option_ticks,uint8 modulo-256 divider,"DEC byte, JNE: wraps initial zero through 255 down to zero. Accesses: 0512:0121: dec byte ptr cs:[0xed]"
+src/engine/keyboard.asm,056A,0000,8,kbd_bit_masks,uint8[8],01FC reads a byte indexed by key & 7; entries are 1 << bit.
+src/engine/keyboard.asm,056A,0008,26,kbd_bios_policy_keys,packed_key16[13],050A loads DI; 050D sets count to 28 then halves it; 0512 uses REPNE SCASW. Only the first 13 iterations can succeed; the rejected final probe overlaps masks[0].
+src/engine/keyboard.asm,056A,0022,26,kbd_bios_policy_masks,uint16[13],"0518 reads a word at post-SCASW DI + 24, pairing key[i] with mask[i]; 051B ANDs it with the policy in DX."
+src/engine/keyboard.asm,056A,003C,2,kbd_escape_callback.offset,far_callback16.offset,Low word of the optional four-byte far Escape callback; CALL FAR [003C] at 0505 reads the complete pointer.
+src/engine/keyboard.asm,056A,003E,2,kbd_escape_callback.segment,far_callback16.segment,High word of the callback; tested for nonzero at 04FD before CALL FAR at 0505; initialized NULL.
+src/engine/keyboard.asm,056A,0040,16,kbd_e0_scans,uint8[16],03D9 loads DI; CX is 17; REPNE SCASB at 03DF. The rejected final probe overlaps distinct_keys[0].
+src/engine/keyboard.asm,056A,0050,16,kbd_e0_distinct_keys,keycode8[16],03E1 reads a byte at post-SCASB DI + 15. A failed terminal search also speculatively reads compatible_keys[0] before discarding the result.
+src/engine/keyboard.asm,056A,0060,16,kbd_e0_compatible_keys,keycode8[16],0453 restores the post-SCASB cursor; 0458 reads [SI + 31] when the distinct-E0 policy bit is clear.
+src/engine/keyboard.asm,056A,0070,128,kbd_queue,packed_key16[64],01B7 loads a word using read_offset; 04CB stores a word using write_offset. Both indices advance by 2 modulo 128; the full test keeps one slot empty.
+src/engine/keyboard.asm,056A,00F0,2,kbd_queue_read_offset,uint16 byte_offset,"Read at 0194, 019F, 01AA and 04C4; written at 01C2 after dequeue."
+src/engine/keyboard.asm,056A,00F2,2,kbd_queue_write_offset,uint16 byte_offset,"Read at 0198, 01AE and 04B7; written at 01A3 by flush and at 04D0 by enqueue."
+src/engine/keyboard.asm,056A,00F4,2,kbd_irq_policy,uint16 policy_bitmask,0379 stores a word from KBD_DATA:0006; 037D reads it into DX. Initial value is 0110h.
+src/engine/keyboard.asm,056A,00F6,2,kbd_lock_flags,uint16 lock_bitmask,OR 1/2 at 02AC/02B6 and 035D/036B; clear the low two bits at 034A; test bits 1/2 at 0473/0486.
+src/engine/keyboard.asm,056A,00F8,89,kbd_scan_to_key,keycode8[89],03F3 reads a byte indexed by the raw non-E0 scan code. Entries cover scans 00h through 58h; there is no original bounds check for higher values.
+src/engine/keyboard.asm,056A,0151,16,kbd_letter_bitmap,uint8[16] bitset128,"0207 uses the bitmap for Ctrl-letter folding; 047C tests it for Caps Lock. Set bits 17-26, 31-39 and 46-52 are exactly the driver codes for A-Z."
+src/engine/keyboard.asm,056A,0161,16,kbd_numlock_bitmap,uint8[16] bitset128,"048F tests the bitmap for Num Lock. Set bits 91, 92, 93, 96, 97, 98, 99, 101, 102, 103 and 104 identify numeric-pad digits/navigation."
+src/engine/keyboard.asm,056A,0171,16,kbd_pressed_keys,uint8[16] bitset128,"0410/0417/041C read, clear and set a bit indexed by translated_key >> 3. Members at +5/+7/+8 are read/written for Shift, Ctrl and Alt."
+src/engine/keyboard.asm,056A,0181,1,kbd_e0_pending,uint8 boolean,Seeded at 02F6 from BIOS enhanced-flags bit 1; E0 sets it at 03B4; tested at 03C5 and cleared at 03CD.
+src/engine/keyboard.asm,056A,0182,1,kbd_pause_bytes_remaining,uint8 countdown,Seeded at 0300 from BIOS enhanced-flags bit 0; E1 sets 3 at 0394; tested at 039A and decremented at 03A2.
+src/engine/keyboard.asm,056A,0183,2,kbd_previous_irq9.offset,far_isr16.offset,INT 21h AX=3509h result BX is saved at 030B and restored at 057D. FAR JMP at 0531 reads the complete pointer.
+src/engine/keyboard.asm,056A,0185,2,kbd_previous_irq9.segment,far_isr16.segment,INT 21h AX=3509h result ES is saved at 0310 and restored at 0576. FAR JMP at 0531 reads the complete pointer.
+src/engine/keyboard.asm,056A,0187,2,kbd_previous_int23.offset,far_isr16.offset,INT 21h AX=3523h result BX is saved at 0326 and restored at 056C using AX=2523h.
+src/engine/keyboard.asm,056A,0189,2,kbd_previous_int23.segment,far_isr16.segment,INT 21h AX=3523h result ES is saved at 032B and restored at 0565 using AX=2523h.
+src/engine/keyboard.asm,056A,018B,8,kbd_bios_modifier_keys,keycode8[8],04D5 loads DI; 04DB performs REPNE SCASB with count 9. Matching any of the first eight keys unconditionally chains to BIOS.
+src/engine/keyboard.asm,056A,0193,1,kbd_modifier_scan_sentinel,uint8 sentinel,"The ninth search byte is 80h, which cannot equal a seven-bit translated key. The terminal CX=0 result uses ordinary key policy."
+src/engine/keyboard.asm,056A,021E,62,kbd_ascii_unshifted,char[62],01E5 reads a byte after checking key < 62. Entries are US unshifted ASCII; keys without a character have value zero.
+src/engine/keyboard.asm,056A,025C,62,kbd_ascii_shifted,char[62],01ED reads a byte after checking key < 62 and the Shift bit in AH. Entries are US shifted ASCII; keys without a character have value zero.
+src/engine/keyboard.asm,056A,055E,1,kbd_extended_key,uint8 boolean,03D3 sets 1 for E0; 03E8 clears it for unsupported E0 scans; 043F tests it and 0447 clears it before compatibility translation.
+src/engine/keyboard.asm,056A,055F,2,kbd_translation_position,uint16 scan_or_cursor,03F8 stores either the normal scan index or the post-E0-SCASB CS offset. Only the E0 path reads this word at 0453 for compatibility lookup.
+src/engine/graphics_rect.asm,GFX_DATA,000E,2,gfx_hspan_x,word,hspan x argument; pixel/byte start
+src/engine/graphics_rect.asm,GFX_DATA,0010,2,gfx_hspan_y,word,hspan y argument; scanline
+src/engine/graphics_rect.asm,GFX_DATA,0012,2,gfx_hspan_count,word,hspan count argument; REP count
+src/engine/graphics_rect.asm,GFX_DATA,0014,2,gfx_hspan_colour,word,"hspan colour, expanded to repeated CGA/Tandy pixels"
+src/engine/graphics_rect.asm,GFX_DATA,0016,2,gfx_copy_src_segment,word,copy_rect/blit_ega_core source segment
+src/engine/graphics_rect.asm,GFX_DATA,0018,2,gfx_copy_src_x,word,source x in mode-dependent bytes
+src/engine/graphics_rect.asm,GFX_DATA,001A,2,gfx_copy_dst_x,word,blit_ega_core destination x in bytes
+src/engine/graphics_rect.asm,GFX_DATA,001C,2,gfx_copy_src_y_or_row_skip,word,"source y, reused as banked row skip after clipping"
+src/engine/graphics_rect.asm,GFX_DATA,001E,2,gfx_copy_dst_y,word,blit_ega_core destination scanline
+src/engine/graphics_rect.asm,GFX_DATA,0020,2,gfx_copy_width,word,clipped row width; converted to words for MOVSW
+src/engine/graphics_rect.asm,GFX_DATA,0022,2,gfx_copy_rows,word,clipped row count; decremented in copy loops
+src/engine/graphics_rect.asm,GFX_DATA,0024,2,gfx_copy_src_offset,word,source offset plus computed scanline displacement
+src/engine/graphics_core.asm,GFX_DATA,0026,2,gfx_fill_rows,word,redraw_rect_hw height multiplied by eight
+src/engine/graphics_core.asm,GFX_DATA,0028,2,gfx_fill_row_stride,word,redraw_rect_hw mode stride 40/80/160/320
+src/engine/graphics_core.asm,GFX_DATA,002A,2,gfx_fill_row_count,word,redraw_rect_hw STOSB/STOSW count per row
+src/engine/graphics_core.asm,GFX_DATA,002C,2,gfx_ega_sprite_src_segment,word,sprite_put_ega source segment
+src/engine/graphics_core.asm,GFX_DATA,002E,2,gfx_ega_sprite_x_byte,word,sprite_put_ega arithmetic x>>3
+src/engine/graphics_core.asm,GFX_DATA,0030,2,gfx_ega_sprite_x_pixel,word,sprite_put_ega pixel x; low three bits shift mask
+src/engine/graphics_core.asm,GFX_DATA,0032,2,gfx_ega_clip_x1,word,C-visible EGA left clip column
+src/engine/graphics_core.asm,GFX_DATA,0034,2,gfx_ega_clip_x2,word,"C-visible EGA right clip column, exclusive"
+src/engine/graphics_core.asm,GFX_DATA,0036,2,gfx_ega_clip_y1,word,C-visible EGA first scanline
+src/engine/graphics_core.asm,GFX_DATA,0038,2,gfx_ega_clip_y2,word,"C-visible EGA bottom scanline, exclusive"
+src/engine/graphics_core.asm,GFX_DATA,003A,2,gfx_pack_src_segment,word,pack_rect source segment
+src/engine/graphics_core.asm,GFX_DATA,003C,2,gfx_pack_dst_start,word,pack_rect initial destination offset used to return encoded size
+src/engine/graphics_core.asm,GFX_DATA,003E,1,gfx_pack_rows,byte,pack_rect height byte decremented at row end
+src/engine/graphics_core.asm,GFX_DATA,003F,2,gfx_pack_width,word,pack_rect width reused four times in source row advance
+src/engine/graphics_core.asm,GFX_DATA,0041,1,gfx_pack_columns_left,byte,pack_rect column counter
+src/engine/graphics_core.asm,GFX_DATA,0042,16,gfx_pack_colour_masks,byte[16],pack_rect clears 16 bytes then accumulates one eight-pixel bit mask per colour
+src/engine/graphics_core.asm,GFX_DATA,0052,2,gfx_tandy_fill_count,word,gfx_fill_rect width+1; STOSB count
+src/engine/graphics_core.asm,GFX_DATA,0054,2,gfx_tandy_fill_rows_minus1,word,gfx_fill_rect height; loop uses JNS after decrement
+src/engine/graphics_core.asm,GFX_DATA,0056,2,gfx_tandy_fill_colour,word,gfx_fill_rect repeated nibble colour word; retained write-only scratch
+src/engine/graphics_core.asm,GFX_DATA,0058,256,gfx_cga_even_pixels,byte[256],set_palette16 generates paired-pixel XLAT map; cga_convert/convert_cga_pixels_and_masks alternate rows
+src/engine/graphics_core.asm,GFX_DATA,0158,256,gfx_cga_odd_pixels,byte[256],set_palette16 generates opposite-phase paired-pixel XLAT map
+src/engine/graphics_core.asm,GFX_DATA,0258,16,gfx_cga_even_palette,byte[16],first 16 copied palette entries; high nibble on even rows
+src/engine/graphics_core.asm,GFX_DATA,0268,16,gfx_cga_odd_palette,byte[16],second 16 copied palette entries; low nibble on even rows
+src/engine/graphics_core.asm,GFX_DATA,0278,2,gfx_cga_convert_src_segment,word,cga_convert source segment loaded through ES
+src/engine/graphics_core.asm,GFX_DATA,027A,1,gfx_cga_convert_row_count,byte,cga_convert/convert_cga_pixels_and_masks number of outputs before alternating lookup maps
+src/engine/graphics_core.asm,GFX_DATA,027B,4,gfx_random_seed,dword,C time_t seed; rand8 updates its first three bytes as a shift register
+src/engine/graphics_core.asm,GFX_DATA,027F,2,gfx_ega_mirror_src_segment,word,mirrored EGA source segment
+src/engine/graphics_core.asm,GFX_DATA,0281,2,gfx_ega_mirror_x_byte,word,mirrored EGA x>>3
+src/engine/graphics_core.asm,GFX_DATA,0283,2,gfx_ega_mirror_x_pixel,word,mirrored EGA original x for bit shift
+src/engine/graphics_core.asm,GFX_DATA,0285,1,gfx_ega_mirror_width,byte,"sprite header width, positions rightmost destination byte"
+src/engine/graphics_core.asm,GFX_DATA,0286,2,gfx_video_mode,word,set_video_type writes adapter selector 0=CGA 1=Tandy 2=EGA 3=VGA
+src/engine/graphics_core.asm,GFX_DATA,0288,2,gfx_clip_x1,word,packed/VGA left edge in eight-pixel columns
+src/engine/graphics_core.asm,GFX_DATA,028A,2,gfx_clip_x2,word,packed/VGA exclusive right edge in eight-pixel columns
+src/engine/graphics_core.asm,GFX_DATA,028C,2,gfx_clip_y1,word,packed/VGA first scanline
+src/engine/graphics_core.asm,GFX_DATA,028E,2,gfx_clip_y2,word,packed/VGA exclusive last scanline
+src/engine/graphics_core.asm,GFX_DATA,0290,2,gfx_packed_src_segment,word,source segment saved before switching DS
+src/engine/graphics_core.asm,GFX_DATA,0292,2,gfx_packed_dst_segment,word,destination segment; unused compatibility slot in mode 3
+src/engine/graphics_core.asm,GFX_DATA,0294,2,gfx_packed_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
+src/engine/graphics_core.asm,GFX_DATA,0296,2,gfx_packed_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
+src/engine/graphics_core.asm,GFX_DATA,0298,2,gfx_packed_rows,word,"clipped sprite height, decremented per row"
+src/engine/graphics_core.asm,GFX_DATA,029A,2,gfx_packed_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
+src/engine/graphics_core.asm,GFX_DATA,029C,2,gfx_packed_source_width,word,unclipped source row width
+src/engine/graphics_core.asm,GFX_DATA,029E,2,gfx_packed_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
+src/engine/graphics_core.asm,GFX_DATA,02A0,1,gfx_packed_subpixel_shift,byte,CGA/Tandy shift bits; mode 3 writes zero but never reads it
+src/engine/graphics_core.asm,GFX_DATA,02A1,2,gfx_packed_clip_columns,word,"clip_x2-clip_x1, expanded by pixels/bytes per column"
+src/engine/graphics_core.asm,GFX_DATA,02A3,2,gfx_sprite_underlay,word,value 1 selects destination-preserving underlay branches; no static writer in this game
+src/engine/graphics_core.asm,GFX_DATA,02A5,256,gfx_swap_nibbles_data,byte[256],formula swaps high/low nibbles; unused DS duplicate of CS table used by mirrored Tandy blits
+src/engine/graphics_core.asm,GFX_DATA,03A5,256,gfx_reverse_cga_pixels,byte[256],four two-bit pixel groups reversed; XLAT in mirrored CGA paths
+src/engine/graphics_core.asm,GFX_DATA,04A5,4096,gfx_font_bitmaps,byte[4096] (1024-byte font plus 3072-byte runtime expansion capacity),128 eight-byte 1bpp glyphs in first 1024 bytes; gfx_init expands in place to 2048 CGA or 4096 Tandy bytes
+src/engine/graphics_core.asm,GFX_DATA,14A5,1,gfx_text_fg,byte,"set_text_colours foreground, EGA/VGA pixel colour"
+src/engine/graphics_core.asm,GFX_DATA,14A6,1,gfx_text_bg,byte,set_text_colours background
+src/engine/graphics_core.asm,GFX_DATA,14A7,2,gfx_text_fg_pixels,word,replicated foreground CGA two-bit or Tandy nibble pixels
+src/engine/graphics_core.asm,GFX_DATA,14A9,2,gfx_text_bg_pixels,word,replicated background CGA two-bit or Tandy nibble pixels
+src/engine/graphics_core.asm,GFX_DATA,14AB,2,gfx_text_row_groups,word,draw_char_tandy4bpp two four-row groups
+src/engine/graphics_core.asm,GFX_DATA,14AD,2,gfx_retrace_wait,word,C-visible retrace timing count
+src/engine/graphics_core.asm,GFX_DATA,14AF,2,gfx_vline_y1,word,vline inclusive first scanline
+src/engine/graphics_core.asm,GFX_DATA,14B1,2,gfx_vline_y2,word,vline inclusive last scanline
+src/engine/graphics_core.asm,GFX_DATA,14B3,2,gfx_vline_colour,word,vline colour expanded/masked to packed destination pixels
+src/engine/graphics_core.asm,GFX_DATA,14B5,1,gfx_dac_levels,byte[1] (DAC table head),six-bit DAC intensities indexed by three-bit colour component; split across OMF modules
+src/engine/graphics_mode3.asm,GFX_DATA,14B6,7,gfx_dac_levels_tail,byte[7] (DAC table continuation),six-bit DAC intensities indexed by three-bit colour component; split across OMF modules
+src/engine/graphics_mode3.asm,GFX_DATA,14BD,2,gfx_m3_forward_src_segment,word,source segment saved before switching DS
+src/engine/graphics_mode3.asm,GFX_DATA,14BF,2,gfx_m3_forward_dst_segment,word,destination segment; unused compatibility slot in mode 3
+src/engine/graphics_mode3.asm,GFX_DATA,14C1,2,gfx_m3_forward_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
+src/engine/graphics_mode3.asm,GFX_DATA,14C3,2,gfx_m3_forward_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
+src/engine/graphics_mode3.asm,GFX_DATA,14C5,2,gfx_m3_forward_rows,word,"clipped sprite height, decremented per row"
+src/engine/graphics_mode3.asm,GFX_DATA,14C7,2,gfx_m3_forward_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
+src/engine/graphics_mode3.asm,GFX_DATA,14C9,2,gfx_m3_forward_source_width,word,unclipped source row width
+src/engine/graphics_mode3.asm,GFX_DATA,14CB,2,gfx_m3_forward_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
+src/engine/graphics_mode3.asm,GFX_DATA,14CD,1,gfx_m3_forward_subpixel_shift,byte,CGA/Tandy shift bits; mode 3 writes zero but never reads it
+src/engine/graphics_mode3.asm,GFX_DATA,14CE,2,gfx_m3_forward_clip_columns,word,"clip_x2-clip_x1, expanded by pixels/bytes per column"
+src/engine/graphics_mode3.asm,GFX_DATA,14D0,2,gfx_m3_mirror_src_segment,word,source segment saved before switching DS
+src/engine/graphics_mode3.asm,GFX_DATA,14D2,2,gfx_m3_mirror_dst_segment,word,destination segment; unused compatibility slot in mode 3
+src/engine/graphics_mode3.asm,GFX_DATA,14D4,2,gfx_m3_mirror_x_or_bank_wrap,word,relative x; packed CGA path reuses it as bank-wrap delta
+src/engine/graphics_mode3.asm,GFX_DATA,14D6,2,gfx_m3_mirror_y_or_row_skip,word,clipped y; packed paths reuse it as row skip
+src/engine/graphics_mode3.asm,GFX_DATA,14D8,2,gfx_m3_mirror_rows,word,"clipped sprite height, decremented per row"
+src/engine/graphics_mode3.asm,GFX_DATA,14DA,2,gfx_m3_mirror_width,word,clipped source row width in bytes (packed) or pixels (mode 3)
+src/engine/graphics_mode3.asm,GFX_DATA,14DC,2,gfx_m3_mirror_source_width,word,unclipped source row width
+src/engine/graphics_mode3.asm,GFX_DATA,14DE,2,gfx_m3_mirror_scanline_phase,word,CGA/Tandy bank counter; unused compatibility slot in mode 3
+src/engine/keyboard.asm,KBD_DATA,0000,1,m3_mirror_subpixel_shift,uint8 sprite_workspace_field,GFX frame 0B7F:14E0 aliases 0CCD:0000. sprite_mirror_m3 writes zero; mode 3 does not read it. It corresponds to the subpixel-shift field in other mode workspaces.
+src/engine/keyboard.asm,KBD_DATA,0001,2,m3_mirror_clip_columns,uint16 unaligned_sprite_workspace_field,"GFX frame 0B7F:14E1 aliases 0CCD:0001. sprite_mirror_m3 stores clip_x2 - clip_x1, then reads and multiplies it by eight for pixel width."
+src/engine/keyboard.asm,KBD_DATA,0003,1,kbd_word_alignment_pad,uint8 alignment_padding,"Unreferenced byte after the packed 19-byte mirrored-sprite workspace. The next word, Ctrl-S toggle, begins at aligned offset 0004. Padding purpose is inferred from layout."
+src/engine/keyboard.asm,KBD_DATA,0004,2,kbd_ctrl_s_toggle,uint16 boolean_toggle,04F2 XORs the word with 1 only for Ctrl-S or Ctrl-Shift-S; initial value is 1. No game consumer was found.
+src/engine/keyboard.asm,KBD_DATA,0006,2,kbd_bios_chain_policy,uint16 policy_bitmask,"0376 reads the word on each IRQ, then latches it into CS:00F4. Initial value 0010h enables BIOS chaining for Ctrl-Alt adjustment keys."

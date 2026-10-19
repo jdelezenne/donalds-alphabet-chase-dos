@@ -10,10 +10,10 @@ case "${DAC_TARGET:-retail}" in
 esac
 command -v nasm >/dev/null || { echo "NASM is required (install nasm)." >&2; exit 1; }
 rm -rf "$OUT"; mkdir -p "$OUT"
-for src in "$ROOT"/src/asm/*.asm; do
+for src in "$ROOT"/src/{audio,engine}/*.asm; do
   obj="$OUT/$(basename "$src" .asm).OBJ"
   rm -f "$obj"
-  nasm -f obj "${flags[@]}" -i "$ROOT/src/asm/" -o "$obj" "$src"
+  nasm -f obj "${flags[@]}" -i "$(dirname "$src")/" -i "$ROOT/src/engine/" -o "$obj" "$src"
   echo "assembled ${obj#"$ROOT/"}"
 done
 python3 "$ROOT/tools/asm_inventory.py" --objects "$OUT" --target "${DAC_TARGET:-retail}"

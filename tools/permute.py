@@ -27,7 +27,7 @@ def score(obj):
         bad += sum(1 for i in range(len(mine)) if i not in fx and mine[i] != orig[i]); tot += len(mine)
     return 100.0 * (tot - bad) / max(tot, 1)
 work = ROOT / "build/perm"; shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True)
-for h in (ROOT / "src/include").glob("*.h"): (work / h.name.upper()).write_text(h.read_text().replace("\n", "\r\n"))
+for h in (ROOT / "src").rglob("*.h"): (work / h.name.upper()).write_text(h.read_text().replace("\n", "\r\n"))
 jobs = []
 for fi, fl in enumerate(flags):
     for ci, c in enumerate(combos):

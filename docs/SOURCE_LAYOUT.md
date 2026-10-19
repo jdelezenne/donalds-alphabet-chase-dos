@@ -1,9 +1,10 @@
 # Source guide and provenance
 
 Donald uses the same purpose-based source organization as the recovered Goofy
-project: application code, shared engine services, audio, data and handwritten
-assembly. These are descriptive reconstruction names, not a claim that the
-original source filenames have been recovered.
+project: application code, shared engine services, audio and data. Handwritten
+assembly lives beside the C code for its subsystem. These are descriptive
+reconstruction names, not a claim that the original source filenames have been
+recovered.
 
 The layout remains 27 C translation units (two data-only) and seven assembly
 modules. No functions were moved between translation units, no code/data was
@@ -16,15 +17,20 @@ annotations and catalogs remain the primary identity of each recovered item.
   selection, actor scripts, jump paths, title/ending flow and disk prompt.
 - `src/main.c`: command-line handling, initialization and shutdown; the
   `DONALD_ALT` differences remain here.
-- `src/audio/music.c`: tune streams and high-level sound playback.
+- `src/audio/`: `music.c` tune streams and high-level sound playback,
+  `sound.asm` sound interrupt driver, and their `sound.h` interface.
 - `src/engine/`: independent rendering, input, timing, memory, resource-file and
   text-window services. `drive.c` contains disk selection; the previous
   `src/seg065b/music.c` filename incorrectly suggested an audio service.
+  This directory also owns the five graphics assembly objects, keyboard
+  interrupt driver and `engine.h`. `tasm.inc` and `gfx_data.inc` describe
+  assembly encodings/layouts; the sound driver shares `tasm.inc`.
 - `src/data/`: script bytes and resource/scene tables. Numeric script operands
   remain intact: negative bytes can be operands as well as opcodes, so a blind
   replacement with `OP_*` names would mislabel the program.
-- `src/asm/`: the five graphics objects, sound interrupt driver and keyboard
-  interrupt driver. `tasm.inc` and `gfx_data.inc` describe encodings/layouts.
+- `src/`: the ordered `donald.h` umbrella plus `bss.h`, `common.h` and
+  `game.h`. Subsystem headers sit with their sources: `data/gamedata.h`,
+  `audio/sound.h` and `engine/engine.h`.
 
 The complete machine-readable map is [modules.csv](../config/retail/modules.csv).
 Each row records the current source, language, retail code segment (or DGROUP
@@ -78,6 +84,10 @@ Include `donald.h` as the supported umbrella. Its order is intentional:
 4. The existing selected Turbo C library headers.
 5. Compatibility aliases for assembly entry points, then `game.h`, `sound.h`
    and `engine.h` function interfaces.
+
+The build and permuter stage these headers together under their unchanged DOS
+basenames, so the umbrella include order and source text stay intact. NASM uses
+the owning directory and `src/engine/` as include search paths.
 
 This separation preserves the original declaration stream. TC 2.0 allocates
 _BSS by symbol-hash bucket and first-declaration order; regrouping globals by

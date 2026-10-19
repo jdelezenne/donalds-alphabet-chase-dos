@@ -163,7 +163,7 @@ class Inventory:
 
     def check_sources(self):
         errors = self.errors
-        for path in sorted((self.root / "src/asm").glob("*.asm")):
+        for path in sorted((self.root / "src").rglob("*.asm")):
             source = read_source(path, errors)
             if source:
                 self.sources[path.relative_to(self.root).as_posix()] = source
@@ -299,14 +299,14 @@ class Inventory:
         return self.errors
 
     def _check_object(self, source_name, source, production, target, nasm):
-        command = [nasm, "-E", "-i", str(source.path.parent) + "/"]
+        command = [nasm, "-E", "-i", str(source.path.parent) + "/", "-i", str(self.root / "src/engine") + "/"]
         if target == "alt":
             command.append("-DDONALD_ALT")
         result = subprocess.run(command + [str(source.path)], capture_output=True, text=True)
         if result.returncode:
             raise ValueError("NASM preprocessing failed:\n" + result.stderr)
         entries = [item for item in self.functions + self.data if item["source"] == source_name]
-        annotated, statements = instrument(result.stdout, entries, source.path.parent / "tasm.inc")
+        annotated, statements = instrument(result.stdout, entries, self.root / "src/engine/tasm.inc")
         with tempfile.TemporaryDirectory(prefix="donald-asm-inventory-") as temporary:
             asm = Path(temporary) / source.path.name
             obj = asm.with_suffix(".OBJ")

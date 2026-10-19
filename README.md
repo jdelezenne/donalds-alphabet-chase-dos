@@ -24,9 +24,9 @@ The recorded alternate-build match is **`DONALD` (sha256 61d3bc8b…) from the s
 See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MATCHING.md](docs/MATCHING.md), [docs/CMP.md](docs/CMP.md) (picture format) and [docs/SCRIPTS.md](docs/SCRIPTS.md) (actor script opcodes) and [docs/DATA.md](docs/DATA.md) (data structures and the evidence for them).
 
 ## Layout
-- `src/game.c` and `src/main.c` game logic/startup; `src/audio/` music; `src/engine/` purpose-named rendering, input, file and text services. Each original C translation-unit boundary and function order is preserved.
-- `src/include/donald.h` is the ordered umbrella for the common, BSS, game-data, game, sound and engine interfaces.
-- `src/asm/` purpose-named NASM graphics, sound and keyboard modules (`tasm.inc` holds the TASM-style encodings).
+- `src/game.c` and `src/main.c` game logic/startup; `src/audio/` music and the sound interrupt driver; `src/engine/` rendering, input, file and text services, including graphics and keyboard assembly. Each original C translation-unit boundary and function order is preserved.
+- `src/donald.h` is the ordered umbrella for the common, BSS, game-data, game, sound and engine interfaces.
+- Headers sit beside their owning sources: shared/game headers in `src/`, `engine.h` in `src/engine/`, `sound.h` in `src/audio/`, and `gamedata.h` in `src/data/`. `src/engine/tasm.inc` holds shared TASM-style encodings and `gfx_data.inc` holds graphics layouts.
 - `src/data/` data-only C units (`scripts.c`, `tables.c`: DGROUP 020A-1AA9, linked after `game.c` (0304)).
 - `config/retail/` `symbols.csv` (name, seg:off, size, status), `functions.csv` (starts, kind, `lang` + `evidence`), `modules.csv` (source/segment/compiler-name provenance), `cflags.txt`, `link.txt` (TLINK object order), `data.csv` (named C globals), `asm_functions.csv` and `asm_data.csv` (reviewed assembly routines/objects).
 - `config/alt/` same for the alternate `DONALD` build.
@@ -42,7 +42,7 @@ See [the source guide](docs/SOURCE_LAYOUT.md) for the complete module map, seman
 | `tools/dosrun.sh` | runs DOS commands headless in DOSBox-X (C: = compiler, D: = work dir) |
 | `tools/build.sh` | compiles cataloged C units with stable DOS compiler names into semantic `build/obj/` objects; flags are in `config/retail/cflags.txt` |
 | `tools/source_manifest.py` | checks all source paths, segment provenance, compiler names, flag overrides and exact link order without game files |
-| `tools/verify.py` | **the checker**: builds, compares every `/* FUNCTION: DONALD SSSS:OOOO */` function (fixups masked) and every `src/asm` module, updates `symbols.csv`, prints byte progress |
+| `tools/verify.py` | **the checker**: builds, compares every `/* FUNCTION: DONALD SSSS:OOOO */` function (fixups masked) and every linked assembly module, updates `symbols.csv`, prints byte progress |
 | `tools/fndiff.py` | instruction-level diff of one function with operands normalised (handles jump tables with `--skip`) |
 | `tools/permute.py` | permuter: tries `@P{a\|b}` source alternatives times a flag list and writes the first 100% match |
 | `tools/dumpfn.py` | `--list` unmatched C functions by size; `SSSS:OOOO` disassembles one |

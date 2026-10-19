@@ -8,7 +8,7 @@ both relinks stay IDENTICAL and verify.py reports 73/73. Turbo C 2.0 large model
 - **Data layout**: an initialised array of structs interleaves its fields in DGROUP; parallel arrays keep each field
   contiguous.
 
-Declarations: `src/include/donald.h` is the supported umbrella. `bss.h` preserves layout-sensitive first declarations, `common.h` defines types/constants, `gamedata.h` declares typed storage, and `game.h`, `sound.h`, `engine.h` declare the APIs. See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md). Asm layouts and offsets: `src/asm/tasm.inc` and `src/asm/gfx_data.inc`. Every assembly-owned storage object is catalogued in `config/retail/asm_data.csv`; see [ASM_DATA.md](ASM_DATA.md) for boundary evidence and original aliasing quirks.
+Declarations: `src/donald.h` is the supported umbrella. `bss.h` preserves layout-sensitive first declarations, `common.h` defines types/constants, `gamedata.h` declares typed storage, and `game.h`, `sound.h`, `engine.h` declare the APIs. See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md). Asm layouts and offsets: `src/engine/tasm.inc` and `src/engine/gfx_data.inc`. Every assembly-owned storage object is catalogued in `config/retail/asm_data.csv`; see [ASM_DATA.md](ASM_DATA.md) for boundary evidence and original aliasing quirks.
 
 ## Recovered
 

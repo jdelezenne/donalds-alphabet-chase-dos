@@ -28,7 +28,7 @@ if summ.exists():
 data_rows = list(csv.DictReader(open(ROOT / "config/retail/asm_data.csv")))
 
 asm = []
-for a in sorted((ROOT / "src/asm").glob("*.asm")):
+for a in sorted((ROOT / "src").rglob("*.asm")):
     t = a.read_text()
     m = re.search(r"SEGMENT:\s*DONALD\s+(\w{4})\s+(\w{4})-(\w{4})", t)
     if m:

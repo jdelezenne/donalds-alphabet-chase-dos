@@ -2,7 +2,7 @@
 """Bootstrap a NASM source for an assembly module from the local DONALD.EXE (one-shot helper; the output is
 then hand-edited: names, comments, structure). Instructions NASM would encode differently are emitted as
 `db` with the mnemonic in a comment, so the file always assembles byte-exactly.
-Usage: asm2nasm.py SEG START END --code OFF[,OFF...] [--data OFF:END ...] > src/asm/segXXXX.asm   (hex, seg-relative)
+Usage: asm2nasm.py SEG START END --code OFF[,OFF...] [--data OFF:END ...] > src/engine/segXXXX.asm   (hex, seg-relative)
 Code is traced (recursive descent) from the --code entry points; everything else becomes db."""
 import sys, struct, subprocess, tempfile, os, re
 from pathlib import Path
@@ -26,7 +26,7 @@ while todo:
             if start <= t < end: targets.add(t); todo.append(t)
         if m in ("ret", "retf", "iret", "jmp", "ljmp") : break
         p += ins.size
-INC = ROOT / "src/asm/tasm.inc"
+INC = ROOT / "src/engine/tasm.inc"
 def nasm_bytes(line, org):
     with tempfile.TemporaryDirectory() as td:
         Path(td, "a.asm").write_text(f"bits 16\norg {org}\n%include \"{INC}\"\n{line}\n")

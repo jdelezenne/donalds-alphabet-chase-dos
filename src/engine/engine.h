@@ -70,7 +70,7 @@ int Get_Resident_Index(char far *name);
 long Read_Resident(int i, char far *buf, long len);
 void inset_rect(int n);
 
-/* Original assembly interfaces (src/asm), with types from the call sites.
+/* Original assembly interfaces (src/engine), with types from the call sites.
    Keep the declaration order, including sound, interrupts and keyboard
    primitives at the end: donald.h preserves the original compiler input. */
 int ega_present(void);

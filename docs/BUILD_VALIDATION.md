@@ -129,6 +129,40 @@ Recorded function statuses are retained from the prior recovery; the fresh
 whole-file hashes independently prove the complete rebuilt files still equal
 the recorded originals. No interactive gameplay result is claimed here.
 
+## Shallow subsystem layout follow-up (2026-10-19)
+
+Headers now live beside their owning sources, with the ordered umbrella and
+shared/game declarations directly in `src/`. Sound assembly is in `src/audio/`;
+graphics and keyboard assembly, plus the shared TASM encoding and graphics
+layout includes, are in `src/engine/`. The empty include/assembly directories
+and header placeholder are gone. All active build, checker, research-tool,
+catalog and documentation paths use this layout; historical `previous_source`
+values in `modules.csv` are unchanged.
+
+Validation repeated for this path-only cleanup:
+
+- All 27 C files, seven assembly files and two assembly includes retain their
+  exact bytes. All seven headers retain their declaration text and ordering;
+  only the directory name in one `engine.h` comment changed.
+- All 34 source module rows retain their order, compiler stems, segment
+  identities, purpose and historical provenance. Compiler flags and the entire
+  `link.txt` are byte-identical to the previous layout.
+- All four exact TC 2.0 toolchain fingerprints passed.
+- Clean `tools/relink.sh all --check-hashes --verify` passed: both complete
+  output files match the sizes and SHA-256 digests above and compare directly
+  byte-for-byte with originals extracted from the user-supplied archive.
+- The fresh retail function verifier matched all 73 C functions (16,710 bytes)
+  and all seven assembly modules (14,020 bytes). Real NASM object inventories
+  passed for both variants: 81 callable entries and 171 data objects.
+- A second clean source/config/tools copy with no existing build and only
+  `game/README.md` passed `tools/relink.sh all --check-hashes` for both targets.
+- Source-only coverage, Python syntax, shell syntax and `git diff --check`
+  passed. `matchreport.py` regenerated the status with current paths and the
+  fresh verifier summary.
+
+Original files remain local and ignored. No game binaries, compiler files or
+runtime assets are committed. No new interactive gameplay test is claimed.
+
 ## CI
 
 Public CI checks source coverage, assembles both real variants, and verifies the assembly catalogs against actual NASM symbol/data bounds. The gated

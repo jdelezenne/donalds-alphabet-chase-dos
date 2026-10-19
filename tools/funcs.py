@@ -43,10 +43,10 @@ for src in (ROOT / "src").rglob("*.c"):
     for m in re.finditer(r"FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})", src.read_text()):
         sg, of = int(m.group(1), 16), int(m.group(2), 16); starts[sg * 16 + of] = (sg, of)
 ASM_SEGS = {0x0512, 0x056A}                     # hand-written asm modules (cs:-relative data, DS reloads)
-# asm module spans (src/asm/*.asm headers) bound the neighbouring functions; a TLINK segment base is only the
+# asm module spans (src/**/*.asm headers) bound the neighbouring functions; a TLINK segment base is only the
 # paragraph below a module's first byte, so sizes are NOT capped at segment bases in general
 asm_spans = []
-for a in (ROOT / "src/asm").glob("*.asm"):
+for a in (ROOT / "src").rglob("*.asm"):
     m = re.search(r"SEGMENT:\s*DONALD\s+(\w{4})\s+(\w{4})-(\w{4})", a.read_text())
     if m: sg, a0, a1 = (int(x, 16) for x in m.groups()); asm_spans.append((sg * 16 + a0, sg * 16 + a1))
 segbases = sorted({a for a, _ in asm_spans} | {end})

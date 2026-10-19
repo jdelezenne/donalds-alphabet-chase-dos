@@ -59,7 +59,7 @@ for src in srcs:
 if full:
     missing = set(expected) - set(seen_addr)
     if missing: errors.append("missing C sources/annotations: " + " ".join(sorted(missing)))
-asm_sources = sorted((ROOT / "src/asm").glob("*.asm"))
+asm_sources = sorted((ROOT / "src").rglob("*.asm"))
 link_inputs = [line.split()[1].split(":", 1)
                for line in (ROOT / "config/retail/link.txt").read_text().splitlines()
                if line.strip() and not line.lstrip().startswith("#")]
@@ -146,7 +146,7 @@ rows = sorted(byaddr.values(), key=lambda r: int(r["addr"][:4], 16) * 16 + int(r
 w = csv.DictWriter(open(p, "w"), fieldnames=["name", "addr", "size", "status", "notes"], lineterminator="\n"); w.writeheader(); w.writerows(rows)
 for n, (a, size, pct, st, src) in sorted(res.items(), key=lambda x: x[1][0]):
     if st != "matched" or "-v" in sys.argv: print(f"{a} {n:<28} {size:5} {pct:6.1f}% {st} {details.get(n, '')}".rstrip())
-# assembly modules: src/asm/*.asm (NASM -f obj, `; SEGMENT: DONALD SSSS AAAA-BBBB` header). The module's first CODE
+# assembly modules: src/**/*.asm (NASM -f obj, `; SEGMENT: DONALD SSSS AAAA-BBBB` header). The module's first CODE
 # segment must equal the original bytes with fixup (relocation) bytes masked; build/asm/<name>.OBJ feeds tools/relink.sh
 # and build/asm/<name>.bin (fixup bytes taken from the original) feeds tools/splice.py.
 asm_ok = 0; asm_bad = []
@@ -155,7 +155,7 @@ for a in asm_sources:
     if not m:
         asm_bad.append(a.name); print(f"{a.name}: missing SEGMENT annotation"); continue
     out = ROOT / "build/asm" / (a.stem + ".OBJ"); out.parent.mkdir(parents=True, exist_ok=True)
-    r = subprocess.run(["nasm", "-f", "obj", "-i", str(a.parent) + "/", "-o", str(out), str(a)], capture_output=True, text=True)
+    r = subprocess.run(["nasm", "-f", "obj", "-i", str(a.parent) + "/", "-i", str(ROOT / "src/engine") + "/", "-o", str(out), str(a)], capture_output=True, text=True)
     sg, s0, s1 = (int(x, 16) for x in m.groups()); want = img[sg * 16 + s0: sg * 16 + s1]
     got, fx = b"", set()
     if r.returncode == 0:

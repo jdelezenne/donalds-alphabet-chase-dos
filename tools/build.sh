@@ -21,7 +21,8 @@ if [ "$#" -eq 0 ]; then
   # A removed/renamed source must never be satisfied by an object from a previous build.
   rm -rf "$OUT"; mkdir -p "$OUT"
 fi
-for h in "$ROOT"/src/include/*.h; do [ -f "$h" ] && sed "s/\r*$/\r/" "$h" > "$DOS/$(basename "$h" | tr a-z A-Z)"; done
+# Flatten subsystem headers to their unchanged DOS basenames; preserve source include order.
+for h in "$ROOT"/src/*.h "$ROOT"/src/{audio,data,engine}/*.h; do [ -f "$h" ] && sed "s/\r*$/\r/" "$h" > "$DOS/$(basename "$h" | tr a-z A-Z)"; done
 cmds=(); names=()
 while IFS=$'\t' read -r f short; do
   [ -f "$f" ] || { echo "Missing source: $f" >&2; exit 1; }
