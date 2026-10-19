@@ -3,17 +3,20 @@
 ; Purpose: window save/restore blits.
 bits 16
 %include "tasm.inc"
+%include "gfx_data.inc"
+%define GFX_TEXT_BASE 0x277e
 
 segment GFX_DATA public align=2 class=DATA use16   ; far data of the graphics modules (starts at 0B7F:000E)
 segment _TEXT public align=1 class=CODE use16
+gfx_text_start:
 
 global _save_window
-_save_window equ L277E
+_save_window equ save_window
 global _blit_generic
-_blit_generic equ L28B3
+_blit_generic equ blit_generic
 ; FUNCTION: DONALD 0000:277E
 ; save_window: window background save/blit (x, y, w, h, buf)
-L277E:
+save_window:
     push bp
     rr mov, bp, sp
     push di
@@ -33,11 +36,11 @@ L277E:
     mov ax, word [bp + 0x10]
     push es
     mov es, ax
-    cmp word [GV_MODE], 0
+    cmp word [GFX.video_mode], 0
     je short L27E7
-    cmp word [GV_MODE], 1
+    cmp word [GFX.video_mode], 1
     je short L2817
-    cmp word [GV_MODE], 2
+    cmp word [GFX.video_mode], 2
     jne short L27BD
     jmp near L2863
 L27BD:
@@ -169,11 +172,12 @@ L28A6:
     pop di
     pop bp
     retf
-    db 0x00,0x00
+blit_src_segment: ; 28B1: source segment saved in CS while DS is the source
+    dw 0
 
 ; FUNCTION: DONALD 0000:28B3
 ; blit_generic: sprite/picture blit for CGA/Tandy (x, y, w, rows, src)
-L28B3:
+blit_generic:
     push bp
     rr mov, bp, sp
     push di
@@ -190,13 +194,13 @@ L28B3:
     shl cx, 1
     mov si, word [bp + 0xe]
     mov ax, word [bp + 0x10]
-    mov word [cs:0x28b1], ax
+    mov word [cs:GFX_CODE(blit_src_segment)], ax
     push es
-    cmp word [GV_MODE], 0
+    cmp word [GFX.video_mode], 0
     je short L2923
-    cmp word [GV_MODE], 1
+    cmp word [GFX.video_mode], 1
     je short L2959
-    cmp word [GV_MODE], 2
+    cmp word [GFX.video_mode], 2
     jne short L28F3
     jmp near L29AB
 L28F3:
@@ -211,7 +215,7 @@ L28F3:
     shl bx, 1
     mov ax, 0xa000
     mov es, ax
-    mov ax, word [cs:0x28b1]
+    mov ax, word [cs:GFX_CODE(blit_src_segment)]
     mov ds, ax
 L2911:
     rr mov, cx, bx
@@ -230,7 +234,7 @@ L2923:
     rr mov, dx, cx
     mov ax, 0xb800
     mov es, ax
-    mov ax, word [cs:0x28b1]
+    mov ax, word [cs:GFX_CODE(blit_src_segment)]
     mov ds, ax
 L2939:
     rr mov, cx, bx
@@ -256,7 +260,7 @@ L2959:
     shl bx, 1
     mov ax, 0xb800
     mov es, ax
-    mov ax, word [cs:0x28b1]
+    mov ax, word [cs:GFX_CODE(blit_src_segment)]
     mov ds, ax
 L2973:
     rr mov, cx, bx
@@ -306,7 +310,7 @@ L29AB:
     mov al, 2
     out dx, al
     inc dx
-    mov ax, word [cs:0x28b1]
+    mov ax, word [cs:GFX_CODE(blit_src_segment)]
     mov ds, ax
 L29D9:
     mov al, 1
@@ -342,4 +346,10 @@ L2A09:
     pop di
     pop bp
     retf
-    db 0x00,0x00,0x00,0x00,0x00,0x00
+; The following workspace is used by the next OMF code fragment, sprite_put_m3.
+m3_forward_skip_left: ; 2A0F: pixels to skip at left of each RLE source row
+    dw 0
+m3_forward_skip_right: ; 2A11: pixels to skip at right of each RLE source row
+    dw 0
+m3_forward_draw_width: ; 2A13: clipped pixels to draw in each RLE row
+    dw 0

@@ -40,13 +40,13 @@ void print_text(char far *s, register int col, int y, int fg, int bg)
             }
             cur = col++;
             if (g_videoMode == VM_CGA)
-                draw_char_tandy(ch << 1, off, cur << 1);
+                draw_char_cga2bpp(ch << 1, off, cur << 1);
             else if (g_videoMode == VM_TANDY)
-                draw_char_cga(ch << 2, off, cur << 2);
+                draw_char_tandy4bpp(ch << 2, off, cur << 2);
             else if (g_videoMode == VM_EGA)
                 draw_char_ega(ch, off, cur);
             else
-                draw_char_buf(ch, off, cur << 3);
+                draw_char_vga8bpp(ch, off, cur << 3);
         }
     }
 }

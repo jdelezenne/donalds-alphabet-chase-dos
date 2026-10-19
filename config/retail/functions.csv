@@ -1,55 +1,61 @@
 addr,linear,size,kind,lang,evidence
 0000:010D,0010D,101,lib,lib,CL.LIB module match
 0000:0172,00172,87,lib,lib,CL.LIB module match
-0000:01C9,001C9,31,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:01E8,001E8,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:01FE,001FE,25,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:0217,00217,299,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0342,00342,120,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
-0000:03BA,003BA,701,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
-0000:0677,00677,578,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:08B9,008B9,89,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
-0000:0912,00912,284,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
-0000:0A2E,00A2E,61,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions"
-0000:0A6B,00A6B,195,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0B2E,00B2E,494,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0D1C,00D1C,58,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0D56,00D56,300,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0E82,00E82,124,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0EFE,00EFE,46,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:0F2C,00F2C,87,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0F83,00F83,107,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:0FEE,00FEE,2,asm,asm,ASM: non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)
-0000:0FF0,00FF0,2,asm,asm,ASM: non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)
-0000:0FF2,00FF2,121,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:106B,0106B,103,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:10D2,010D2,141,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:115F,0115F,33,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
-0000:1180,01180,23,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:1197,01197,69,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, carry-flag result, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:11DC,011DC,645,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:1461,01461,23,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:1478,01478,25,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:1491,01491,54,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:14C7,014C7,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment"
-0000:14DD,014DD,541,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:16FA,016FA,1564,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, carry-flag result, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:1D16,01D16,1410,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, carry-flag result, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:2298,02298,129,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:2319,02319,97,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:237A,0237A,72,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:23C2,023C2,91,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:241D,0241D,83,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:2470,02470,139,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:24FB,024FB,64,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:253B,0253B,24,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O"
-0000:2553,02553,49,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O"
-0000:2584,02584,410,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:271E,0271E,96,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, direct int"
-0000:277E,0277E,309,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, port I/O, string instructions"
-0000:28B3,028B3,354,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:2A15,02A15,459,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
-0000:2BE0,02BE0,467,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...)"
+0000:01C9,001C9,31,asm,asm,far API: ega_present: int 10h AH=12h BL=10h: EGA BIOS present; C compatibility symbol _ega_present
+0000:01E8,001E8,22,asm,asm,far API: set_text_mode: int 10h mode 3; C compatibility symbol _set_text_mode
+0000:01FE,001FE,25,asm,asm,"far API: ega_select_palette: int 10h AH=10h, palette 0/1; C compatibility symbol _ega_select_palette"
+0000:0217,00217,299,asm,asm,"far API: hspan: horizontal EGA span (x, y, n, colour); C compatibility symbol _hspan"
+0000:0342,00342,120,asm,asm,"far API: copy_rect: rectangle copy (src, dst, x, y, w, h); scales x/w by the video mode, then copy_rect_core; C compatibility symbol _copy_rect"
+0000:03BA,003BA,116,asm,asm,"far API: copy_rect_ega: EGA rectangle copy (src, dst, x, y, w, h); C compatibility symbol _copy_rect_ega"
+0000:042E,0042E,585,asm,asm,near dispatcher; overlapping embedded EGA latch entry: Called by copy_rect and copy_rect_ega; mode dispatch branches terminate at RET 0564 or 0676.
+0000:048B,0048B,43,asm,asm,near entry overlapping copy_rect_core: Called by blit_ega_core; also entered by fallthrough from 042E dispatcher; local span 048B-04B5 jumps to shared RET at 0564.
+0000:0677,00677,578,asm,asm,far API: blit_ega_core: EGA latch blit used by blit_ega; C compatibility symbol _blit_ega_core
+0000:08B9,008B9,89,asm,asm,far API: clear_screen: clears video memory B800/A000 per mode; C compatibility symbol _clear_screen
+0000:0912,00912,284,asm,asm,far API: fill_rect_cells: solid fill of an eight-pixel-cell rectangle in the active video mode; C compatibility symbol _redraw_rect_hw
+0000:0A2E,00A2E,61,asm,asm,"far API: far_copy: rep movsw far copy (src, dst, len); C compatibility symbol _far_copy"
+0000:0A6B,00A6B,185,asm,asm,far API: present_buffer: copies the off-screen buffer to video memory (EGA planes via 3C4/3CE); C compatibility symbol _present_buffer
+0000:0B2E,00B2E,494,asm,asm,"far API: sprite_put_ega: draw_sprite, EGA; C compatibility symbol _sprite_put_ega"
+0000:0D1C,00D1C,58,asm,asm,far API: cga_shift_rows: moves the converted CGA rows into place (small-window mode); C compatibility symbol _cga_shift_rows
+0000:0D56,00D56,281,asm,asm,"far API: pack_rect: packs a screen rectangle into a buffer, returns its size; C compatibility symbol _pack_rect"
+0000:0E6F,00E6F,19,asm,asm,"near helper: Called by pack_rect; extracts high nibble of BX into DL, shifts BX four places, RET."
+0000:0E82,00E82,124,asm,asm,"far API: gfx_fill_rect: (x, y, w, h, colour); C compatibility symbol _gfx_fill_rect"
+0000:0EFE,00EFE,46,asm,asm,far API: dos_free_kb: int 21h AH=48h probe; returns free conventional memory in KB; C compatibility symbol _dos_free_kb
+0000:0F2C,00F2C,87,asm,asm,"far API: cmp_unpack_planar: decodes a .CMP picture (EGA/Tandy layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_planar"
+0000:0F83,00F83,107,asm,asm,"far API: cmp_unpack_cga: decodes a .CMP picture (CGA layout), see docs/CMP.md; C compatibility symbol _cmp_unpack_cga"
+0000:0FEE,00FEE,2,asm,asm,far API: enable_ints: sti; C compatibility symbol _enable_ints
+0000:0FF0,00FF0,2,asm,asm,far API: disable_ints: cli; C compatibility symbol _disable_ints
+0000:0FF2,00FF2,121,asm,asm,far API: set_palette16: loads a 16-entry palette table; C compatibility symbol _set_palette16
+0000:106B,0106B,103,asm,asm,far API: cga_convert: 4-bit pixels -> CGA 2-bit via xlat table; C compatibility symbol _cga_convert
+0000:10D2,010D2,141,asm,asm,far API: convert_cga_pixels_and_masks: in-place 4bpp -> CGA pixel byte plus transparency-mask byte; C compatibility symbol _clear_buffer
+0000:115F,0115F,33,asm,asm,far API: normalize_ptr: far pointer normalisation (offset < 16); C compatibility symbol _normalize_ptr
+0000:1180,01180,23,asm,asm,far API: dos_putc: int 21h AH=06h; C compatibility symbol _dos_putc
+0000:1197,01197,59,asm,asm,far API: rand8: shift-register random byte (state at GFX_DATA:027B); C compatibility symbol _rand8
+0000:11DC,011DC,645,asm,asm,far API: sprite_mirror_ega: horizontally mirrored transparent EGA sprite; C compatibility symbol _sprite_mask_ega
+0000:1461,01461,23,asm,asm,far API: dos_set_drive: int 21h AH=0Eh; C compatibility symbol _dos_set_drive
+0000:1478,01478,25,asm,asm,far API: cga_select_palette: int 10h AH=0Bh BH=1; C compatibility symbol _cga_select_palette
+0000:1491,01491,54,asm,asm,"far API: set_palette_reg: EGA attribute controller register (index, value); C compatibility symbol _set_palette_reg"
+0000:14C7,014C7,22,asm,asm,far API: set_video_type: stores g_videoMode in the graphics driver (GFX_DATA:0286); C compatibility symbol _set_video_type
+0000:14DD,014DD,23,asm,asm,far API: set_bios_mode: int 10h AH=00h; C compatibility symbol _set_bios_mode
+0000:16FA,016FA,1308,asm,asm,"far API: sprite_put_cga: draw_sprite, CGA/Tandy buffer; C compatibility symbol _sprite_put_cga"
+0000:1D16,01D16,1371,asm,asm,far API: sprite_mirror_packed: horizontally mirrored transparent CGA/Tandy sprite; C compatibility symbol _sprite_mask_cga; bounding span includes independent near helper 1F96-1FC7; main body resumes at 1FC8
+0000:1F96,01F96,50,asm,asm,near helper embedded in sprite_mirror_packed: CALL at 1F33 path; local RET at 1FC7; caller body resumes 1FC8. Its 50 bytes overlap caller bounding span 1D16-2270.
+0000:2271,02271,39,asm,asm,"near helper: Called by shifted mirrored CGA path; reverses pixel groups through GFX.reverse_cga_pixels, merges first edge byte, RET."
+0000:2298,02298,129,asm,asm,"far API: set_text_colours: (fg, bg) for draw_char_*; C compatibility symbol _set_text_colours"
+0000:2319,02319,97,asm,asm,"far API: draw_char_tandy4bpp: four bytes per row, four interleaved Tandy video banks; C compatibility symbol _draw_char_cga"
+0000:237A,0237A,72,asm,asm,"far API: draw_char_cga2bpp: two bytes per row, two interleaved CGA video banks; C compatibility symbol _draw_char_tandy"
+0000:23C2,023C2,91,asm,asm,far API: draw_char_ega: glyph to EGA planes; C compatibility symbol _draw_char_ega
+0000:241D,0241D,83,asm,asm,far API: draw_char_vga8bpp: one byte per pixel in linear A000 VGA video memory; C compatibility symbol _draw_char_buf
+0000:2470,02470,109,asm,asm,far API: gfx_init: graphics driver init; C compatibility symbol _gfx_init
+0000:24DD,024DD,30,asm,asm,near helper: Called twice per source byte by gfx_init Tandy expansion; STOSW then RET.
+0000:24FB,024FB,64,asm,asm,far API: set_palette_regs: all 16 attribute registers; C compatibility symbol _set_palette_regs
+0000:253B,0253B,24,asm,asm,far API: in_vretrace: 3DA bit 3; C compatibility symbol _in_vretrace
+0000:2553,02553,49,asm,asm,far API: wait_vretrace: waits for (the end of) vertical retrace; C compatibility symbol _wait_vretrace
+0000:2584,02584,410,asm,asm,"far API: vline: (x, y1, y2, colour); C compatibility symbol _vline"
+0000:271E,0271E,96,asm,asm,far API: set_dac_regs: int 10h AX=1010h; C compatibility symbol _set_dac_regs
+0000:277E,0277E,307,asm,asm,"far API: save_window: window background save/blit (x, y, w, h, buf); C compatibility symbol _save_window"
+0000:28B3,028B3,348,asm,asm,"far API: blit_generic: sprite/picture blit for CGA/Tandy (x, y, w, rows, src); C compatibility symbol _blit_generic"
+0000:2A15,02A15,453,asm,asm,"far API: sprite_put_m3: draw_sprite, g_videoMode 3; C compatibility symbol _sprite_put_m3"
+0000:2BE0,02BE0,459,asm,asm,"far API: sprite_mirror_m3: horizontally mirrored transparent RLE sprite, VGA mode 13h; C compatibility symbol _sprite_mask_m3"
 0000:2DB3,02DB3,254,lib,lib,CL.LIB module match
 0000:2EB1,02EB1,68,lib,lib,CL.LIB module match
 0000:2EF5,02EF5,91,lib,lib,CL.LIB module match
@@ -84,25 +90,34 @@ addr,linear,size,kind,lang,evidence
 04FC:0009,04FC9,214,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue, caller-cleans cdecl calls"
 04FC:00DF,0509F,99,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
 04FC:0142,05102,31,c,c,"C: byte-matched by TCC 2.0, caller-cleans cdecl calls"
-0512:00EE,0520E,20,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data"
-0512:0102,05222,594,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O"
-0512:0354,05474,68,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, port I/O, direct int"
-0512:0398,054B8,53,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, port I/O, direct int"
-0512:03CD,054ED,36,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment"
-0512:03F1,05511,22,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment"
-0512:0407,05527,51,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), direct int"
-0512:043A,0555A,34,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, direct int"
-0512:045C,0557C,198,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...), direct int"
-0512:0522,05642,34,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data, direct int"
-0512:0544,05664,20,asm,asm,"C: bp-frame prologue, TC epilogue; ASM: push di,si,ds order (not TC), loads DS with own/far data segment, cs:-relative data"
+0512:00EE,0520E,20,asm,asm,"public far API: Range [0512:00EE,0512:0102); last 0512:0101: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0102,05222,23,asm,asm,"public far API: Range [0512:0102,0512:0119); last 0512:0118: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0119,05239,90,asm,asm,"interrupt handler: Range [0512:0119,0512:0173); last 0512:0172: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by snd_init at 0512:037D for DOS AH=25h AL=08h."
+0512:0173,05293,460,asm,asm,"internal near helper: Range [0512:0173,0512:033F); last 0512:033E: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:014C: call 0x173"
+0512:033F,0545F,7,asm,asm,"internal near helper: Range [0512:033F,0512:0346); last 0512:0345: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F7: call 0x33f"
+0512:0346,05466,7,asm,asm,"internal near helper: Range [0512:0346,0512:034D); last 0512:034C: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01FD: call 0x346; 0512:0332: call 0x346"
+0512:034D,0546D,7,asm,asm,"internal near helper: Range [0512:034D,0512:0354); last 0512:0353: ret; no overlap with any other function body; all direct branches stay in body. Near callers: 0512:01F4: call 0x34d"
+0512:0354,05474,68,asm,asm,"public far API: Range [0512:0354,0512:0398); last 0512:0397: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0398,054B8,53,asm,asm,"public far API: Range [0512:0398,0512:03CD); last 0512:03CC: retf; no overlap with any other function body; all direct branches stay in body."
+0512:03CD,054ED,36,asm,asm,"public far API: Range [0512:03CD,0512:03F1); last 0512:03F0: retf; no overlap with any other function body; all direct branches stay in body."
+0512:03F1,05511,22,asm,asm,"public far API: Range [0512:03F1,0512:0407); last 0512:0406: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0407,05527,41,asm,asm,"public far API: Range [0512:0407,0512:0430); last 0512:042F: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0430,05550,10,asm,asm,"interrupt handler: Range [0512:0430,0512:043A); last 0512:0439: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by ctrlc_install at 0512:0422 for DOS AH=25h AL=23h."
+0512:043A,0555A,34,asm,asm,"public far API: Range [0512:043A,0512:045C); last 0512:045B: retf; no overlap with any other function body; all direct branches stay in body."
+0512:045C,0557C,41,asm,asm,"public far API: Range [0512:045C,0512:0485); last 0512:0484: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0485,055A5,157,asm,asm,"interrupt handler: Range [0512:0485,0512:0522); last 0512:0521: iret; no overlap with any other function body; all direct branches stay in body. Vector address loaded by kbbreak_install at 0512:0477 for DOS AH=25h AL=09h."
+0512:0522,05642,34,asm,asm,"public far API: Range [0512:0522,0512:0544); last 0512:0543: retf; no overlap with any other function body; all direct branches stay in body."
+0512:0544,05664,20,asm,asm,"public far API: Range [0512:0544,0512:0558); last 0512:0557: retf; no overlap with any other function body; all direct branches stay in body."
 0567:0008,05678,34,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, TC epilogue"
 0567:002A,0569A,6,c,c,C: byte-matched by TCC 2.0
-056A:0194,05834,10,asm,asm,ASM: cs:-relative data
-056A:019E,0583E,11,asm,asm,"ASM: cs:-relative data, writes to code segment"
-056A:01A9,05849,34,asm,asm,"ASM: cs:-relative data, writes to code segment"
-056A:01CB,0586B,207,asm,asm,C: caller-cleans cdecl calls; ASM: cs:-relative data
-056A:029A,0593A,712,asm,asm,"C: caller-cleans cdecl calls; ASM: loads DS with own/far data segment, cs:-relative data, writes to code segment, iret (interrupt handler), port I/O, string instructions, non-TC idioms (cli/sti/xchg/rcl/loop/jcxz...), direct int"
-056A:0562,05C02,41,asm,asm,"ASM: cs:-relative data, direct int"
+056A:0194,05834,10,asm,asm,far callable: 0194 reads read-offset; 0198 XORs write-offset; RETF
+056A:019E,0583E,11,asm,asm,far callable: 019F reads read-offset; 01A3 copies it into write-offset; RETF
+056A:01A9,05849,34,asm,asm,far callable: 01AA waits for unequal indices; 01B7 word dequeue; index +=2 & 127; RETF
+056A:01CB,0586B,83,asm,asm,far callable: far CALL getcode; indexed byte reads at 01E5/01ED; Ctrl-letter bitmap 0207; RETF at021D; ASCII data begins021E
+056A:029A,0593A,168,asm,asm,far callable: reads BIOS keyboard state; INT21 AH35 saves IRQ9/INT23 vectors; AH25 installs0342/0561; RETF at0341
+056A:0342,059E2,540,asm,asm,hardware interrupt handler: IRQ1 port60 input; make/break state and queue updates; far chain0531 or IRET055D; scratch begins055E
+056A:0561,05C01,1,asm,asm,DOS INT23 interrupt handler: address passed to INT21 AX2523 by install; single IRET byte
+056A:0562,05C02,41,asm,asm,far callable: saved far vectors restored using INT21 AX2523 and AX2509; RETF at058A
 05C2:000B,05C2B,17,c,c,C: byte-matched by TCC 2.0
 05C2:001C,05C3C,28,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, sub sp,N locals, push si[,di] (TC register vars), TC epilogue"
 05C5:0008,05C58,234,c,c,"C: byte-matched by TCC 2.0, bp-frame prologue, push si[,di] (TC register vars), TC epilogue, caller-cleans cdecl calls"

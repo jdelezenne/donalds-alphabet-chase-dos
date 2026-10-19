@@ -16,3 +16,4 @@ for src in "$ROOT"/src/asm/*.asm; do
   nasm -f obj "${flags[@]}" -i "$ROOT/src/asm/" -o "$obj" "$src"
   echo "assembled ${obj#"$ROOT/"}"
 done
+python3 "$ROOT/tools/asm_inventory.py" --objects "$OUT" --target "${DAC_TARGET:-retail}"

@@ -143,7 +143,7 @@ while editing). The relink above supersedes it as the proof.
 - `shutdown()` returns to `main()` instead of calling `exit(g_videoMode)`.
 - These changes make M04FC 74 bytes shorter. The hand-written drivers seg0512/seg056a then start 8 bytes further into
   their paragraph (0512 at offset 9, 056A at offset 8), and their TASM-style hard-coded `cs:` offsets move with them.
-  They are written as `CSO(n)` (= `n`, or `n + 8` under `DONALD_ALT`).
+  They are written as label differences plus the correct module paragraph bias (`SND_OFFSET` / `KBD_CSO`), producing the original literals without extra offset fixups.
 Originally only units mentioning `DONALD_ALT` were rebuilt. The standalone build now compiles and assembles every unit separately for each variant (`build/alt/obj`, `build/alt/asm`), avoiding fallback to stale retail objects.
 
 ## Names (batch 6)
@@ -164,9 +164,10 @@ messages and file names, and those name the message globals (`msg_*`, `msg_err_*
 - `struct window` is now `{x, y, w, h, fg, bg, col, row}`: set_window swaps the last four with
   `g_win.fg/g_win.bg/g_win.col/g_win.row`.
 - New asm names: `copy_rect` (0000:0342) with its helpers `copy_rect_core`/`copy_rect_ega_latch`, and in seg0512
-  `ctrlc_install/remove` (int 23h) and `kbbreak_install/remove` (int 9). Internal helpers: `take_nibble`,
-  `smc_merge_nibble`, `smc_merge_shifted`, `expand_bits4`. `GV_MODE` (tasm.inc) names GFX_DATA:0286. The other
-  `Lxxxx` labels are branch targets or aliases of named publics.
+  `ctrlc_install/remove` (int 23h) and `kbbreak_install/remove` (int 9). Internal helpers now have complete catalog entries: `take_nibble`,
+  `merge_mirrored_tandy_edge`, `merge_mirrored_cga_edge`, `expand_bits4`. The latter names replace the
+  earlier `smc_merge_*` labels. `GFX.video_mode` names GFX_DATA:0286. Shared-body ranges and inline data
+  are explicit in `asm_functions.csv` / `asm_data.csv`; size sums are not disjoint instruction coverage.
 - Left as `unused_XXXX`: `unused_1ED0`, `unused_38E2`, `unused_3A9C`, `unused_3AE8`, `unused_3AFE`. Nothing references
   them; they only fill layout gaps. `arrow_scancodes` and `msg_err_write_io` are named from their contents, but nothing
   references them either.
@@ -201,3 +202,25 @@ compares, and forced 16-bit memory displacements where needed. The six old
 single-instruction `db` exceptions also had valid NASM spellings (explicit
 rotate count 1 or forced disp16) and are now mnemonics. `rr` is an instruction
 encoding macro, not a stored executable slice.
+
+
+## Semantic assembly data recovery
+
+A source-only byte-identical relink does not alone establish that a decompilation
+has recovered meaningful data structures. The earlier assembly reconstruction
+still labeled mixed runs by the first scalar. Those runs are now split into
+actual typed state, pointers, bounded lookup/font arrays and documented reserved
+slots, and every operand uses the corresponding symbol or structure member.
+See [ASM_DATA.md](ASM_DATA.md) for all boundaries, aliasing, original keyboard
+quirks and access evidence. The inventory verifier checks actual NASM locations
+and initializer coverage, not only module presence.
+
+The 81-entry callable catalog includes previously omitted timer/keyboard ISRs,
+speaker helpers and six graphics near entries. Routine sizes exclude trailing
+inline data; overlapping entry bodies are flagged and counted by interval union.
+The mode-3 mirrored sprite's final three scratch bytes alias KBD_DATA, which
+explains the formerly unnamed prefix without moving either segment.
+
+The binary lacks original names. Recovered semantic names do not imply exact
+original spelling. Source types/bounds are based on accesses; a tiny genuinely
+unreferenced reservation remains explicitly unknown rather than misidentified.

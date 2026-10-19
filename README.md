@@ -17,16 +17,16 @@ Expected hashes are in [config/originals.sha256](config/originals.sha256).
 Both complete source-only builds were verified with Turbo C 2.0 against the original SHA-256 hashes, with no game files present. See [validation evidence](docs/BUILD_VALIDATION.md).
 
 The recorded reference results cover all 73 C functions (16,710 bytes), byte-matching with Turbo C 2.0 (`-ml`, plus `-O -Z` on some modules; see `config/retail/cflags.txt`).
-The seven assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14,020 bytes including embedded data) are readable NASM sources, with all executable byte blobs recovered as instructions. Every function is classified C/asm/lib with evidence in `config/retail/functions.csv` (`tools/classify.py`). The 71 recorded runtime symbol spans are identified against the real `CL.LIB`/`C0L.OBJ` (they are not 71 separate library modules).
+The seven assembly modules (5 graphics objects in segment 0000, plus 0512 and 056A; 14,020 bytes including embedded data) are readable NASM sources, with all executable byte blobs recovered as instructions. All 81 assembly callable entries (including interrupts and overlapping near helpers) and 171 bounded assembly data objects have explicit catalogs and access evidence; see [assembly structures](docs/ASM_DATA.md). Function classification remains in `config/retail/functions.csv`. The 71 recorded runtime symbol spans are identified against the real `CL.LIB`/`C0L.OBJ` (they are not 71 separate library modules).
 That covers 99.97% of the 38,000 code bytes; the rest is 12 bytes of zero padding.
 **`tools/relink.sh` builds both complete executables from C/assembly source plus the separately installed Turbo C runtime, without reading `game/`.** All game code, initialised data, `GFX_DATA` and `_BSS` are source definitions. `--check-hashes` checks each complete output against the recorded original SHA-256 without needing the original file; `--verify` explicitly enables comparison with local original executable(s). See [docs/BUILD_VALIDATION.md](docs/BUILD_VALIDATION.md) for the current validation evidence and limitations.
-The recorded alternate-build match is **`DONALD` (sha256 61d3bc8b…) from the same sources** with `DONALD_ALT` defined: a shorter `main()` with no command-line options, `shutdown()` without `exit()`, and the two driver modules 8 bytes further into their paragraph (`CSO()` offsets).
+The recorded alternate-build match is **`DONALD` (sha256 61d3bc8b…) from the same sources** with `DONALD_ALT` defined: a shorter `main()` with no command-line options, `shutdown()` without `exit()`, and the two driver modules 8 bytes further into their paragraph (label-derived CS offsets).
 See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MATCHING.md](docs/MATCHING.md), [docs/CMP.md](docs/CMP.md) (picture format) and [docs/SCRIPTS.md](docs/SCRIPTS.md) (actor script opcodes) and [docs/DATA.md](docs/DATA.md) (data structures and the evidence for them).
 
 ## Layout
 - `src/segXXXX/` one C file per original code segment (= one Turbo C translation unit, functions in address order); `src/include/` headers; `src/asm/` NASM sources of the assembly modules (`tasm.inc` holds the TASM-style encodings).
 - `src/data/` data-only C units (`scripts.c`, `tables.c`: DGROUP 020A-1AA9, linked after seg0304).
-- `config/retail/` `symbols.csv` (name, seg:off, size, status), `functions.csv` (starts, kind, `lang` + `evidence`), `cflags.txt`, `link.txt` (TLINK object order), `data.csv` (named globals).
+- `config/retail/` `symbols.csv` (name, seg:off, size, status), `functions.csv` (starts, kind, `lang` + `evidence`), `cflags.txt`, `link.txt` (TLINK object order), `data.csv` (named C globals), `asm_functions.csv` and `asm_data.csv` (reviewed assembly routines/objects).
 - `config/alt/` same for the alternate `DONALD` build.
 - `tools/` workflow scripts (below). `build/` and `game/` are git-ignored.
 
@@ -52,7 +52,8 @@ See [docs/STATUS.md](docs/STATUS.md), [docs/BINARY.md](docs/BINARY.md), [docs/MA
 | `tools/libmatch.py` | finds Turbo C startup/library modules in the image (relocation-masked) |
 | `tools/omf.py` | minimal OMF reader (segments, publics, LEDATA, fixups) |
 | `tools/mzinfo.py` | MZ header, packer/banner detection, relocation segment histogram |
-| `tools/funcs.py` | function starts, sizes (C sizes exclude trailing data) and kind lib/asm/c → `functions.csv` |
+| `tools/funcs.py` | reference-image candidate discovery; preserves reviewed C/ASM boundaries and evidence when updating `functions.csv` |
+| `tools/asm_inventory.py` | source catalog consistency and real-NASM function/data boundary coverage |
 | `tools/matchreport.py` | regenerates `docs/STATUS.md` from `symbols.csv` |
 
 ## Building without the retail binary
