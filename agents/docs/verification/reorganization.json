@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "method": "Fresh source-only copy; both targets; no original input or argument; Python audit blocks parent-checkout/reference reads.",
+  "input_file_count": 68,
+  "input_manifest_sha256": "c45aa82b7a459e86439f2336b68dd0d8fbb7a7e31a47f071b7b538037228405b",
+  "source_inputs_unchanged": true,
+  "toolchain_inputs": {
+    "TCC.EXE": "24535a9a628b70f1daf3e2382c6911046f671baad02e890be5e7e62dbaad6c1e",
+    "TLINK.EXE": "997fcac6089fa88f3d868bdaf8bd65bd44c5aa83885a1d61e73f77808bd4f8f7",
+    "LIB/C0L.OBJ": "cc2555af491bb0947c457230e4417c3d3560d643a52dabc51e142965894617b4",
+    "LIB/CL.LIB": "8acad0642a2d9d38f50115a8138203522b9d81e2336a1ff00ad7f5c3da26e2b8",
+    "INCLUDE/ALLOC.H": "0f896335b457a26a4604f94bf4e68141fbbebcfb727c48c8515d4a11da1af040",
+    "INCLUDE/DOS.H": "2628ede2e348ea8d531d04282fe2dc7858c9dd0c950e67730654b4a9c4bd8dce",
+    "INCLUDE/STDLIB.H": "73dd4b4dae883b66fb009bc09df6004acbdcade7226ab5574b19704328e0f26e",
+    "INCLUDE/STRING.H": "724e0ab4d8a1f4b14ade9e80ab6ca24abd2909dc2d82854ea5fbcb77374ee004",
+    "INCLUDE/TIME.H": "2b726b5c8ce68ee521358d55cd3baa66fb1fd3a768eaed93dcdf23629795c702"
+  },
+  "toolchain_inputs_unchanged": true,
+  "build_exit_code": 0,
+  "python_audit_processes": 12,
+  "python_open_events": 617,
+  "python_audit_ok": true,
+  "artifacts": [
+    {
+      "target": "retail",
+      "file": "build/link/DONALD.EXE",
+      "bytes": 55512,
+      "sha256": "c72ed19069a37fd5b8968a95d6413dba8044f21879651776c2bc2c89f4193aa8",
+      "expected_bytes": 55512,
+      "expected_sha256": "c72ed19069a37fd5b8968a95d6413dba8044f21879651776c2bc2c89f4193aa8",
+      "exact": true
+    },
+    {
+      "target": "alt",
+      "file": "build/link-alt/DONALD",
+      "bytes": 55432,
+      "sha256": "61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23",
+      "expected_bytes": 55432,
+      "expected_sha256": "61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23",
+      "exact": true
+    }
+  ],
+  "limitations": [
+    "Python audit is not an OS-level native file-read trace or an isolation boundary.",
+    "No new interactive gameplay, audio or input test is implied by complete file identity."
+  ],
+  "tested_commit": "150d3a3ab051c253bb1d7615889a1a57ba12fe3f",
+  "agents_directory_absent": true,
+  "source_blob_identity": "All pre-reorganization C, assembly, include and header blob hashes unchanged.",
+  "compiler_free_checks": "Passed in physical copied tree with agents/ and .git removed; both NASM variants.",
+  "run_validation": "Shell syntax and missing-build guard checked; interactive gameplay not rerun."
+}
