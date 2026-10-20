@@ -15,7 +15,7 @@ BAT="$WORK/_RUN.BAT"
 trap 'rm -f "$BAT"; rm -rf "$STAGE"' EXIT
 python3 "$ROOT/tools/toolchain.py" "$TC" --stage "$STAGE/compiler"
 mkdir "$STAGE/home"
-cp "$ROOT/config/compiler-dosbox.conf" "$STAGE/compiler.conf"
+cp "$ROOT/tools/config/compiler-dosbox.conf" "$STAGE/compiler.conf"
 {
   echo "@echo off"
   echo "set PATH=C:\\"

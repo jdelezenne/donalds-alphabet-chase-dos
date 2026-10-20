@@ -14,7 +14,7 @@ def main():
     parser.add_argument("target", choices=["retail", "alt", "all"], nargs="?", default="all")
     args = parser.parse_args()
     expected = {}
-    for line in (ROOT / "config/originals.sha256").read_text().splitlines():
+    for line in (ROOT / "src/donald/outputs.sha256").read_text().splitlines():
         digest, size, filename = line.split()
         expected[filename] = (int(size), digest)
     targets = OUTPUTS if args.target == "all" else [args.target]

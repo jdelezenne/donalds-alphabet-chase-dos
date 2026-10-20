@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Compile cataloged C units (or the given subset) with Turbo C 2.0 into build/obj/<semantic-name>.OBJ.
-# config/retail/modules.csv preserves the pre-refactor 8.3 compiler filename and CODE segment identity.
-# Flags: config/retail/cflags.txt line 1 (default) + optional per-file override "name.c: flags".
+# src/donald/modules.csv preserves the pre-refactor 8.3 compiler filename and CODE segment identity.
+# Flags: src/donald/cflags.txt line 1 (default) + optional per-file override "name.c: flags".
 # DAC_TARGET=alt builds the alternate DONALD variant (-DDONALD_ALT) into build/alt/obj.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"; DEF=""
@@ -23,7 +23,7 @@ cleanup() {
   rm -rf "$DOS"
 }
 trap cleanup EXIT
-FLAGS=$(head -1 "$ROOT/config/retail/cflags.txt")
+FLAGS=$(head -1 "$ROOT/src/donald/cflags.txt")
 python3 "$ROOT/tools/source_manifest.py" --compile-list "$@" > "$DOS/SOURCES.TSV"
 mkdir -p "$OUT"
 if [ "$#" -eq 0 ]; then
@@ -41,10 +41,10 @@ while IFS=$'\t' read -r f short; do
   # HARDERR_TEXT must continue sharing the runtime's HARDERR segment.
   sed "s/\r*$/\r/" "$f" > "$DOS/$short.C"; names+=("$short:$base")
   rm -f "$OUT/$base.OBJ"
-  rel=${f#"$ROOT/src/"}; over=""
-  # override lines: "<glob relative to src/>: flags" (last match wins), e.g. "engine/files.c: -ml"
+  rel=${f#"$ROOT/src/donald/"}; over=""
+  # override lines: "<glob relative to src/donald/>: flags" (last match wins), e.g. "engine/files.c: -ml"
   while IFS= read -r line; do g=${line%%:*}; [[ "$line" == *:* && "$line" != \#* ]] || continue
-    [[ "$rel" == $g ]] && over=${line#*:}; done < <(tail -n +2 "$ROOT/config/retail/cflags.txt")
+    [[ "$rel" == $g ]] && over=${line#*:}; done < <(tail -n +2 "$ROOT/src/donald/cflags.txt")
   cmds+=("TCC -c -IC:\\INCLUDE ${DEF}${over:-$FLAGS} $short.C")
 done < "$DOS/SOURCES.TSV"
 "$ROOT/tools/dosrun.sh" "$DOS" "${cmds[@]}"

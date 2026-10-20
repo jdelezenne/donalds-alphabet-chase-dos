@@ -1,0 +1,39 @@
+# TLINK object order for DONALD.EXE, recovered from the MZ relocation table: TLINK writes relocations module by
+# module in link order, so the order in which each module's relocation entries first appear is the link order
+# (see docs/MATCHING.md "Relink"). One line per object: DOS name, source (build object).
+# DSCRIPTS/DTABLES are data-only C units (src/donald/data/) whose relocations follow seg0304's code ones.
+C0L      lib:C0L.OBJ
+M0304    obj:game
+DSCRIPTS obj:scripts
+DTABLES  obj:tables
+M04FC    obj:main
+A01C9    asm:graphics_bios
+A0512    asm:sound
+M0567    obj:music
+A056A    asm:keyboard
+M05C2    obj:input
+A0217    asm:graphics_rect
+M05C5    obj:egablit
+A08B9    asm:graphics_core
+M05D4    obj:retrace
+M05D5    obj:text
+M05E7    obj:fillrect
+M05ED    obj:lines
+M0604    obj:picture
+M060B    obj:palette
+M0612    obj:xalloc
+A277E    asm:graphics_window
+M061A    obj:loadfile
+M061F    obj:calibrat
+M062D    obj:capture
+M065B    obj:drive
+M065E    obj:setwin
+M066F    obj:redraw
+M0671    obj:wraptext
+M06AD    obj:wordtext
+M06C3    obj:sprite
+M06D3    obj:mirror
+M06E3    obj:harderr
+A2A15    asm:graphics_mode3
+M06EF    obj:window
+M06F0    obj:files

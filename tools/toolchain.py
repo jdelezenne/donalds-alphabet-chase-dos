@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def inventory():
     files = {}
-    for line in (ROOT / "config/tc20.sha256").read_text().splitlines():
+    for line in (ROOT / "tools/config/tc20.sha256").read_text().splitlines():
         digest, name = line.split()
         if name in files or Path(name).is_absolute() or ".." in Path(name).parts:
             raise ValueError(f"Invalid/duplicate toolchain input: {name}")

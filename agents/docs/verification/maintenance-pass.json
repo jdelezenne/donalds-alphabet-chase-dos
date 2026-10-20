@@ -1,0 +1,199 @@
+{
+  "status": "passed",
+  "scope": "Evidence-backed source constants, current/historical documentation, compiler-free source/NASM checks, original-free exact checks for both releases and fresh compiler staging. No new gameplay coverage.",
+  "baseline": {
+    "local_commit": "0d8f2a5dd4db38f0ee7784830e8b1170a421bbda",
+    "verified_remote_commit": "6c716bbceaa74fcd463f10b00bf9200d6edf267a",
+    "matching_tree": "37f4d751437ef37029f9d1408dc792123c70e423"
+  },
+  "source_only_build": {
+    "status": "passed",
+    "method": "Fresh source-only copy; both targets; no original input or argument; Python audit blocks parent-checkout/reference reads.",
+    "input_file_count": 89,
+    "input_manifest_sha256": "39093ff194a0c1bd726dc243555a1a2ca525a34e3a567ac6e325484455139b54",
+    "source_inputs_unchanged": true,
+    "toolchain_inputs": {
+      "TCC.EXE": "24535a9a628b70f1daf3e2382c6911046f671baad02e890be5e7e62dbaad6c1e",
+      "TLINK.EXE": "997fcac6089fa88f3d868bdaf8bd65bd44c5aa83885a1d61e73f77808bd4f8f7",
+      "LIB/C0L.OBJ": "cc2555af491bb0947c457230e4417c3d3560d643a52dabc51e142965894617b4",
+      "LIB/CL.LIB": "8acad0642a2d9d38f50115a8138203522b9d81e2336a1ff00ad7f5c3da26e2b8",
+      "INCLUDE/ALLOC.H": "0f896335b457a26a4604f94bf4e68141fbbebcfb727c48c8515d4a11da1af040",
+      "INCLUDE/DOS.H": "2628ede2e348ea8d531d04282fe2dc7858c9dd0c950e67730654b4a9c4bd8dce",
+      "INCLUDE/STDLIB.H": "73dd4b4dae883b66fb009bc09df6004acbdcade7226ab5574b19704328e0f26e",
+      "INCLUDE/STRING.H": "724e0ab4d8a1f4b14ade9e80ab6ca24abd2909dc2d82854ea5fbcb77374ee004",
+      "INCLUDE/TIME.H": "2b726b5c8ce68ee521358d55cd3baa66fb1fd3a768eaed93dcdf23629795c702"
+    },
+    "toolchain_inputs_unchanged": true,
+    "build_exit_code": 0,
+    "python_audit_processes": 14,
+    "python_open_events": 1053,
+    "python_audit_ok": true,
+    "artifacts": [
+      {
+        "target": "retail",
+        "file": "build/link/DONALD.EXE",
+        "bytes": 55512,
+        "sha256": "c72ed19069a37fd5b8968a95d6413dba8044f21879651776c2bc2c89f4193aa8",
+        "expected_bytes": 55512,
+        "expected_sha256": "c72ed19069a37fd5b8968a95d6413dba8044f21879651776c2bc2c89f4193aa8",
+        "exact": true
+      },
+      {
+        "target": "alt",
+        "file": "build/link-alt/DONALD",
+        "bytes": 55432,
+        "sha256": "61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23",
+        "expected_bytes": 55432,
+        "expected_sha256": "61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23",
+        "exact": true
+      }
+    ],
+    "limitations": [
+      "Python audit is not an OS-level native file-read trace or an isolation boundary.",
+      "No new interactive gameplay, audio or input test is implied by complete file identity."
+    ]
+  },
+  "source_preprocessing": {
+    "method": "GNU cpp with identical genuine Turbo C headers and __TURBOC__/__LARGE__ defines; lexical token comparison, not a substitute for Turbo C code generation.",
+    "baseline_commit": "0d8f2a5dd4db38f0ee7784830e8b1170a421bbda",
+    "translation_units_per_variant": 27,
+    "variants": [
+      "retail",
+      "alt"
+    ],
+    "all_token_streams_equal": true
+  },
+  "source_changes": {
+    "resource_indices": "PIC_* values 18-26 are the g_cmpFiles/g_palettes entries named in src/donald/data/tables.c, used by run_game and ending.",
+    "counts": "Existing NUM_SLOTS, NUM_LETTERS, NUM_SPRITES and NUM_GROUPS constants replace identical literal tokens only at proven array/count uses.",
+    "preserved": [
+      "C types and qualifiers",
+      "header declaration/include order",
+      "27 original C translation units and function order",
+      "7 assembly source bodies",
+      "compiler stems/flags",
+      "link order",
+      "data initializer values"
+    ]
+  },
+  "compiler_staging": {
+    "real_source_subset": "src/donald/game.c",
+    "all_omf_records_equal_except_dependency_timestamps": true,
+    "dependency_timestamp_records": 13,
+    "normalized_omf_sha256": "615fba662d2d4fc1d9b8b7e69d398846bc0eae2be6fef711f5cd981e805fcfe6",
+    "normalization": "Only the four timestamp bytes of Borland COMENT class E9 dependency records and their checksums are excluded; every other OMF payload/record, including complete fixups, remains compared.",
+    "ambient_contamination_ignored_and_preserved": {
+      "ambient/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "ambient/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "ambient/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "ambient/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "ambient/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285",
+      "home/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "home/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "home/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "home/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "home/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285",
+      "home/.tools/config/dosbox-x/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "home/.tools/config/dosbox-x/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "home/.tools/config/dosbox-x/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "home/.tools/config/dosbox-x/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "home/.tools/config/dosbox-x/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285",
+      "source/build/dos/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "source/build/dos/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "source/build/dos/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "source/build/dos/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "source/build/dos/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285",
+      "source/build/obj/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "source/build/obj/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "source/build/obj/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "source/build/obj/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "source/build/obj/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285",
+      "compiler/TCC.CFG": "6c70cefb308cd090a1f15fbce4e3b3b2440d3ba79d4865a65ae53acaf90956a9",
+      "compiler/STDLIB.H": "a0a41f0fd006f75dff700bc553801888077ac026a8c4d25ebb15c8082feffe27",
+      "compiler/dosbox.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "compiler/dosbox-x.conf": "e3c58a79b737bc7c7b7feb9a08bd5d63d3dae82c359d288b841ca7a81d209a9a",
+      "compiler/KEEP.TXT": "6e5b417effcb9f4b76b910f6e23d54b382999dc2fab4ed894892fab54f0ea285"
+    },
+    "subset_cli_rejections": [
+      {
+        "arguments": [
+          ""
+        ],
+        "exit_code": 1
+      },
+      {
+        "arguments": [
+          "src/donald/missing.c"
+        ],
+        "exit_code": 1
+      },
+      {
+        "arguments": [
+          "src/donald/game.c",
+          "src/donald/game.c"
+        ],
+        "exit_code": 1
+      },
+      {
+        "arguments": [
+          "src/donald/game.h"
+        ],
+        "exit_code": 1
+      }
+    ],
+    "compiler_failure_exit_code": 1,
+    "stale_selected_object_removed": true,
+    "low_level_runner_scope": "dosrun.sh intentionally mounts its supplied WORK directory; build/relink callers provide fresh/cleared work staging. This is not an OS sandbox."
+  },
+  "negative_checks": [
+    {
+      "case": "duplicate header",
+      "exit_code": 1,
+      "diagnostic": "Invalid or duplicate DOS header basename: src/donald/engine/common.h"
+    },
+    {
+      "case": "missing source include",
+      "exit_code": 1,
+      "diagnostic": "Missing/non-basename source include: src/donald/main.c: missing.h"
+    },
+    {
+      "case": "unreferenced header",
+      "exit_code": 1,
+      "diagnostic": "Unreferenced source headers: ['UNUSED.H']"
+    },
+    {
+      "case": "changed real alternate output",
+      "exit_code": 1,
+      "diagnostic": "MATCH build/link/DONALD.EXE: 55512 bytes, sha256 c72ed19069a37fd5b8968a95d6413dba8044f21879651776c2bc2c89f4193aa8\nMISMATCH build/link-alt/DONALD: 55432 bytes, sha256 956cabd1c50e73d99b779972393a8426d1be7518b73b1221c42884854ae76d19\n  expected 55432 bytes, sha256 61d3bc8be22a17a7db59fc6ae044fdb2163c9b4ec3eb2e30dcc8e27d37b27f23"
+    },
+    {
+      "case": "refuse reused exact-output directory",
+      "exit_code": 2
+    },
+    {
+      "case": "Python audit denies parent reference read",
+      "exit_code": 1
+    }
+  ],
+  "direct_reference_verification": {
+    "command": "rm -rf build && tools/relink.sh all --check-hashes --verify",
+    "retail": "byte-identical to the local real DONALD.EXE reference",
+    "alt": "byte-identical to the local real DONALD reference",
+    "retail_c_functions_matched": 73,
+    "retail_c_bytes_matched": 16710,
+    "assembly_modules_matched": 7,
+    "assembly_bytes_matched": 14020
+  },
+  "public_ci": {
+    "workflow": ".github/workflows/ci.yml",
+    "command": "make check-source",
+    "local_result": "passed",
+    "retail_and_alt_real_nasm_inventories": "81 callable entries and 171 bounded data objects in each variant",
+    "hosted_run": "not run; no changes pushed"
+  },
+  "limitations": [
+    "Python file-open auditing supplements the source inventory; it is not an OS-level native read trace.",
+    "Historical component reports remain snapshots. This receipt records the maintenance checks.",
+    "Complete executable identity does not claim a new interactive gameplay/audio/input test or unknown original names/types/tool versions."
+  ]
+}

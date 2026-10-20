@@ -2,7 +2,7 @@
 """Build both complete executables in a fresh original-free source snapshot.
 
 No reference-game input is accepted. Expected hashes were recorded independently
-in config/originals.sha256. Python audit logs supplement the input inventory;
+in src/donald/outputs.sha256. Python audit logs supplement the input inventory;
 they are not an OS-level sandbox or a trace of native emulator file reads.
 """
 import argparse
@@ -20,7 +20,7 @@ from check_source import check_paths
 from toolchain import prepare
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORIES = ("src", "tools", "config")
+DIRECTORIES = ("src", "tools")
 
 
 def sha(path):
@@ -54,10 +54,8 @@ def main():
     for directory in DIRECTORIES:
         shutil.copytree(ROOT / directory, copy / directory,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    for name in ("Makefile", "README.md", "AGENTS.md", ".gitignore"):
+    for name in ("Makefile", "README.md", ".gitignore", "setup.sh", "build.sh", "recomp.sh", "run.sh"):
         shutil.copy2(ROOT / name, copy / name)
-    (copy / "game").mkdir()
-    shutil.copy2(ROOT / "game/README.md", copy / "game/README.md")
     inputs = {str(path.relative_to(copy)): sha(path)
               for path in sorted(copy.rglob("*")) if path.is_file()}
     (out / "inputs.json").write_text(json.dumps(inputs, indent=2, sort_keys=True) + "\n")
@@ -88,7 +86,7 @@ sys.addaudithook(audit)
         result = subprocess.run([str(copy / "tools/relink.sh"), "all", "--check-hashes"],
                                 cwd=copy, env=env, stdout=log, stderr=subprocess.STDOUT)
     expected = {}
-    for line in (copy / "config/originals.sha256").read_text().splitlines():
+    for line in (copy / "src/donald/outputs.sha256").read_text().splitlines():
         digest, size, name = line.split()
         expected[name] = (int(size), digest)
     artifacts = []

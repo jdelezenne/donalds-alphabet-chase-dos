@@ -12,13 +12,13 @@ for arg in "$@"; do
     -h|--help)
       echo "Usage: tools/relink.sh [retail|alt|all] [--check-hashes] [--verify]"
       echo "Default: build both targets without reading game/."
-      echo "--check-hashes checks the built files against config/originals.sha256 (no originals needed)."
+      echo "--check-hashes checks the built files against src/donald/outputs.sha256 (no originals needed)."
       echo "--verify also compares with the selected original executable(s) in game/."
       exit 0 ;;
     *) echo "Unknown argument: $arg" >&2; exit 2 ;;
   esac
 done
-python3 tools/verify.py --sources-only
+python3 tools/source_manifest.py
 if [ ${#verify[@]} -gt 0 ]; then
   if [ "$target" != alt ] && [ ! -f game/DONALD.EXE ]; then
     echo "--verify requires game/DONALD.EXE; omit --verify for a source-only build." >&2; exit 1
@@ -31,7 +31,6 @@ if [ "$target" != alt ]; then
   DAC_TARGET=retail tools/build.sh
   DAC_TARGET=retail tools/assemble.sh
   python3 tools/relink.py "${verify[@]}"
-  if [ ${#verify[@]} -gt 0 ]; then python3 tools/verify.py --no-build; fi
 fi
 if [ "$target" != retail ]; then
   DAC_TARGET=alt tools/build.sh

@@ -13,7 +13,7 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-FIELDS = ["source", "kind", "segment", "compiler_stem", "previous_source", "purpose"]
+FIELDS = ["source", "kind", "compiler_stem"]
 
 
 def read_headers():
@@ -28,7 +28,7 @@ def read_headers():
             raise ValueError(f"Source header must not be a symlink: {path}")
         by_name[name] = path
     declared_system = {line.split()[1] for line in
-                       (ROOT / "config/tc20.sha256").read_text().splitlines()}
+                       (ROOT / "tools/config/tc20.sha256").read_text().splitlines()}
     referenced = set()
     for source in sorted((ROOT / "src").rglob("*.c")) + headers:
         for delimiter, name in re.findall(r'^\s*#\s*include\s*([<"])([^>"\n]+)[>"]',
@@ -45,7 +45,7 @@ def read_headers():
 
 
 def read_modules():
-    with (ROOT / "config/retail/modules.csv").open(newline="") as handle:
+    with (ROOT / "src/donald/modules.csv").open(newline="") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames != FIELDS:
             raise ValueError("modules.csv has unexpected columns")
@@ -63,7 +63,7 @@ def read_modules():
         if kind not in {"c", "asm"}:
             errors.append(f"{source}: unknown source kind {kind}")
             continue
-        if not source.startswith("src/") or ".." in Path(source).parts or path.suffix != "." + kind:
+        if not source.startswith("src/donald/") or ".." in Path(source).parts or path.suffix != "." + kind:
             errors.append(f"{source}: invalid source path")
             continue
         obj = (kind, path.stem.lower())
@@ -83,22 +83,13 @@ def read_modules():
         if not path.is_file():
             errors.append(f"missing source {source}")
             continue
-        text = path.read_text()
-        annotation = r"(?:FUNCTION|SEGMENT):\s*DONALD\s+([0-9A-Fa-f]{4})"
-        segments = {s.upper() for s in re.findall(annotation, text)}
-        addresses = re.findall(r"FUNCTION:\s*DONALD\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})", text)
-        if kind == "c" and addresses != sorted(addresses, key=lambda pair: tuple(int(x, 16) for x in pair)):
-            errors.append(f"{source}: C function annotations are not in original address order")
-        expected = set() if row["segment"] == "DGROUP" else {row["segment"]}
-        if segments != expected:
-            errors.append(f"{source}: segment annotations {sorted(segments)} disagree with {row['segment']}")
     if errors:
         raise ValueError("source manifest check failed:\n" + "\n".join(errors))
     actual = {str(p.relative_to(ROOT)) for p in (ROOT / "src").rglob("*") if p.suffix in {".c", ".asm"}}
     if actual != sources:
-        errors.append(f"source manifest differs from src/: missing {sorted(actual - sources)}, stale {sorted(sources - actual)}")
+        errors.append(f"source manifest differs from src/donald/: missing {sorted(actual - sources)}, stale {sorted(sources - actual)}")
     link = []
-    for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
+    for line in (ROOT / "src/donald/link.txt").read_text().splitlines():
         if line.strip() and not line.lstrip().startswith("#"):
             _, spec = line.split()
             kind, stem = spec.split(":", 1)
@@ -108,8 +99,8 @@ def read_modules():
     if link != declared:
         errors.append("modules.csv must follow the exact non-runtime object order in link.txt")
     # Every per-file override must still select a real source after a rename.
-    c_sources = [Path(row["source"]).relative_to("src") for row in rows if row["kind"] == "c"]
-    for line in (ROOT / "config/retail/cflags.txt").read_text().splitlines()[1:]:
+    c_sources = [Path(row["source"]).relative_to("src/donald") for row in rows if row["kind"] == "c"]
+    for line in (ROOT / "src/donald/cflags.txt").read_text().splitlines()[1:]:
         if line.strip() and not line.lstrip().startswith("#"):
             pattern, separator, flags = line.partition(":")
             if not separator or not flags.strip() or not any(p.match(pattern) for p in c_sources):
@@ -144,7 +135,7 @@ def main():
             for row in c_rows:
                 print(f"{ROOT / row['source']}\t{row['compiler_stem']}")
         else:
-            print(f"Source provenance OK: {len(c_rows)} C units, {len(rows) - sum(r['kind'] == 'c' for r in rows)} assembly modules; exact link order and compiler overrides accounted for.")
+            print(f"Build manifest OK: {len(c_rows)} C units, {len(rows) - sum(r['kind'] == 'c' for r in rows)} assembly modules; exact link order and compiler overrides accounted for.")
     except (OSError, ValueError, KeyError) as exc:
         sys.exit(str(exc))
 

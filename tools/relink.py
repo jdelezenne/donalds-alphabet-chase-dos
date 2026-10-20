@@ -30,7 +30,7 @@ def main():
 
     # Check every input before discarding a previous successful link.
     inputs = []
-    for line in (ROOT / "config/retail/link.txt").read_text().splitlines():
+    for line in (ROOT / "src/donald/link.txt").read_text().splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         name, source = line.split()
